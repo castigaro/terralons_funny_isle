@@ -83,6 +83,12 @@ func frames(n: int = 1) -> void:
 		await tree().process_frame
 
 
+## Waits n physics frames.
+func physics_frames(n: int = 1) -> void:
+	for i in n:
+		await tree().physics_frame
+
+
 ## Frees tracked nodes and waits one frame.
 func _teardown() -> void:
 	for node in _nodes:

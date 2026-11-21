@@ -14,6 +14,9 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
     balance keys, balance file names or i18n keys.
 (f) No global randomness outside scripts/core/seeded_rng.gd, no zero-argument shuffle()/pick_random(),
     no get_meta(<key>, null), and every git-tracked .gd has a git-tracked .gd.uid (skipped without git).
+(g) No turn-based, grid or inventory mechanics: no action_point(s), end_turn, turn_count, turn_based, snap_to_grid,
+    tile_step or grid_move sequence and no inventory/recipe/crafting part in .gd identifiers and .tscn node names
+    below scripts/ and scenes/ or in the [input] action names of project.godot (turn_speed stays allowed).
 Comments and string literals never count as code.
 """
 import argparse
@@ -64,6 +67,13 @@ RNG_NEW_RE = re.compile(r"(?<![\w.])RandomNumberGenerator\s*\.\s*new\s*\(")
 FUNC_DEF_RE = re.compile(r"\bfunc\s+$")
 META_NULL_RE = re.compile(r"\bget_meta\s*\([^()]*,\s*null\s*\)")
 RNG_ALLOWED = {"scripts/core/seeded_rng.gd"}
+
+TURN_SEQUENCES = ("action_point", "action_points", "end_turn", "turn_count", "turn_based", "snap_to_grid",
+                  "tile_step", "grid_move")
+INVENTORY_PARTS = {"inventory", "inventories", "recipe", "recipes", "crafting"}
+TURN_GD_DIRS = ("scripts", "scenes")
+INPUT_SECTION_RE = re.compile(r"^\[input\]\n(.*?)(?=^\[|\Z)", re.M | re.S)
+INPUT_ACTION_RE = re.compile(r"^(\w+)=\{", re.M)
 
 
 def _line(text: str, offset: int) -> int:
@@ -342,11 +352,52 @@ def check_uids(root: Path) -> list:
             for f in sorted(tracked) if f.endswith(".gd") and f + ".uid" not in tracked]
 
 
+# --- (g) turn-based, grid and inventory mechanics ----------------------------------------------
+
+def turn_grid_tokens(name: str) -> list:
+    """Return the turn/grid sequences and inventory parts contained in an identifier, node or action name."""
+    parts = split_identifier(name)
+    joined = "_" + "_".join(parts) + "_"
+    hits = [seq for seq in TURN_SEQUENCES if "_" + seq + "_" in joined]
+    hits += sorted(set(parts) & INVENTORY_PARTS)
+    return hits
+
+
+def check_turn_grid(root: Path) -> list:
+    errors = []
+    for path in _files(root, TURN_GD_DIRS, ".gd"):
+        rel = _rel(root, path)
+        _nc, bare, _strings = gd_strip(_read(path))
+        reported = set()
+        for match in IDENT_RE.finditer(bare):
+            name = match.group(0)
+            hits = turn_grid_tokens(name)
+            if hits and name not in reported:
+                reported.add(name)
+                errors.append("%s:%d: turn-based/grid/inventory identifier %s (%s) – the game is real-time with "
+                              "one carry slot" % (rel, _line(bare, match.start()), name, "/".join(hits)))
+    for path in _files(root, TURN_GD_DIRS, ".tscn"):
+        for line_no, line in enumerate(_read(path).splitlines(), start=1):
+            match = TSCN_NODE_RE.match(line)
+            if match and turn_grid_tokens(match.group(1)):
+                errors.append("%s:%d: turn-based/grid/inventory node name %s" % (_rel(root, path), line_no,
+                                                                                match.group(1)))
+    project = Path(root) / "project.godot"
+    if project.is_file():
+        text = _read(project)
+        section = INPUT_SECTION_RE.search(text)
+        if section:
+            for match in INPUT_ACTION_RE.finditer(section.group(1)):
+                if turn_grid_tokens(match.group(1)):
+                    errors.append("project.godot: turn-based/grid/inventory input action %s" % match.group(1))
+    return errors
+
+
 def validate(root: Path = REPO) -> list:
     """Return every code-rule error below root (empty = valid)."""
     root = Path(root)
     return (check_comments(root) + check_magic_numbers(root) + check_networking(root) + check_third_party(root)
-            + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root))
+            + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root))
 
 
 def main(argv=None) -> int:

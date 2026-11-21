@@ -87,6 +87,26 @@ class ValidateCodeFailTest(unittest.TestCase):
     def test_rng_new_outside_seeded_rng(self):
         self.assert_fails({"scripts/a.gd": gd("var r := RandomNumberGenerator.new()")}, "use SeededRng")
 
+    def test_turn_grid_identifiers(self):
+        names = ["action_points", "actionPoint", "end_turn", "turn_count", "is_turn_based", "snap_to_grid",
+                 "tile_step", "grid_move_speed"]
+        for name in names:
+            with self.subTest(name=name):
+                self.assert_fails({"scripts/a.gd": gd("var %s := 0" % name)}, "turn-based/grid/inventory identifier")
+
+    def test_recipe_and_crafting_identifiers(self):
+        self.assert_fails({"scripts/a.gd": gd("var recipe_list := []")}, "identifier recipe_list")
+        self.assert_fails({"scripts/a.gd": gd("func start_crafting() -> void:\n\tpass")},
+                          "identifier start_crafting")
+
+    def test_inventory_node_name(self):
+        self.assert_fails({"scenes/hud.tscn": '[gd_scene format=3]\n\n[node name="InventoryPanel" type="Control"]\n'},
+                          "turn-based/grid/inventory node name InventoryPanel")
+
+    def test_inventory_input_action(self):
+        project = '[application]\n\n[input]\n\ninventory={\n"deadzone": 0.2,\n"events": []\n}\n\n[physics]\n'
+        self.assert_fails({"project.godot": project}, "input action inventory")
+
 
 class ValidateCodePassTest(unittest.TestCase):
     def assert_passes(self, files: dict):
@@ -113,6 +133,13 @@ class ValidateCodePassTest(unittest.TestCase):
 
     def test_seeded_rng_may_use_rng(self):
         self.assert_passes({"scripts/core/seeded_rng.gd": gd("var r := RandomNumberGenerator.new()")})
+
+    def test_turn_speed_and_turn_tokens_in_comments_strings_and_tests(self):
+        self.assert_passes({
+            "scripts/a.gd": gd('var turn_speed := 0\n# no end_turn or inventory here\nvar s := "snap_to_grid"'),
+            "tests/b.gd": gd("var end_turn := 0\nvar inventory := []"),
+            "project.godot": '[input]\n\nmove_up={\n"deadzone": 0.2,\n"events": []\n}\n',
+        })
 
     def test_real_repo_passes(self):
         code, out = run(common.REPO)

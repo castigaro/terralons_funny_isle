@@ -21,6 +21,8 @@ from common import (  # noqa: E402
 )
 
 GD_TIMEOUT = 120
+# GDScript tests run on a fixed 60 fps clock: deterministic physics ticks and no real-time waiting.
+GD_TEST_ARGS = ["--fixed-fps", "60"]
 EXCLUDED_GD_PARTS = ("support", "fixtures")
 
 
@@ -96,6 +98,11 @@ def py_test_files(filter_text):
     return files
 
 
+def gdscript_args(res):
+    """Return the Godot arguments that run one GDScript test file with the headless runner."""
+    return GD_TEST_ARGS + ["--script", "res://tests/runner.gd", "--", res]
+
+
 def stage_syntax(stage):
     pys = sorted((REPO / "tools").glob("*.py")) + sorted((REPO / "tests").rglob("*.py"))
     for py in pys:
@@ -118,7 +125,7 @@ def stage_import(stage, godot, env, allowlist):
 def stage_gdscript(stage, godot, env, allowlist, files):
     for res in files:
         start = time.time()
-        code, out = run_godot(godot, ["--script", "res://tests/runner.gd", "--", res], env, timeout=GD_TIMEOUT)
+        code, out = run_godot(godot, gdscript_args(res), env, timeout=GD_TIMEOUT)
         results = parse_results(out)
         hits = scan_output(out, allowlist)
         problems = []

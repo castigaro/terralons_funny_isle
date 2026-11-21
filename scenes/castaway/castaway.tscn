@@ -1,0 +1,73 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/castaway/castaway.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://scenes/castaway/soft_shadow.tres" id="2_shadow"]
+[ext_resource type="Script" path="res://scripts/gameplay/castaway/castaway_visual.gd" id="3_visual"]
+[ext_resource type="Texture2D" path="res://assets/graphics/topdown-characters/PNG/Survivor 1/survivor1_stand.png" id="4_stand"]
+[ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/star_06.png" id="5_star"]
+[ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/dirt_01.png" id="6_dirt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 22.0
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_star"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dust"]
+blend_mode = 1
+
+[sub_resource type="Gradient" id="Gradient_dust"]
+colors = PackedColorArray(1, 0.95, 0.8, 0.7, 1, 0.95, 0.8, 0)
+
+[node name="Castaway" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 7
+motion_mode = 1
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+position = Vector2(4, 10)
+scale = Vector2(1.6, 1.15)
+texture = ExtResource("2_shadow")
+
+[node name="DustEmitter" type="CPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_dust")
+position = Vector2(0, 12)
+emitting = false
+amount = 10
+lifetime = 0.45
+one_shot = true
+explosiveness = 0.9
+texture = ExtResource("6_dirt")
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 40.0
+initial_velocity_max = 140.0
+damping_min = 120.0
+damping_max = 200.0
+scale_amount_min = 0.06
+scale_amount_max = 0.12
+color_ramp = SubResource("Gradient_dust")
+
+[node name="Visual" type="Node2D" parent="."]
+script = ExtResource("3_visual")
+
+[node name="Body" type="Sprite2D" parent="Visual"]
+scale = Vector2(2.3, 2.3)
+texture = ExtResource("4_stand")
+
+[node name="HoldPoint" type="Marker2D" parent="Visual"]
+position = Vector2(40, 0)
+
+[node name="Stars" type="Node2D" parent="."]
+visible = false
+position = Vector2(0, -30)
+
+[node name="Star" type="Sprite2D" parent="Stars"]
+modulate = Color(1, 0.9, 0.25, 1)
+material = SubResource("CanvasItemMaterial_star")
+scale = Vector2(0.12, 0.12)
+texture = ExtResource("5_star")
