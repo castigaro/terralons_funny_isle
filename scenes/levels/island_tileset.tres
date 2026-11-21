@@ -1,0 +1,117 @@
+[gd_resource type="TileSet" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/Tilesheet/tiles_sheet@2.png" id="1_sheet"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack-derived/grass_edges@2.png" id="2_derived"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_island"]
+texture = ExtResource("1_sheet")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+0:0/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, -42, -64, -42)
+0:0/0/physics_layer_1/polygon_1/points = PackedVector2Array(-64, -64, -42, -64, -42, 64, -64, 64)
+0:0/0/custom_data_0 = "sand"
+1:0/0 = 0
+1:0/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, -42, -64, -42)
+1:0/0/custom_data_0 = "sand"
+2:0/0 = 0
+2:0/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, -64, 64, -64, 64, -42, -64, -42)
+2:0/0/physics_layer_1/polygon_1/points = PackedVector2Array(42, -64, 64, -64, 64, 64, 42, 64)
+2:0/0/custom_data_0 = "sand"
+0:1/0 = 0
+0:1/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, -64, -42, -64, -42, 64, -64, 64)
+0:1/0/custom_data_0 = "sand"
+2:1/0 = 0
+2:1/0/physics_layer_1/polygon_0/points = PackedVector2Array(42, -64, 64, -64, 64, 64, 42, 64)
+2:1/0/custom_data_0 = "sand"
+0:2/0 = 0
+0:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, 42, 64, 42, 64, 64, -64, 64)
+0:2/0/physics_layer_1/polygon_1/points = PackedVector2Array(-64, -64, -42, -64, -42, 64, -64, 64)
+0:2/0/custom_data_0 = "sand"
+1:2/0 = 0
+1:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, 42, 64, 42, 64, 64, -64, 64)
+1:2/0/custom_data_0 = "sand"
+2:2/0 = 0
+2:2/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, 42, 64, 42, 64, 64, -64, 64)
+2:2/0/physics_layer_1/polygon_1/points = PackedVector2Array(42, -64, 64, -64, 64, 64, 42, 64)
+2:2/0/custom_data_0 = "sand"
+0:3/0 = 0
+0:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+0:3/0/custom_data_0 = "stone"
+1:3/0 = 0
+1:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+1:3/0/custom_data_0 = "stone"
+2:3/0 = 0
+2:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+2:3/0/custom_data_0 = "stone"
+0:4/0 = 0
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+0:4/0/custom_data_0 = "stone"
+1:4/0 = 0
+1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+1:4/0/custom_data_0 = "stone"
+2:4/0 = 0
+2:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(36.96, 15.31, 15.31, 36.96, -15.31, 36.96, -36.96, 15.31, -36.96, -15.31, -15.31, -36.96, 15.31, -36.96, 36.96, -15.31)
+2:4/0/custom_data_0 = "stone"
+3:4/0 = 0
+3:4/0/custom_data_0 = "sand"
+4:4/0 = 0
+4:4/0/custom_data_0 = "sand"
+6:1/0 = 0
+6:1/0/custom_data_0 = "grass"
+7:1/0 = 0
+7:1/0/custom_data_0 = "grass"
+6:2/0 = 0
+6:2/0/custom_data_0 = "grass"
+7:2/0 = 0
+7:2/0/custom_data_0 = "grass"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_derived"]
+texture = ExtResource("2_derived")
+texture_region_size = Vector2i(128, 128)
+0:0/0 = 0
+0:0/0/custom_data_0 = "grass"
+1:0/0 = 0
+1:0/0/custom_data_0 = "grass"
+2:0/0 = 0
+2:0/0/custom_data_0 = "grass"
+3:0/0 = 0
+3:0/0/custom_data_0 = "grass"
+0:1/0 = 0
+0:1/0/custom_data_0 = "grass"
+1:1/0 = 0
+1:1/0/custom_data_0 = "grass"
+2:1/0 = 0
+2:1/0/custom_data_0 = "grass"
+3:1/0 = 0
+3:1/0/custom_data_0 = "grass"
+0:2/0 = 0
+0:2/0/custom_data_0 = "grass"
+1:2/0 = 0
+1:2/0/custom_data_0 = "grass"
+2:2/0 = 0
+2:2/0/custom_data_0 = "grass"
+3:2/0 = 0
+3:2/0/custom_data_0 = "grass"
+0:3/0 = 0
+0:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, -64, -42, -64, -42, -42, -64, -42)
+0:3/0/custom_data_0 = "sand"
+1:3/0 = 0
+1:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(42, -64, 64, -64, 64, -42, 42, -42)
+1:3/0/custom_data_0 = "sand"
+2:3/0 = 0
+2:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(-64, 42, -42, 42, -42, 64, -64, 64)
+2:3/0/custom_data_0 = "sand"
+3:3/0 = 0
+3:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(42, 42, 64, 42, 64, 64, 42, 64)
+3:3/0/custom_data_0 = "sand"
+
+[resource]
+tile_size = Vector2i(128, 128)
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
+physics_layer_1/collision_layer = 2
+physics_layer_1/collision_mask = 0
+custom_data_layer_0/name = "surface"
+custom_data_layer_0/type = 4
+sources/0 = SubResource("TileSetAtlasSource_island")
+sources/1 = SubResource("TileSetAtlasSource_derived")

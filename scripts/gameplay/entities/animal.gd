@@ -7,6 +7,9 @@ extends CharacterBody2D
 
 const GROUP := "level_entity"
 const REGISTRY_GROUP := "entity_registry"
+## Art groups shared with the castaway and level props (drop shadow and sprite size rules, docs/art_treatment.md).
+const ACTOR_GROUP := "actor"
+const KIND_GROUP := "animal"
 
 ## Animal kind from data/animals.json.
 @export var kind := ""
@@ -40,6 +43,8 @@ var _shadow_base := Vector2.ONE
 func _ready() -> void:
 	add_to_group(Grabbable.GROUP)
 	add_to_group(GROUP)
+	add_to_group(ACTOR_GROUP)
+	add_to_group(KIND_GROUP)
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	_shadow_base = shadow.scale
 	_watch = FlightWatch.new(self, _on_flight_start)
@@ -63,7 +68,8 @@ func setup(new_kind: String, config: EntityConfig = null) -> void:
 	circle.radius = body_radius()
 	collision.shape = circle
 	shadow.scale = _shadow_base * cfg.shadow_scale * circle.radius / float(shadow.texture.get_width()) * 2.0
-	shadow.position = Vector2(0.0, circle.radius / 2.0)
+	# The shadow sits at the bottom edge of the body sprite with the palette offset, so it peeks out below the body.
+	shadow.position = Vector2(0.0, circle.radius / cfg.body_radius_factor / 2.0) + ArtPalette.shadow()["offset"]
 	visual.setup(cfg, def, speed_lines, stars)
 	_restore_collision()
 

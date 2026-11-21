@@ -21,6 +21,14 @@ func root() -> Window:
 	return tree().root
 
 
+## Frame rate of this run: the --fps=N user argument set by run_tests.py for "## run-fps:" files (default 60).
+func run_fps() -> int:
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--fps="):
+			return int(arg.get_slice("=", 1))
+	return 60
+
+
 # --- Checks ------------------------------------------------------------------
 
 func fail(message: String) -> void:

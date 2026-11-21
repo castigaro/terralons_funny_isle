@@ -6,6 +6,9 @@ extends Node2D
 
 const GROUP := "level_entity"
 const REGISTRY_GROUP := "entity_registry"
+## Art groups shared with the castaway and level props (drop shadow and sprite size rules, docs/art_treatment.md).
+const ACTOR_GROUP := "actor"
+const KIND_GROUP := "item"
 
 ## Item kind from data/items.json.
 @export var kind := ""
@@ -44,6 +47,8 @@ var _fx_recoil_total := 0.0
 func _ready() -> void:
 	add_to_group(Grabbable.GROUP)
 	add_to_group(GROUP)
+	add_to_group(ACTOR_GROUP)
+	add_to_group(KIND_GROUP)
 	_shadow_base = shadow.scale
 	_watch = FlightWatch.new(self, _on_flight_start)
 	if kind != "":
@@ -61,6 +66,7 @@ func setup(new_kind: String, config: EntityConfig = null) -> void:
 		body.texture = load(path)
 	_body_scale = Vector2.ONE * float(def.get("sprite_scale", 1.0))
 	body.scale = _body_scale
+	ArtPalette.apply_outline(body)
 	var marker := get_node_or_null(home_marker) as Node2D if not home_marker.is_empty() else null
 	home = marker.global_position if marker != null else global_position
 	_guard = RespawnGuard.new(cfg.respawn_delay)
@@ -70,7 +76,7 @@ func setup(new_kind: String, config: EntityConfig = null) -> void:
 func _reset_shadow() -> void:
 	var size := body.texture.get_size() * body.scale if body.texture != null else Vector2.ONE
 	shadow.scale = _shadow_base * cfg.shadow_scale * size.x / float(shadow.texture.get_width())
-	shadow.position = Vector2(0.0, size.y / 2.0 / 2.0)
+	shadow.position = Vector2(0.0, size.y / 2.0) + ArtPalette.shadow()["offset"]
 
 
 func _physics_process(delta: float) -> void:

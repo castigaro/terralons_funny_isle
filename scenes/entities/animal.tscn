@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/entities/animal.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/castaway/soft_shadow.tres" id="2_shadow"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/graphics/animals/PNG/Round (outline)/chicken.png" id="4_body"]
 [ext_resource type="Script" path="res://scripts/gameplay/entities/dizzy_stars.gd" id="5_stars"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/trace_01.png" id="6_trace"]
+[ext_resource type="Script" path="res://scripts/levels/drop_shadow.gd" id="90_drop_shadow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 24.0
@@ -29,6 +30,7 @@ shape = SubResource("CircleShape2D_body")
 position = Vector2(0, 12)
 scale = Vector2(1, 0.55)
 texture = ExtResource("2_shadow")
+script = ExtResource("90_drop_shadow")
 
 [node name="SpeedLines" type="CPUParticles2D" parent="."]
 material = SubResource("CanvasItemMaterial_lines")

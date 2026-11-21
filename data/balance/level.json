@@ -1,0 +1,15 @@
+{
+	"camera_follow_speed": 7.0,
+	"camera_max_step_px": 40,
+	"camera_max_lag_px": 4,
+	"camera_jitter_max_px": 0.5,
+	"camera_lead_px": 60,
+	"camera_edge_margin_px": 96,
+	"bounds_thickness": 256,
+	"backdrop_margin_viewports": 1.0,
+	"walkable_probe_radius": 20,
+	"restart_cue_seconds": 1.0,
+	"palm_crown_px": 200,
+	"palm_crown_lift_px": 80,
+	"palm_footprint_radius": 18
+}

@@ -118,7 +118,7 @@ func _land() -> void:
 	else:
 		_shadow.scale = _shadow_base
 	var base_scale := squashed.scale
-	var tween := squashed.create_tween()
+	var tween := squashed.create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
 	tween.tween_property(squashed, "scale", Vector2(base_scale.x / squash, base_scale.y * squash), squash_seconds / 2.0)
 	tween.tween_property(squashed, "scale", base_scale, squash_seconds / 2.0)
 	var kind := String(obj.get("kind")) if "kind" in obj else ""

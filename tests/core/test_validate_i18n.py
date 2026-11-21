@@ -45,6 +45,15 @@ class ValidateI18nTest(unittest.TestCase):
         code, out = run(common.REPO)
         self.assertEqual(code, 0, out)
 
+    def test_level_keys_exist_in_en_and_de(self):
+        import csv
+        with open(common.REPO / "i18n" / "level.csv", encoding="utf-8", newline="") as handle:
+            rows = {row["key"]: row for row in csv.DictReader(handle)}
+        for key in ("level.error.load_failed", "level.error.back", "level.restarted"):
+            self.assertIn(key, rows)
+            self.assertTrue(rows[key]["en"].strip() and rows[key]["de"].strip(), key)
+        self.assertTrue((common.REPO / "i18n" / "level.csv.import").is_file())
+
     def test_missing_key(self):
         gd = 'extends Node\n\nfunc _ready() -> void:\n\tprint(tr("core.nope"))\n'
         self.assert_fails({"i18n/core.csv": CSV_OK, "scripts/a.gd": gd}, "unknown key in translation call: core.nope")

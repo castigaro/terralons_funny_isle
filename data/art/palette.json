@@ -1,0 +1,42 @@
+{
+	"format_version": 1,
+	"colors": {
+		"sand": "#fae8c2",
+		"grass": "#2ecc71",
+		"water": "#abe3f5",
+		"water_deep": "#5bb8de",
+		"foliage": "#2e9e5b",
+		"outline": "#3b2c22",
+		"ui_panel": "#1d2733",
+		"ui_text": "#f7f3e8",
+		"ui_accent": "#ffc93c",
+		"shadow": "#1e3b3f"
+	},
+	"water_tint": "water",
+	"highlight": "#ffffff",
+	"highlight_alpha": 0.2,
+	"outline": {
+		"color_key": "outline",
+		"thickness_px_1080": 3
+	},
+	"shadow": {
+		"color_key": "shadow",
+		"alpha": 0.75,
+		"scale": 0.8,
+		"squash": 0.5,
+		"offset": [6, 4],
+		"min_px": 48,
+		"tree_width_share": 0.7,
+		"min_contrast_on_sand": 0.25
+	},
+	"outlined": [
+		"assets/graphics/items/"
+	],
+	"drawn_outline": [
+		"assets/graphics/foliage/",
+		"assets/graphics/foliage-sprites/",
+		"assets/graphics/pirate-pack/PNG/Retina/Tiles/",
+		"assets/graphics/topdown-characters/",
+		"assets/graphics/animals/PNG/Round (outline)/"
+	]
+}

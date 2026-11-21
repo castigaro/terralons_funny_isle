@@ -21,7 +21,16 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
     wounded token, no exact hp token and no token starting with injur in .gd identifiers and .tscn node names below
     scripts/, scenes/, ui/ and tests/, in balance file names and keys, in the keys of data/animals.json and
     data/items.json or in i18n keys. The engine call .kill( (Tween.kill) stays allowed.
-(i) Engine.time_scale is global (hit-stop): only scripts/feedback/feedback_director.gd may assign it; files below
+(i) No fog of war, darkness or procedural maps: no fog/darkness/unexplored/explored part and no fog_of_war,
+    reveal_tile, revealed_cells or visibility_grid sequence in .gd identifiers and .tscn node names below scripts/
+    and scenes/; no CanvasModulate, PointLight2D or LightOccluder2D node (.tscn) or .new() (.gd) there; no
+    set_cell(), set_cells_terrain_connect(), set_cells_terrain_path() or FastNoiseLite in .gd below scripts/
+    (layouts are painted offline by tools/build_level_layout.gd).
+(j) No placeholder graphics: no ColorRect, Polygon2D or Line2D node in .tscn files below scenes/ (scenes/ui/ is
+    allowed) and no ColorRect.new(), Polygon2D.new(), draw_rect(), draw_circle() or draw_polygon() in
+    scripts/gameplay, scripts/levels and scripts/feedback. GradientTexture2D and NoiseTexture2D stay allowed.
+    A .gd line may opt out of (i) and (j) with the comment "# art-exempt: <reason>".
+(k) Engine.time_scale is global (hit-stop): only scripts/feedback/feedback_director.gd may assign it; files below
     tests/ are exempt (they restore it between tests).
 Comments and string literals never count as code.
 """
@@ -88,6 +97,23 @@ TIME_SCALE_RE = re.compile(r"\bEngine\s*\.\s*time_scale\s*(?:[-+*/]?=)(?!=)")
 TIME_SCALE_WRITER = "scripts/feedback/feedback_director.gd"
 INPUT_SECTION_RE = re.compile(r"^\[input\]\n(.*?)(?=^\[|\Z)", re.M | re.S)
 INPUT_ACTION_RE = re.compile(r"^(\w+)=\{", re.M)
+
+ART_EXEMPT_RE = re.compile(r"art-exempt:\s*\S")
+ART_GD_DIRS = ("scripts", "scenes")
+FOG_PARTS = {"fog", "darkness", "unexplored", "explored"}
+FOG_SEQUENCES = ("fog_of_war", "reveal_tile", "revealed_cells", "visibility_grid")
+LIGHT_TYPES = ("CanvasModulate", "PointLight2D", "LightOccluder2D")
+LIGHT_TSCN_RE = re.compile(r'type="(%s)"' % "|".join(LIGHT_TYPES))
+LIGHT_GD_RE = re.compile(r"\b(%s)\s*\.\s*new\s*\(" % "|".join(LIGHT_TYPES))
+PROC_MAP_DIRS = ("scripts",)
+PROC_MAP_RE = re.compile(r"(?<![\w.])(set_cell|set_cells_terrain_connect|set_cells_terrain_path)\s*\(|"
+                         r"\.(set_cell|set_cells_terrain_connect|set_cells_terrain_path)\s*\(|\b(FastNoiseLite)\b")
+PLACEHOLDER_TYPES = ("ColorRect", "Polygon2D", "Line2D")
+PLACEHOLDER_TSCN_RE = re.compile(r'^\[node [^\]]*type="(%s)"' % "|".join(PLACEHOLDER_TYPES))
+PLACEHOLDER_TSCN_DIRS = ("scenes",)
+PLACEHOLDER_TSCN_ALLOWED = ("scenes/ui/",)
+PLACEHOLDER_GD_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback")
+PLACEHOLDER_GD_RE = re.compile(r"\b(ColorRect|Polygon2D)\s*\.\s*new\s*\(|(?<![\w])(draw_rect|draw_circle|draw_polygon)\s*\(")
 
 
 def _line(text: str, offset: int) -> int:
@@ -473,7 +499,84 @@ def check_harm(root: Path) -> list:
     return errors
 
 
-# --- (i) single writer of Engine.time_scale ----------------------------------------------------------
+# --- (i) fog, darkness and procedural maps; (j) placeholder graphics ----------------------------------------
+
+def fog_tokens(name: str) -> list:
+    """Return the fog/darkness/reveal parts and sequences contained in an identifier or node name."""
+    parts = split_identifier(name)
+    joined = "_" + "_".join(parts) + "_"
+    hits = [seq for seq in FOG_SEQUENCES if "_" + seq + "_" in joined]
+    hits += sorted(set(parts) & FOG_PARTS)
+    return hits
+
+
+def _art_exempt_lines(text: str) -> set:
+    return {line_no for line_no, body in gd_comments(text) if ART_EXEMPT_RE.search(body)}
+
+
+def _gd_matches(root: Path, dirs, regex, message: str) -> list:
+    errors = []
+    for path in _files(root, dirs, ".gd"):
+        text = _read(path)
+        exempt = _art_exempt_lines(text)
+        _nc, bare, _strings = gd_strip(text)
+        for match in regex.finditer(bare):
+            line_no = _line(bare, match.start())
+            if line_no in exempt:
+                continue
+            found = next(g for g in match.groups() if g)
+            errors.append("%s:%d: %s %s" % (_rel(root, path), line_no, found, message))
+    return errors
+
+
+def check_fog_and_procedural(root: Path) -> list:
+    errors = []
+    for path in _files(root, ART_GD_DIRS, ".gd"):
+        rel = _rel(root, path)
+        text = _read(path)
+        exempt = _art_exempt_lines(text)
+        _nc, bare, _strings = gd_strip(text)
+        reported = set()
+        for match in IDENT_RE.finditer(bare):
+            name = match.group(0)
+            hits = fog_tokens(name)
+            line_no = _line(bare, match.start())
+            if hits and name not in reported and line_no not in exempt:
+                reported.add(name)
+                errors.append("%s:%d: fog/darkness/reveal identifier %s (%s) – the whole level is always visible"
+                              % (rel, line_no, name, "/".join(hits)))
+    for path in _files(root, ART_GD_DIRS, ".tscn"):
+        for line_no, line in enumerate(_read(path).splitlines(), start=1):
+            match = TSCN_NODE_RE.match(line)
+            if match and fog_tokens(match.group(1)):
+                errors.append("%s:%d: fog/darkness/reveal node name %s" % (_rel(root, path), line_no, match.group(1)))
+            light = LIGHT_TSCN_RE.search(line)
+            if light:
+                errors.append("%s:%d: %s darkens or hides the level (not allowed)"
+                              % (_rel(root, path), line_no, light.group(1)))
+    errors += _gd_matches(root, ART_GD_DIRS, LIGHT_GD_RE, "darkens or hides the level (not allowed)")
+    errors += _gd_matches(root, PROC_MAP_DIRS, PROC_MAP_RE,
+                          "– levels are handcrafted; paint layouts offline with tools/build_level_layout.gd")
+    return errors
+
+
+def check_placeholders(root: Path) -> list:
+    errors = []
+    for path in _files(root, PLACEHOLDER_TSCN_DIRS, ".tscn"):
+        rel = _rel(root, path)
+        if rel.startswith(PLACEHOLDER_TSCN_ALLOWED):
+            continue
+        for line_no, line in enumerate(_read(path).splitlines(), start=1):
+            match = PLACEHOLDER_TSCN_RE.match(line)
+            if match:
+                errors.append("%s:%d: placeholder node %s in a gameplay scene – use sprites from assets/"
+                              % (rel, line_no, match.group(1)))
+    errors += _gd_matches(root, PLACEHOLDER_GD_DIRS, PLACEHOLDER_GD_RE,
+                          "draws a placeholder shape – use sprites from assets/")
+    return errors
+
+
+# --- (k) single writer of Engine.time_scale ----------------------------------------------------------
 
 def check_time_scale(root: Path) -> list:
     errors = []
@@ -493,7 +596,7 @@ def validate(root: Path = REPO) -> list:
     root = Path(root)
     return (check_comments(root) + check_magic_numbers(root) + check_networking(root) + check_third_party(root)
             + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root)
-            + check_harm(root) + check_time_scale(root))
+            + check_harm(root) + check_fog_and_procedural(root) + check_placeholders(root) + check_time_scale(root))
 
 
 def main(argv=None) -> int:

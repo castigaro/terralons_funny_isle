@@ -17,7 +17,7 @@ Stages: syntax (Python), headless Godot import, GDScript tests (`tests/**/test_*
 
 Test data never goes to user folders: every Godot process of a test run gets `APPDATA`, `LOCALAPPDATA` and `TFI_DATA_DIR` redirected below the testdata root – `<repo>.testdata/run_tests` for the main checkout, `<main>.testdata/<worktree>/run_tests` for a worktree, or `$TFI_TESTDATA/run_tests`. Folders below `tests/fixtures/` and `tests/support/` are not collected as tests; `tests/fixtures/runner/` holds deliberately failing files for the runner self-test.
 
-GDScript tests run with `--fixed-fps 60` (deterministic physics ticks) and extend `TestCase` (`check`, `check_eq`, `check_has`, `fail`, `add_node`, `frames`, `physics_frames`); `before_each`/`after_each` hooks and coroutine tests are supported. Between tests `tests/support/test_env.gd` unpauses the tree, releases the castaway input actions, clears Balance overrides and switches I18n back to English. `tests/support/signal_recorder.gd` records the signals of any object.
+GDScript tests run with `--fixed-fps 60` (deterministic physics ticks; a file whose first lines contain `## run-fps: 60,144` runs once per listed frame rate, and `TestCase.run_fps()` tells it which) and extend `TestCase` (`check`, `check_eq`, `check_has`, `fail`, `add_node`, `frames`, `physics_frames`); `before_each`/`after_each` hooks and coroutine tests are supported. Between tests `tests/support/test_env.gd` unpauses the tree, releases the castaway input actions, clears Balance overrides and switches I18n back to English. `tests/support/signal_recorder.gd` records the signals of any object.
 
 ## Autoloads
 
@@ -59,7 +59,8 @@ The CC0 packs live in `assets/` (copied unchanged from the spec folder), with so
 ## Conventions
 
 - Every `i18n/<area>.csv` needs a committed sibling `i18n/<area>.csv.import` containing `importer="keep"`, so Godot does not generate `.translation` files.
-- After adding a `.gd` file, run the import (any `run_tests.py` run does it) and commit the generated `.gd.uid`.
+- After adding a `.gd` or `.gdshader` file, run the import (any `run_tests.py` run does it) and commit the generated `.uid` file.
+- Level scenes, the camera, the layout builder and the opt-in windowed capture (`python tools/capture_level.py`) are described in `docs/levels.md`; art rules in `docs/art_treatment.md`.
 - Error fixtures for loaders are written at test time below the redirected data folder, never under `res://`.
 
 ## Docs

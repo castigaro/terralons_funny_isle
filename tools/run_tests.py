@@ -7,6 +7,7 @@ import argparse
 import ast
 import importlib.util
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -24,6 +25,9 @@ GD_TIMEOUT = 120
 # GDScript tests run on a fixed 60 fps clock: deterministic physics ticks and no real-time waiting.
 GD_TEST_ARGS = ["--fixed-fps", "60"]
 EXCLUDED_GD_PARTS = ("support", "fixtures")
+# A GD test file whose first lines contain "## run-fps: 60,144" runs once per value (frame-rate dependent checks).
+RUN_FPS_RE = re.compile(r"^##\s*run-fps:\s*([0-9][0-9,\s]*)$")
+RUN_FPS_HEADER_LINES = 5
 
 
 class Stage:
@@ -98,9 +102,32 @@ def py_test_files(filter_text):
     return files
 
 
-def gdscript_args(res):
-    """Return the Godot arguments that run one GDScript test file with the headless runner."""
-    return GD_TEST_ARGS + ["--script", "res://tests/runner.gd", "--", res]
+def gdscript_args(res, fps=None):
+    """Return the Godot arguments that run one GDScript test file with the headless runner.
+
+    Without fps the file runs on the default 60 fps clock; with fps it runs with --fixed-fps <fps> and the user
+    argument --fps=<fps> (read by TestCase.run_fps()).
+    """
+    if fps is None:
+        return GD_TEST_ARGS + ["--script", "res://tests/runner.gd", "--", res]
+    return ["--fixed-fps", str(fps), "--script", "res://tests/runner.gd", "--", res, "--fps=%d" % fps]
+
+
+def run_fps_values(res, repo=None):
+    """Return the fps values of a "## run-fps:" header in the first lines of a GD test file, else [None]."""
+    path = Path(repo or REPO) / res[len("res://"):]
+    try:
+        with open(path, encoding="utf-8") as handle:
+            head = [handle.readline() for _ in range(RUN_FPS_HEADER_LINES)]
+    except OSError:
+        return [None]
+    for line in head:
+        match = RUN_FPS_RE.match(line.strip())
+        if match:
+            values = [int(v) for v in re.split(r"[,\s]+", match.group(1).strip()) if v]
+            if values:
+                return values
+    return [None]
 
 
 def stage_syntax(stage):
@@ -124,35 +151,41 @@ def stage_import(stage, godot, env, allowlist):
 
 def stage_gdscript(stage, godot, env, allowlist, files):
     for res in files:
-        start = time.time()
-        code, out = run_godot(godot, gdscript_args(res), env, timeout=GD_TIMEOUT)
-        results = parse_results(out)
-        hits = scan_output(out, allowlist)
-        problems = []
-        if code is None:
-            problems.append("timeout")
-        elif code != 0:
-            problems.append("exit code %s" % code)
-        if res not in results:
-            problems.append("missing RESULT line")
-        else:
-            passed, failed = results[res]
-            if failed > 0:
-                problems.append("%d failed" % failed)
-            if passed == 0:
-                problems.append("no passing test")
-        if hits:
-            problems.append("%d error line(s)" % len(hits))
-        summary = results.get(res, (0, 0))
-        print("  %s passed=%d failed=%d (%.1f s)" % (res, summary[0], summary[1], time.time() - start))
-        if problems:
-            detail = [ln for ln in out.splitlines() if ln.startswith(("FAIL", "WATCHDOG", "TIMEOUT"))]
-            detail += hits
-            if not detail:
-                detail = out.splitlines()[-40:]
-            stage.fail("%s: %s" % (res, ", ".join(problems)), "\n".join(detail))
-        else:
-            stage.ok()
+        for fps in run_fps_values(res):
+            _run_gdscript_file(stage, godot, env, allowlist, res, fps)
+
+
+def _run_gdscript_file(stage, godot, env, allowlist, res, fps):
+    label = res if fps is None else "%s@%d" % (res, fps)
+    start = time.time()
+    code, out = run_godot(godot, gdscript_args(res, fps), env, timeout=GD_TIMEOUT)
+    results = parse_results(out)
+    hits = scan_output(out, allowlist)
+    problems = []
+    if code is None:
+        problems.append("timeout")
+    elif code != 0:
+        problems.append("exit code %s" % code)
+    if res not in results:
+        problems.append("missing RESULT line")
+    else:
+        passed, failed = results[res]
+        if failed > 0:
+            problems.append("%d failed" % failed)
+        if passed == 0:
+            problems.append("no passing test")
+    if hits:
+        problems.append("%d error line(s)" % len(hits))
+    summary = results.get(res, (0, 0))
+    print("  %s passed=%d failed=%d (%.1f s)" % (label, summary[0], summary[1], time.time() - start))
+    if problems:
+        detail = [ln for ln in out.splitlines() if ln.startswith(("FAIL", "WATCHDOG", "TIMEOUT"))]
+        detail += hits
+        if not detail:
+            detail = out.splitlines()[-40:]
+        stage.fail("%s: %s" % (label, ", ".join(problems)), "\n".join(detail))
+    else:
+        stage.ok()
 
 
 def stage_python(stage, files):

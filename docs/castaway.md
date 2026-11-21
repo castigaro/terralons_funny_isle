@@ -38,7 +38,7 @@ Duck-typed, because animals and items use different base classes:
 
 - Grabbable (`Grabbable`, group `grabbable`): `kind: String`, `can_grab() -> bool`, `on_grabbed(carrier)`, `on_released()`, optional `get_throw_visual() -> Node2D`. While carried the object keeps its parent; the castaway moves it to its hold point every tick, so `on_grabbed` should disable the object's own collision and behaviour. `on_released` is called after a drop, after a throw landing and before a use.
 - Use target (`UseTarget`, group `use_target`; aim-snap-only targets in group `throw_target`): `target_kind: String`, `accepts(obj) -> bool`, `use(obj)`.
-- Surface provider (group `surface_provider`): `get_surface_at(global_pos) -> String` returning `sand`, `grass` or `water`; without a provider the surface is `sand`.
+- Surface provider (group `surface_provider`): `get_surface_at(global_pos) -> String` returning `sand`, `grass`, `stone` or `water` (`LevelBase` in levels, see `docs/levels.md`); without a provider the surface is `sand`.
 
 ## EventBus signals
 

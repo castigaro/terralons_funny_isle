@@ -189,5 +189,70 @@ class ValidateCodePassTest(unittest.TestCase):
         self.assertEqual(code, 0, out)
 
 
+class ValidateCodeArtRulesTest(unittest.TestCase):
+    """Rules (i) fog/darkness/procedural maps and (j) placeholder graphics."""
+
+    def assert_fails(self, files: dict, message: str):
+        code, out = run(make_tree(files))
+        self.assertEqual(code, 1, out)
+        self.assertIn(message, out)
+
+    def assert_passes(self, files: dict):
+        code, out = run(make_tree(files))
+        self.assertEqual(code, 0, out)
+
+    def test_fog_identifiers_fail(self):
+        for name in ("fog_alpha", "fog_of_war_layer", "darkness_level", "reveal_tile_at", "unexplored_cells"):
+            self.assert_fails({"scripts/a.gd": gd("var %s := 0" % name)}, "fog/darkness/reveal identifier %s" % name)
+
+    def test_fog_node_name_fails(self):
+        tscn = '[gd_scene format=3]\n\n[node name="FogLayer" type="Node2D"]\n'
+        self.assert_fails({"scenes/a.tscn": tscn}, "fog/darkness/reveal node name FogLayer")
+
+    def test_reveal_stars_strings_and_comments_pass(self):
+        self.assert_passes({"scripts/a.gd": gd('var reveal_stars := 0\nvar s := "fog_of_war"\n# no fog here'),
+                            "tests/b.gd": gd("var fog := 0")})
+
+    def test_light_nodes_fail(self):
+        for kind in ("CanvasModulate", "PointLight2D", "LightOccluder2D"):
+            tscn = '[gd_scene format=3]\n\n[node name="Mood" type="%s"]\n' % kind
+            self.assert_fails({"scenes/a.tscn": tscn}, "%s darkens or hides the level" % kind)
+            self.assert_fails({"scripts/a.gd": gd("var m := %s.new()" % kind)}, "%s darkens or hides" % kind)
+
+    def test_procedural_map_calls_fail_in_scripts(self):
+        for call in ("layer.set_cell(Vector2i.ZERO, 0, Vector2i.ZERO)", "set_cell(Vector2i.ZERO)",
+                     "layer.set_cells_terrain_connect([], 0, 0)", "layer.set_cells_terrain_path([], 0, 0)"):
+            self.assert_fails({"scripts/levels/a.gd": gd("func f(layer) -> void:\n\t" + call)},
+                              "levels are handcrafted")
+        self.assert_fails({"scripts/a.gd": gd("var n := FastNoiseLite.new()")}, "FastNoiseLite")
+
+    def test_procedural_calls_in_tools_pass(self):
+        self.assert_passes({"tools/build.gd": gd("func f(layer) -> void:\n\tlayer.set_cell(Vector2i.ZERO, 0)")})
+
+    def test_placeholder_nodes_fail_in_gameplay_scenes(self):
+        for kind in ("ColorRect", "Polygon2D", "Line2D"):
+            tscn = '[gd_scene format=3]\n\n[node name="Box" type="%s"]\n' % kind
+            self.assert_fails({"scenes/levels/a.tscn": tscn}, "placeholder node %s" % kind)
+
+    def test_placeholder_nodes_pass_in_ui_scenes(self):
+        tscn = '[gd_scene format=3]\n\n[node name="Dim" type="ColorRect"]\n'
+        self.assert_passes({"scenes/ui/a.tscn": tscn})
+
+    def test_placeholder_drawing_fails_in_gameplay_scripts(self):
+        for body in ("draw_rect(Rect2(), Color.RED)", "draw_circle(Vector2.ZERO, 4.0, Color.RED)",
+                     "draw_polygon([], [])", "var r := ColorRect.new()"):
+            self.assert_fails({"scripts/levels/a.gd": gd("func _draw() -> void:\n\t" + body)}, "placeholder shape")
+
+    def test_drawing_passes_in_ui_scripts(self):
+        self.assert_passes({"scripts/ui/a.gd": gd("func _draw() -> void:\n\tdraw_rect(Rect2(), Color.RED)")})
+
+    def test_gradient_and_noise_textures_pass(self):
+        self.assert_passes({"scripts/levels/a.gd": gd("var g := GradientTexture2D.new()\nvar n := NoiseTexture2D.new()")})
+
+    def test_art_exempt_comment_passes(self):
+        self.assert_passes({"scripts/levels/a.gd": gd(
+            "func _draw() -> void:\n\tdraw_circle(Vector2.ZERO, 1.0, Color.RED)  # art-exempt: debug overlay")})
+
+
 if __name__ == "__main__":
     unittest.main()

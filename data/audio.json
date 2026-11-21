@@ -351,6 +351,7 @@
 		"announcer_line": "emitted by the Audio autoload itself",
 		"event_warning": "visual pre-warning only, the event start plays the warning sound",
 		"fx_anchor": "position carrier for the feedback director, no action",
-		"fx_anchor_node": "position carrier for the feedback director, no action"
+		"fx_anchor_node": "position carrier for the feedback director, no action",
+		"level_restarted": "instant in-place reset, the restart cue shows it; no extra sound"
 	}
 }

@@ -8,7 +8,9 @@ Errors:
 - a media resource (image, audio, font) referenced by a .tscn, .tres, .gd, project.godot or data/**/*.json file
   lies outside assets/ or in a pack not listed in SOURCES.md;
 - a referenced file does not exist;
-- a referenced asset file name contains a token of the deny list data/assets/deny_list.json.
+- a referenced asset file name contains a token of the deny list data/assets/deny_list.json;
+- an image (png, jpg, jpeg, webp, svg) lies outside assets/ (git-tracked files, or every file without git); only
+  the project icon (application/config/icon) is excepted.
 Warnings (listed, exit code stays 0): imported asset files that nothing references, and imported files whose
 name matches the deny list. Folders with a .gdignore file are not imported by Godot and are skipped.
 A reference with a format placeholder (%s, %d, {name}) counts as a pattern: its fixed folder must follow the
@@ -17,6 +19,8 @@ rules and every file it matches counts as used.
 import argparse
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -36,6 +40,9 @@ QUOTED_RE = re.compile(r'"([^"\n]*)"')
 JSON_ASSET_RE = re.compile(r"^(?:res://)?assets/")
 PLACEHOLDER_RE = re.compile(r"%[-+ #0-9.]*[a-zA-Z]|\{[A-Za-z0-9_]*\}|\*")
 ROW_RE = re.compile(r"^\|\s*`([^`]+)`\s*\|(.*)\|\s*$")
+IMAGE_EXT = {"png", "jpg", "jpeg", "webp", "svg"}
+IMAGE_SKIP_DIRS = {".godot", ".git", "build", "__pycache__"}
+ICON_RE = re.compile(r'^config/icon="res://([^"]+)"', re.M)
 
 
 def parse_sources(root: Path):
@@ -181,10 +188,49 @@ def pattern_regex(target: str):
     return re.compile("^" + "[^/]+".join(re.escape(p) for p in pieces) + "$")
 
 
+def project_icon(root: Path) -> str:
+    """Return the repo-relative path of application/config/icon in project.godot, or ''."""
+    project = root / "project.godot"
+    if not project.is_file():
+        return ""
+    match = ICON_RE.search(project.read_text(encoding="utf-8", errors="replace"))
+    return match.group(1) if match else ""
+
+
+def candidate_images(root: Path) -> list:
+    """Return repo-relative image paths: git-tracked files when root is a git top level, else every file."""
+    files = None
+    if shutil.which("git") is not None:
+        try:
+            top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True,
+                                 text=True, encoding="utf-8")
+            if top.returncode == 0 and Path(top.stdout.strip()).resolve() == root.resolve():
+                out = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True,
+                                     encoding="utf-8", check=True).stdout
+                files = [line.strip() for line in out.splitlines() if line.strip()]
+        except (OSError, subprocess.CalledProcessError):
+            files = None
+    if files is None:
+        files = []
+        for path in root.rglob("*"):
+            rel = path.relative_to(root).as_posix()
+            if path.is_file() and not any(p in IMAGE_SKIP_DIRS for p in rel.split("/")[:-1]):
+                files.append(rel)
+    return sorted(f for f in files if f.rsplit(".", 1)[-1].lower() in IMAGE_EXT)
+
+
+def check_images_outside_assets(root: Path) -> list:
+    """Every sprite lives below assets/ (R-39); only the project icon may lie elsewhere."""
+    icon = project_icon(root)
+    return ["image outside assets/ (sprites must come from the asset packs): %s" % rel
+            for rel in candidate_images(root) if not rel.startswith("assets/") and rel != icon]
+
+
 def validate(root: Path):
     """Return (errors, warnings) for the tree at root."""
     root = Path(root)
     packs, errors = parse_sources(root)
+    errors += check_images_outside_assets(root)
     deny, deny_errors = load_deny(root)
     errors += deny_errors
     warnings = []
@@ -197,7 +243,10 @@ def validate(root: Path):
     errors += ref_errors
     used = set()
     known = set(all_files)
+    icon = project_icon(root)
     for src, line_no, target in refs:
+        if icon and target == icon and (root / target).is_file():
+            continue
         where = "%s:%d" % (src, line_no) if line_no else src
         name = target.rsplit("/", 1)[-1]
         ext = name.rsplit(".", 1)[-1].lower() if "." in name else ""

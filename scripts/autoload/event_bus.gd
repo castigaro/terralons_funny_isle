@@ -60,6 +60,8 @@ signal animal_lured(kind: String)
 signal entity_lost(kind: String, reason: String)
 @warning_ignore("unused_signal")
 signal entity_respawned(kind: String, position: Vector2)
+@warning_ignore("unused_signal")
+signal level_restarted(level_id: String)
 # Feedback (BI-8): a warning shortly before an event starts, and position anchors emitted right before a
 # position-less signal so the feedback director knows where to play it (consumed by the next gameplay signal).
 @warning_ignore("unused_signal")

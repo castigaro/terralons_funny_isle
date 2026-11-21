@@ -7,7 +7,7 @@ var cap := 1
 var decay_per_second := 1.0
 var noise_speed := 1.0
 var sources: Array[Dictionary] = []
-var _noise := FastNoiseLite.new()
+var _noise := FastNoiseLite.new()  # art-exempt: camera shake noise, not a level map.
 var _time := 0.0
 
 
@@ -16,7 +16,7 @@ func _init(max_sources: int, decay: float, speed: float, noise_seed: int) -> voi
 	decay_per_second = maxf(0.0, decay)
 	noise_speed = speed
 	_noise.seed = noise_seed
-	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX  # art-exempt: camera shake noise, not a level map.
 
 
 ## Adds a source; at the cap it replaces the weakest source when the new one is stronger, else it is dropped.

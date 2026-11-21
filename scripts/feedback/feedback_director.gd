@@ -134,6 +134,8 @@ func _layer(layer_name: String, z: int) -> Node2D:
 	layer.name = layer_name
 	layer.z_index = z
 	layer.y_sort_enabled = false
+	# Effects are animated in _process only, so they are not physics-interpolated.
+	layer.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	add_child(layer)
 	return layer
 
