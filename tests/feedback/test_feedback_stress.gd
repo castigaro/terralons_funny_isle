@@ -14,6 +14,20 @@ func _check_caps(frame: int) -> void:
 			fail("frame %d: %s active %d > cap %d" % [frame, type, director.active_count(type), cap])
 
 
+# Nodes outside the Audio autoload, whose per-sound player pools are built lazily on first use (BI-9).
+func _node_count_without_audio() -> int:
+	var count := int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
+	var audio := root().get_node_or_null("Audio")
+	return count - (_subtree_size(audio) if audio != null else 0)
+
+
+func _subtree_size(node: Node) -> int:
+	var n := 1
+	for child in node.get_children(true):
+		n += _subtree_size(child)
+	return n
+
+
 func test_fifty_events_in_one_frame() -> void:
 	make_director()
 	var animal := make_target(Vector2(600, 400))
@@ -24,7 +38,7 @@ func test_fifty_events_in_one_frame() -> void:
 		check_eq(sizes[type], director.cap(type), "%s pool preallocated to its cap" % type)
 	var children := director.effect_layer_child_count()
 	var own_children := director.get_child_count()
-	var objects_before := Performance.get_monitor(Performance.OBJECT_NODE_COUNT)
+	var objects_before := _node_count_without_audio()
 	var surfaces := ["water", "sand", "mud", "grass"]
 	for i in 50:
 		match i % 10:
@@ -64,7 +78,7 @@ func test_fifty_events_in_one_frame() -> void:
 		check_eq(director.pool_size(type), sizes[type], "%s pool size constant" % type)
 	check_eq(director.effect_layer_child_count(), children, "effect layer children constant")
 	check_eq(director.get_child_count(), own_children, "director children constant")
-	check_eq(Performance.get_monitor(Performance.OBJECT_NODE_COUNT), objects_before, "no nodes allocated")
+	check_eq(_node_count_without_audio(), objects_before, "no nodes allocated")
 	await frames(10)
 	check_eq(Engine.time_scale, 1.0, "time scale restored after the storm")
 	check(director.played("popup") > director.cap("popup"), "popups were recycled, not piled up")

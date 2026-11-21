@@ -3,7 +3,7 @@
 	"id": "valid_counts",
 	"title_key": "fixture.level_title",
 	"theme": "jungle_hut",
-	"music": "fixture_tune",
+	"music": "level_1",
 	"seed": 77,
 	"timer_seconds": 180,
 	"three_star_share": 0.5,

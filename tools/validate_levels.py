@@ -3,7 +3,8 @@
 Usage: python tools/validate_levels.py [--root DIR] [--path FILE] [--i18n-dir DIR ...]   (exit code 1 on errors)
 
 Limits (timer range, task and event counts) come from data/balance/rules.json. Text keys must exist with
-non-empty EN and DE text in root/i18n/*.csv plus every --i18n-dir. One line per error:
+non-empty EN and DE text in root/i18n/*.csv plus every --i18n-dir. The level music must be a key of the
+"music" section of root/data/audio.json when that file exists. One line per error:
 "<file>: <field path>: <message>". A missing or empty data/levels folder is valid. The GDScript loader
 scripts/rules/level_def.gd implements the same rule set (see docs/rules.md).
 """
@@ -50,6 +51,7 @@ TIME_TYPES = ("before_time", "before_event")
 ENTITY_FIELDS = {"in_zone": ("entity",), "held": ("entity",), "delivered_to": ("entity",), "worn": ("item", "wearer")}
 ANIMALS_FILE = "data/animals.json"
 ITEMS_FILE = "data/items.json"
+AUDIO_FILE = "data/audio.json"
 
 EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground")
 PARAM_TYPES = ("string", "int", "float", "bool")
@@ -105,6 +107,14 @@ def load_entity_kinds(root: Path) -> set:
         if not err and isinstance(data, dict) and isinstance(data.get(key), dict):
             kinds.update(data[key])
     return kinds
+
+
+def load_music_ids(root: Path) -> set:
+    """Return the music ids of root/data/audio.json (empty when the file is missing or broken)."""
+    data, err = load_json(Path(root) / AUDIO_FILE)
+    if err or not isinstance(data, dict) or not isinstance(data.get("music"), dict):
+        return set()
+    return set(data["music"])
 
 
 def validate_event_types(data, fname: str = "events.json") -> list:
@@ -226,10 +236,12 @@ def _counting(conds) -> list:
             and c.get("type") in CONDITIONS]
 
 
-def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict, entity_kinds=()) -> list:
+def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict, entity_kinds=(),
+                   music_ids=()) -> list:
     """Return the errors of one parsed level (pure): '<fname>: <field path>: <message>'.
 
     entity_kinds: the known animal and item kinds; when empty, entity names are not checked.
+    music_ids: the music ids of data/audio.json; when empty, the music id is not checked.
     """
     errors = []
 
@@ -255,6 +267,8 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
     for key in ("theme", "music"):
         if key in data and not is_name(data[key]):
             err(key, "must match %s" % ID_RE.pattern)
+    if music_ids and is_name(data.get("music")) and data["music"] not in music_ids:
+        err("music", "unknown music id %s (not in the music section of %s)" % (data["music"], AUDIO_FILE))
     if "seed" in data and not is_int(data["seed"]):
         err("seed", "must be an integer")
     timer = data.get("timer_seconds")
@@ -424,6 +438,7 @@ def main(argv=None) -> int:
             event_types = {}
     catalog, _cat_errors = load_catalog(root)
     entity_kinds = load_entity_kinds(root)
+    music_ids = load_music_ids(root)
     for extra in opts.i18n_dir:
         more, _more_errors = load_catalog_dir(Path(extra))
         catalog.update(more)
@@ -439,7 +454,7 @@ def main(argv=None) -> int:
             if err:
                 errors.append("%s: %s" % (path.name, err))
                 continue
-            errors.extend(validate_level(data, path.name, rules, event_types, catalog, entity_kinds))
+            errors.extend(validate_level(data, path.name, rules, event_types, catalog, entity_kinds, music_ids))
     for line in errors:
         print(line)
     print("validate_levels: %d level file(s), %d error(s)" % (len(files), len(errors)))

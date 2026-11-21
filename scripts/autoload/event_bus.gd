@@ -68,3 +68,6 @@ signal event_warning(event_id: String, event_type: String, seconds_until: float)
 signal fx_anchor(kind: String, position: Vector2)
 @warning_ignore("unused_signal")
 signal fx_anchor_node(kind: String, node: Node2D)
+# Announcer caption (BI-9): emitted by the Audio autoload when a line starts; seconds is how long to show it.
+@warning_ignore("unused_signal")
+signal announcer_line(line_id: String, caption_key: String, seconds: float)

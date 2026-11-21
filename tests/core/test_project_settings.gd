@@ -1,7 +1,7 @@
 extends TestCase
 ## Project settings required by the foundation item (viewport, window, physics, autoloads).
 
-const EXPECTED_AUTOLOADS := ["Balance", "DataDir", "EventBus", "I18n"]
+const EXPECTED_AUTOLOADS := ["Audio", "Balance", "DataDir", "EventBus", "I18n"]
 const FORBIDDEN_AUTOLOADS := ["Game", "Features", "Capabilities", "Actions"]
 
 

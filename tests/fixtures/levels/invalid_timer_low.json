@@ -3,7 +3,7 @@
 	"id": "invalid_timer_low",
 	"title_key": "fixture.level_title",
 	"theme": "palm_beach",
-	"music": "fixture_tune",
+	"music": "level_1",
 	"seed": 4242,
 	"timer_seconds": 179,
 	"tasks": [

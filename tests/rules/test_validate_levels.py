@@ -44,6 +44,7 @@ EXPECTED = {
     "invalid_before_time_beyond": "seconds: before_time seconds",
     "invalid_unknown_event_ref": "before_event must name an event",
     "invalid_unknown_entity": "tasks[0].conditions[0].entity: unknown entity kind dragon",
+    "invalid_unknown_music": "music: unknown music id disco_tune",
 }
 
 

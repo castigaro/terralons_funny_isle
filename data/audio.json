@@ -1,0 +1,356 @@
+{
+	"format_version": 1,
+	"music": {
+		"title": "assets/audio/music/Juhani Junkala [Retro Game Music Pack] Title Screen.wav",
+		"level_1": "assets/audio/music/Juhani Junkala [Retro Game Music Pack] Level 1.wav",
+		"level_2": "assets/audio/music/Juhani Junkala [Retro Game Music Pack] Level 2.wav",
+		"level_3": "assets/audio/music/Juhani Junkala [Retro Game Music Pack] Level 3.wav",
+		"ending": "assets/audio/music/Juhani Junkala [Retro Game Music Pack] Ending.wav"
+	},
+	"sfx": {
+		"step": {
+			"files": [
+				"assets/audio/sfx-rpg/OGG/footstep00.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep01.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep02.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep03.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep04.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep05.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep06.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep07.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep08.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep09.ogg"
+			],
+			"volume_db": -8.0
+		},
+		"dash": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/scratch_001.ogg",
+				"assets/audio/sfx-interface/Audio/scratch_002.ogg",
+				"assets/audio/sfx-interface/Audio/scratch_003.ogg",
+				"assets/audio/sfx-interface/Audio/scratch_004.ogg",
+				"assets/audio/sfx-interface/Audio/scratch_005.ogg"
+			],
+			"volume_db": -2.0
+		},
+		"grab": {
+			"files": [
+				"assets/audio/sfx-rpg/OGG/cloth1.ogg",
+				"assets/audio/sfx-rpg/OGG/cloth2.ogg",
+				"assets/audio/sfx-rpg/OGG/cloth3.ogg",
+				"assets/audio/sfx-rpg/OGG/cloth4.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"throw": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/maximize_001.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_002.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_003.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_004.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"land": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/drop_001.ogg",
+				"assets/audio/sfx-interface/Audio/drop_002.ogg",
+				"assets/audio/sfx-interface/Audio/drop_003.ogg",
+				"assets/audio/sfx-interface/Audio/drop_004.ogg",
+				"assets/audio/sfx-rpg/OGG/dropLeather.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"splash": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/glass_001.ogg",
+				"assets/audio/sfx-interface/Audio/glass_002.ogg",
+				"assets/audio/sfx-interface/Audio/glass_003.ogg",
+				"assets/audio/sfx-interface/Audio/glass_004.ogg",
+				"assets/audio/sfx-interface/Audio/glass_005.ogg",
+				"assets/audio/sfx-interface/Audio/glass_006.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"bonk": {
+			"files": [
+				"assets/audio/sfx-rpg/OGG/metalPot1.ogg",
+				"assets/audio/sfx-rpg/OGG/metalPot2.ogg",
+				"assets/audio/sfx-rpg/OGG/metalPot3.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"use": {
+			"files": [
+				"assets/audio/sfx-rpg/OGG/metalLatch.ogg",
+				"assets/audio/sfx-rpg/OGG/doorClose_1.ogg",
+				"assets/audio/sfx-rpg/OGG/creak1.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"dizzy": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/bong_001.ogg"
+			],
+			"volume_db": 0.0,
+			"pitch": 0.8
+		},
+		"animal_flee": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/pluck_001.ogg",
+				"assets/audio/sfx-interface/Audio/pluck_002.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"animal_bonk": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/bong_001.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"animal_panic": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/question_001.ogg",
+				"assets/audio/sfx-interface/Audio/question_002.ogg",
+				"assets/audio/sfx-interface/Audio/question_003.ogg",
+				"assets/audio/sfx-interface/Audio/question_004.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"animal_caught": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/pluck_002.ogg"
+			],
+			"volume_db": 0.0,
+			"pitch": 1.2
+		},
+		"animal_lured": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/question_001.ogg",
+				"assets/audio/sfx-interface/Audio/question_002.ogg"
+			],
+			"volume_db": -2.0,
+			"pitch": 1.2
+		},
+		"lost": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/error_001.ogg",
+				"assets/audio/sfx-interface/Audio/error_002.ogg",
+				"assets/audio/sfx-interface/Audio/error_003.ogg",
+				"assets/audio/sfx-interface/Audio/error_004.ogg",
+				"assets/audio/sfx-interface/Audio/error_005.ogg",
+				"assets/audio/sfx-interface/Audio/error_006.ogg",
+				"assets/audio/sfx-interface/Audio/error_007.ogg",
+				"assets/audio/sfx-interface/Audio/error_008.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"respawn": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/pluck_001.ogg"
+			],
+			"volume_db": -2.0,
+			"pitch": 0.7
+		},
+		"task_progress": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/confirmation_001.ogg",
+				"assets/audio/sfx-interface/Audio/confirmation_002.ogg",
+				"assets/audio/sfx-interface/Audio/confirmation_003.ogg",
+				"assets/audio/sfx-interface/Audio/confirmation_004.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"event_warning": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/back_001.ogg",
+				"assets/audio/sfx-interface/Audio/back_002.ogg",
+				"assets/audio/sfx-interface/Audio/back_003.ogg",
+				"assets/audio/sfx-interface/Audio/back_004.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"event_parrot": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/pluck_001.ogg",
+				"assets/audio/sfx-interface/Audio/pluck_002.ogg"
+			],
+			"volume_db": 0.0,
+			"pitch": 1.6
+		},
+		"event_stampede": {
+			"files": [
+				"assets/audio/sfx-rpg/OGG/footstep00.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep01.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep02.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep03.ogg",
+				"assets/audio/sfx-rpg/OGG/footstep04.ogg"
+			],
+			"volume_db": 2.0,
+			"pitch": 0.6
+		},
+		"event_coconut": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/maximize_005.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_006.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_007.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_008.ogg",
+				"assets/audio/sfx-interface/Audio/maximize_009.ogg"
+			],
+			"volume_db": 0.0,
+			"pitch": 0.8
+		},
+		"event_rain": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/scroll_001.ogg",
+				"assets/audio/sfx-interface/Audio/scroll_002.ogg",
+				"assets/audio/sfx-interface/Audio/scroll_003.ogg",
+				"assets/audio/sfx-interface/Audio/scroll_004.ogg",
+				"assets/audio/sfx-interface/Audio/scroll_005.ogg"
+			],
+			"volume_db": 0.0
+		},
+		"event_mud": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/minimize_001.ogg",
+				"assets/audio/sfx-interface/Audio/minimize_002.ogg",
+				"assets/audio/sfx-interface/Audio/minimize_003.ogg",
+				"assets/audio/sfx-interface/Audio/minimize_004.ogg"
+			],
+			"volume_db": 0.0,
+			"pitch": 0.6
+		},
+		"timer_warning": {
+			"files": [
+				"assets/audio/sfx-interface/Audio/tick_001.ogg",
+				"assets/audio/sfx-interface/Audio/tick_002.ogg",
+				"assets/audio/sfx-interface/Audio/tick_004.ogg"
+			],
+			"volume_db": 0.0
+		}
+	},
+	"pitch": {
+		"chicken": 1.35,
+		"duck": 1.2,
+		"goat": 0.85,
+		"pig": 0.75,
+		"monkey": 1.1,
+		"parrot": 1.5,
+		"penguin": 1.0
+	},
+	"signals": {
+		"castaway_step": {
+			"default": "step"
+		},
+		"castaway_dashed": {
+			"default": "dash"
+		},
+		"object_grabbed": {
+			"default": "grab"
+		},
+		"object_thrown": {
+			"default": "throw"
+		},
+		"object_landed": {
+			"default": "land",
+			"water": "splash",
+			"mud": "event_mud"
+		},
+		"object_bonked": {
+			"default": "bonk"
+		},
+		"object_used": {
+			"default": "use"
+		},
+		"castaway_dizzy_started": {
+			"default": "dizzy"
+		},
+		"animal_fled": {
+			"default": "animal_flee"
+		},
+		"animal_bonked": {
+			"default": "animal_bonk"
+		},
+		"animal_panicked": {
+			"default": "animal_panic"
+		},
+		"animal_caught": {
+			"default": "animal_caught"
+		},
+		"animal_lured": {
+			"default": "animal_lured"
+		},
+		"entity_lost": {
+			"default": "lost",
+			"water": "splash"
+		},
+		"entity_respawned": {
+			"default": "respawn"
+		},
+		"task_progress": {
+			"default": "task_progress"
+		},
+		"event_triggered": {
+			"default": "event_warning",
+			"parrot_steal_hat": "event_parrot",
+			"goat_stampede": "event_stampede",
+			"coconut_throw": "event_coconut",
+			"rain_panic": "event_rain",
+			"wave_wash": "splash",
+			"mud_trail": "event_mud"
+		},
+		"timer_warning": {
+			"default": "timer_warning",
+			"announcer": "hurry_up"
+		},
+		"task_completed": {
+			"jingle": "task_done"
+		},
+		"level_won": {
+			"jingle": "won",
+			"announcer": "level_complete"
+		},
+		"level_lost": {
+			"jingle": "lost",
+			"announcer": "times_up"
+		},
+		"level_started": {
+			"announcer": "go"
+		}
+	},
+	"jingles": {
+		"task_done": "assets/audio/jingles/OGG/jingles_NES/jingles_NES03.ogg",
+		"won": "assets/audio/jingles/OGG/jingles_NES/jingles_NES00.ogg",
+		"lost": "assets/audio/jingles/OGG/jingles_NES/jingles_NES09.ogg"
+	},
+	"announcer": {
+		"go": {
+			"file": "assets/audio/voiceover/Male/go.ogg",
+			"caption": "audio.announcer_go"
+		},
+		"hurry_up": {
+			"file": "assets/audio/voiceover/Male/hurry_up.ogg",
+			"caption": "audio.announcer_hurry_up"
+		},
+		"times_up": {
+			"file": "assets/audio/voiceover/Male/time_over.ogg",
+			"caption": "audio.announcer_times_up"
+		},
+		"level_complete": {
+			"file": "assets/audio/voiceover/Male/mission_completed.ogg",
+			"caption": "audio.announcer_level_complete"
+		}
+	},
+	"ignored": {
+		"level_timer_tick": "per-frame HUD update, no sound",
+		"settings_changed": "no gameplay action",
+		"interact_verb_changed": "HUD prompt only",
+		"all_required_done": "covered by the task jingle and level_won",
+		"castaway_dizzy_ended": "end of a state, no sound",
+		"event_ended": "the event start is already warned",
+		"announcer_line": "emitted by the Audio autoload itself",
+		"event_warning": "visual pre-warning only, the event start plays the warning sound",
+		"fx_anchor": "position carrier for the feedback director, no action",
+		"fx_anchor_node": "position carrier for the feedback director, no action"
+	}
+}

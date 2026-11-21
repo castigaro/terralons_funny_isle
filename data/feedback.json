@@ -13,7 +13,8 @@
 		"task_progress": "the HUD task counter shows it",
 		"event_ended": "event actors leave by themselves",
 		"fx_anchor": "anchor carrier for the next signal",
-		"fx_anchor_node": "anchor carrier for the next signal"
+		"fx_anchor_node": "anchor carrier for the next signal",
+		"announcer_line": "the announcer caption shows it (BI-9)"
 	},
 	"signals": {
 		"level_started": {

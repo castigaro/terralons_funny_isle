@@ -9,6 +9,7 @@ const FROZEN := [
 	"task_progress", "timer_warning", "event_ended",
 	"animal_fled", "animal_bonked", "animal_panicked", "animal_caught", "animal_lured", "entity_lost",
 	"entity_respawned", "event_warning", "fx_anchor", "fx_anchor_node",
+	"announcer_line",
 ]
 
 var _got: Array = []
