@@ -56,11 +56,28 @@ func test_restarted_signal_and_entity_reset() -> void:
 	var got: Array = []
 	level.restarted.connect(func(id: String) -> void: got.append(id))
 	var coconut := level.get_node("Actors/Coconut1") as Node2D
+	var chicken := level.get_node("Actors/Chicken1") as Node2D
+	var session := level.level_session()
 	coconut.global_position += Vector2(300, 0)
+	chicken.global_position += Vector2(-200, 150)
 	level.restart_level()
 	check_eq(got, ["valid_sample_level"], "restarted once")
-	check_eq(coconut.global_position, level.home_point("coconut_1"), "entity back home")
-	check_eq(coconut.get("reset_calls"), 1, "reset_to_home called")
+	check_eq(coconut.global_position, level.home_point("coconut_1"), "coconut back home in the restart frame")
+	check_eq(chicken.global_position, level.home_point("chicken_1"), "chicken back home in the restart frame")
+	check(level.level_session() == session, "same session object (protection keeps its wiring)")
+
+
+func test_protection_still_works_after_restart() -> void:
+	await open_level()
+	level.restart_level()
+	await physics_frames(1)
+	var chicken := level.get_node("Actors/Chicken1") as Animal
+	var reg := level.entity_registry()
+	chicken.relocate_to(level.zone("zone_a").global_position)
+	await physics_frames(2)
+	check(level.level_session().task_progress().any(
+			func(t: Dictionary) -> bool: return t["id"] == "fx_chicken_a" and t["done"]), "chicken task done")
+	check(reg.is_protected(chicken), "chicken protected after the restart")
 
 
 func test_restart_key_restarts() -> void:

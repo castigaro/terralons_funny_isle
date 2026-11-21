@@ -8,7 +8,7 @@ func test_small_level_camera_stays_fixed() -> void:
 	await open_level(SMALL_LEVEL)
 	var cam := level.camera()
 	check(cam.is_fixed_axis(0) and cam.is_fixed_axis(1), "both axes fixed")
-	var centre := level.get_bounds().get_center()
+	var centre := level.get_bounds_rect().get_center()
 	check_eq(cam.global_position, centre, "camera at the bounds centre")
 	var moved := 0
 	for i in 120:
@@ -26,7 +26,7 @@ func test_small_level_camera_stays_fixed() -> void:
 func test_backdrop_covers_a_viewport_around_the_level() -> void:
 	for path in [SAMPLE_LEVEL, SMALL_LEVEL]:
 		await open_level(path)
-		var grown := level.get_bounds().grow_individual(VIEW.x, VIEW.y, VIEW.x, VIEW.y)
+		var grown := level.get_bounds_rect().grow_individual(VIEW.x, VIEW.y, VIEW.x, VIEW.y)
 		check(level.backdrop_rect().encloses(grown), "%s backdrop %s covers %s" % [path, level.backdrop_rect(), grown])
 		level.queue_free()
 		await frames(1)

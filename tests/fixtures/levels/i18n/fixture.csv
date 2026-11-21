@@ -24,3 +24,5 @@ fixture.reach_b_hint,Run to zone B.,Lauf zu Zone B.
 fixture.reach_b_fail,You never reached zone B!,Du warst nie in Zone B!
 fixture.grab_coconut_hint,Grab the coconut.,Schnapp dir die Kokosnuss.
 fixture.grab_coconut_fail,The coconut is still lying around!,Die Kokosnuss liegt noch herum!
+fixture.chicken_a_hint,Carry the chicken to zone A.,Trag das Huhn zu Zone A.
+fixture.chicken_a_fail,The chicken never reached zone A!,Das Huhn war nie in Zone A!

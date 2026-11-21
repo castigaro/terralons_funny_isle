@@ -44,6 +44,19 @@
 			],
 			"hint_key": "fixture.grab_coconut_hint",
 			"fail_key": "fixture.grab_coconut_fail"
+		},
+		{
+			"id": "fx_chicken_a",
+			"required": false,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "zone_a"
+				}
+			],
+			"hint_key": "fixture.chicken_a_hint",
+			"fail_key": "fixture.chicken_a_fail"
 		}
 	],
 	"events": [

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/castaway/castaway.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/castaway/soft_shadow.tres" id="2_shadow"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/graphics/topdown-characters/PNG/Survivor 1/survivor1_stand.png" id="4_stand"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/star_06.png" id="5_star"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/dirt_01.png" id="6_dirt"]
+[ext_resource type="Script" path="res://scripts/levels/drop_shadow.gd" id="90_drop_shadow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 22.0
@@ -32,6 +33,7 @@ shape = SubResource("CircleShape2D_body")
 position = Vector2(4, 10)
 scale = Vector2(1.6, 1.15)
 texture = ExtResource("2_shadow")
+script = ExtResource("90_drop_shadow")
 
 [node name="DustEmitter" type="CPUParticles2D" parent="."]
 material = SubResource("CanvasItemMaterial_dust")

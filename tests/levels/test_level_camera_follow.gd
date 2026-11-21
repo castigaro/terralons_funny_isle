@@ -32,7 +32,7 @@ func test_follow_run_dash_and_stop() -> void:
 	var cfg := _cfg()
 	var cap := float(cfg["camera_max_step_px"])
 	var margin := float(cfg["camera_edge_margin_px"])
-	var b := level.get_bounds()
+	var b := level.get_bounds_rect()
 	await place_castaway(Vector2(1100, 900))
 	tree().process_frame.connect(_on_frame)
 	var too_big := 0
@@ -98,7 +98,7 @@ func test_axis_limits_and_fixed_axes() -> void:
 	var cam := level.camera()
 	check_false(cam.is_fixed_axis(0), "sample x scrolls")
 	check_false(cam.is_fixed_axis(1), "sample y scrolls")
-	var b := level.get_bounds()
+	var b := level.get_bounds_rect()
 	check_eq(cam.clamp_to_bounds(Vector2(-5000, -5000)), b.position + HALF_VIEW, "top-left limit")
 	check_eq(cam.clamp_to_bounds(Vector2(9000, 9000)), b.end - HALF_VIEW, "bottom-right limit")
 	check_eq(cam.offset, Vector2.ZERO, "offset untouched")

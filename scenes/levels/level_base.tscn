@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/levels/level_base.gd" id="1_base"]
 [ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_73.png" id="2_water"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/levels/level_camera.gd" id="5_camera"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_cue.tscn" id="6_cue"]
 [ext_resource type="PackedScene" path="res://scenes/ui/level_error_panel.tscn" id="7_error"]
+[ext_resource type="Script" path="res://scripts/gameplay/entities/entity_registry.gd" id="8_registry"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
 resource_local_to_scene = true
@@ -55,6 +56,9 @@ y_sort_enabled = true
 [node name="Bounds" type="StaticBody2D" parent="."]
 collision_layer = 4
 collision_mask = 0
+
+[node name="EntityRegistry" type="Node" parent="."]
+script = ExtResource("8_registry")
 
 [node name="LevelCamera" type="Camera2D" parent="."]
 process_physics_priority = 2

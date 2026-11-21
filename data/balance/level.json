@@ -9,5 +9,7 @@
 	"backdrop_margin_viewports": 1.0,
 	"walkable_probe_radius": 20,
 	"restart_cue_seconds": 1.0,
-	"max_zone_hits": 32
+	"palm_crown_px": 200,
+	"palm_crown_lift_px": 80,
+	"palm_footprint_radius": 18
 }

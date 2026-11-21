@@ -4,8 +4,9 @@ extends RefCounted
 
 const PATH := "res://data/art/palette.json"
 const REQUIRED_COLORS := ["sand", "grass", "water", "water_deep", "foliage", "outline", "ui_panel", "ui_text",
-		"ui_accent"]
+		"ui_accent", "shadow"]
 const FALLBACK_COLOR := "#ff00ff"
+const OUTLINE_SHADER := preload("res://scenes/levels/art/outline.gdshader")
 
 static var _cache: Dictionary = {}
 
@@ -37,7 +38,9 @@ static func validate(palette: Dictionary) -> Array:
 	if not shadow_block is Dictionary or not shadow_block.get("offset") is Array or shadow_block["offset"].size() != 2:
 		errors.append("shadow: needs alpha, scale, squash and offset [x, y]")
 	else:
-		for key in ["alpha", "scale", "squash"]:
+		if not colors.has(shadow_block.get("color_key", "")):
+			errors.append("shadow.color_key: must name a palette colour")
+		for key in ["alpha", "scale", "squash", "min_px", "tree_width_share"]:
 			if not float(shadow_block.get(key, 0.0)) > 0.0:
 				errors.append("shadow.%s: must be > 0" % key)
 	var outlined: Variant = palette.get("outlined")
@@ -71,12 +74,15 @@ static func outline_px() -> float:
 	return float(data().get("outline", {}).get("thickness_px_1080", 1.0))
 
 
-## Drop shadow block: {alpha, scale, squash, offset: Vector2}.
+## Drop shadow block: {color, alpha, scale, squash, offset: Vector2, min_px, tree_width_share, min_contrast_on_sand}.
 static func shadow() -> Dictionary:
 	var block: Dictionary = data().get("shadow", {})
 	var off: Array = block.get("offset", [0, 0])
-	return {"alpha": float(block.get("alpha", 1.0)), "scale": float(block.get("scale", 1.0)),
-			"squash": float(block.get("squash", 1.0)), "offset": Vector2(float(off[0]), float(off[1]))}
+	return {"color": color(str(block.get("color_key", "shadow"))), "alpha": float(block.get("alpha", 1.0)),
+			"scale": float(block.get("scale", 1.0)), "squash": float(block.get("squash", 1.0)),
+			"offset": Vector2(float(off[0]), float(off[1])), "min_px": float(block.get("min_px", 0.0)),
+			"tree_width_share": float(block.get("tree_width_share", 1.0)),
+			"min_contrast_on_sand": float(block.get("min_contrast_on_sand", 0.0))}
 
 
 ## True when the texture comes from a pack with a drawn outline (never gets the outline shader).
@@ -104,6 +110,24 @@ static func apply_to(material: Material) -> void:
 		var hl := Color.html(str(data().get("highlight", "#ffffff")))
 		hl.a = float(data().get("highlight_alpha", hl.a))
 		material.set_shader_parameter("highlight", hl)
+
+
+## Gives a sprite the outline shader when its texture comes from an outlined pack (3 px on screen at any scale);
+## clears a previous outline material otherwise.
+static func apply_outline(sprite: Sprite2D) -> void:
+	if sprite == null or sprite.texture == null:
+		return
+	var current := sprite.material as ShaderMaterial
+	var has_outline := current != null and current.shader == OUTLINE_SHADER
+	if not is_outlined(sprite.texture.resource_path):
+		if has_outline:
+			sprite.material = null
+		return
+	var mat := current if has_outline else ShaderMaterial.new()
+	mat.shader = OUTLINE_SHADER
+	apply_to(mat)
+	mat.set_shader_parameter("outline_px", outline_px() / maxf(absf(sprite.scale.x), 0.01))  # balance-exempt: divide guard
+	sprite.material = mat
 
 
 static func _matches(texture_path: String, prefixes: Array) -> bool:

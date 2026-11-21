@@ -2,7 +2,8 @@ class_name LevelBase
 extends Node2D
 ## Reusable level scene base: loads the level JSON into a LevelSession, owns the handcrafted TileMapLayers (painted
 ## offline by tools/build_level_layout.gd), the level bounds, spawn, home points, named zones and the camera, feeds
-## the session a world snapshot every physics tick and runs the instant restart. The whole level is always visible:
+## the session a world snapshot every physics tick and runs the instant restart. Its EntityRegistry child owns the
+## animals and items (snapshot entities, protection, respawn, restart reset). The whole level is always visible:
 ## there is no map generation and no hidden or revealed area. See docs/levels.md for the contract.
 
 signal level_ready(level_id: String)
@@ -10,8 +11,6 @@ signal level_load_failed(path: String, errors: Array)
 signal restarted(level_id: String)
 signal exit_requested()
 
-const PLAYER := "player"
-const ENTITY_GROUP := "level_entity"
 const SURFACE_WATER := "water"
 const SURFACE_KEY := "surface"
 ## Surface lookup order, top layer first.
@@ -19,7 +18,7 @@ const SURFACE_LAYERS := ["Details", "Shore", "Grass", "Sand"]
 ## Layers whose cells count as land.
 const LAND_LAYERS := ["Sand", "Shore"]
 const REQUIRED_CHILDREN := ["WaterBackdrop", "Sand", "Grass", "Shore", "Details", "Actors", "Markers/Spawn",
-		"HomePoints", "Zones", "Bounds", "LevelCamera", "Overlay/LevelCue", "Overlay/LevelErrorPanel"]
+		"HomePoints", "Zones", "Bounds", "EntityRegistry", "LevelCamera", "Overlay/LevelCue", "Overlay/LevelErrorPanel"]
 const NEIGHBOURS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 const RESTART_CUE_KEY := "level.restarted"
 
@@ -46,6 +45,8 @@ var _bounds := Rect2()
 var _cfg := {}
 var _castaway: Node2D
 var _camera: LevelCamera
+var _registry: EntityRegistry
+var _protection: EntityProtection
 
 
 func _ready() -> void:
@@ -62,7 +63,12 @@ func _ready() -> void:
 		_fail(problems)
 		return
 	_camera = $LevelCamera
+	_registry = $EntityRegistry as EntityRegistry
+	for child in $Zones.get_children():
+		if child is Zone and (child as Zone).zone_id == "":
+			(child as Zone).zone_id = String(child.name)
 	_bounds = bounds_override if bounds_override.has_area() else _land_rect()
+	add_to_group(EntityRegistry.BOUNDS_GROUP)
 	_build_bounds()
 	_size_backdrop()
 	var loaded := _load_def()
@@ -74,6 +80,10 @@ func _ready() -> void:
 		_fail(missing)
 		return
 	_session = LevelSession.new(_def, EventBus, Balance.get_section("rules"), session_options)
+	_registry.set_castaway(_castaway)
+	_registry.refresh()
+	_protection = EntityProtection.new(_session, _def)
+	_registry.set_protection(_protection.is_protected, _protection.confine_zone)
 	_camera.setup(_castaway, _bounds)
 	if _castaway.has_method("reset_to"):
 		_castaway.call("reset_to", spawn_position(), spawn_facing())
@@ -102,9 +112,35 @@ func _load_def() -> Array:
 
 func _contract_problems() -> Array:
 	var problems: Array = []
+	var file := level_json_path.get_file()
 	for zone_id in required_zone_ids(_def):
 		if zone(zone_id) == null:
-			problems.append("%s: zone %s used by a task is missing under Zones" % [level_json_path.get_file(), zone_id])
+			problems.append("%s: zone %s used by a task is missing under Zones" % [file, zone_id])
+	problems.append_array(zone_problems())
+	return problems
+
+
+## Zone contract: every child of Zones is a Zone whose node name equals its zone_id and whose shapes are
+## rectangles or circles in CollisionShape2D nodes (the only shapes Zone.area_contains supports).
+func zone_problems() -> Array:
+	var problems: Array = []
+	for child in $Zones.get_children():
+		if not child is Zone:
+			problems.append("%s: Zones/%s is not a Zone" % [name, child.name])
+			continue
+		var z := child as Zone
+		if z.zone_id != String(z.name):
+			problems.append("%s: zone node %s has zone_id %s (must match)" % [name, z.name, z.zone_id])
+		var shapes := 0
+		for part in z.get_children():
+			var cs := part as CollisionShape2D
+			if cs != null and (cs.shape is RectangleShape2D or cs.shape is CircleShape2D):
+				shapes += 1
+			elif part is CollisionShape2D or part is CollisionPolygon2D:
+				problems.append("%s: zone %s uses an unsupported shape %s (rectangle or circle only)"
+						% [name, z.name, part.name])
+		if shapes == 0:
+			problems.append("%s: zone %s has no rectangle or circle shape" % [name, z.name])
 	return problems
 
 
@@ -172,6 +208,10 @@ func camera() -> LevelCamera:
 	return _camera
 
 
+func entity_registry() -> EntityRegistry:
+	return _registry
+
+
 func start_level() -> void:
 	if _failed or _session == null:
 		return
@@ -187,9 +227,7 @@ func restart_level() -> void:
 	_session.start()
 	if _castaway.has_method("reset_to"):
 		_castaway.call("reset_to", spawn_position(), spawn_facing())
-	for node in _entities():
-		if node.has_method("reset_to_home"):
-			node.call("reset_to_home")
+	_registry.reset_all()
 	_camera.snap()
 	var cue := get_node_or_null("Overlay/LevelCue")
 	if cue != null:
@@ -214,7 +252,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # --- Snapshot -------------------------------------------------------------------------------------------
 
-## World snapshot for LevelSession.tick (format in docs/rules.md).
+## World snapshot for LevelSession.tick (format in docs/rules.md); the entities come from the EntityRegistry.
 func build_snapshot() -> Dictionary:
 	var player := {"zones": [], "held": "", "worn": "", "stunned": false}
 	if _castaway != null:
@@ -225,32 +263,8 @@ func build_snapshot() -> Dictionary:
 			player["worn"] = String(_castaway.call("get_worn_kind"))
 		if _castaway.has_method("is_dizzy"):
 			player["stunned"] = bool(_castaway.call("is_dizzy"))
-	var entities: Array = []
-	for node in _entities():
-		var held_by: Variant = node.get("held_by")
-		var worn_by: Variant = node.get("worn_by")
-		var held := ""
-		if held_by is Object and held_by != null and held_by == _castaway:
-			held = PLAYER
-		elif held_by is String or held_by is StringName:
-			held = String(held_by)
-		entities.append({
-			"uid": String(node.get("uid")),
-			"kind": _kind_of(node),
-			"zones": zones_at(node.global_position),
-			"held_by": held,
-			"worn_by": String(worn_by) if worn_by is String or worn_by is StringName else "",
-		})
+	var entities: Array = _registry.snapshot_entities() if _registry != null else []
 	return {"player": player, "entities": entities}
-
-
-func _entities() -> Array:
-	var found: Array = []
-	for node in get_tree().get_nodes_in_group(ENTITY_GROUP):
-		if node is Node2D and is_ancestor_of(node):
-			found.append(node)
-	found.sort_custom(func(a: Node, b: Node) -> bool: return String(a.get("uid")) < String(b.get("uid")))
-	return found
 
 
 func _kind_of(obj: Variant) -> String:
@@ -261,37 +275,37 @@ func _kind_of(obj: Variant) -> String:
 
 # --- Zones, markers and bounds ----------------------------------------------------------------------------
 
-func zone(zone_id: String) -> LevelZone:
-	return get_node_or_null("Zones/" + zone_id) as LevelZone
+## The Zone below Zones whose zone_id is zone_id, or null.
+func zone(zone_id: String) -> Zone:
+	for child in $Zones.get_children():
+		if child is Zone and (child as Zone).zone_id == zone_id:
+			return child
+	return null
 
 
 func zone_ids() -> Array:
 	var ids: Array = []
 	for child in $Zones.get_children():
-		if child is LevelZone:
-			ids.append(String(child.name))
+		if child is Zone:
+			ids.append((child as Zone).zone_id)
 	ids.sort()
 	return ids
 
 
-## Sorted ids of the zones containing a global point (physics point query on the zones layer).
+## Sorted ids of the level zones containing a global point, computed from the zone shapes (same rule as
+## EntityRegistry.zones_of, valid in the same frame without a physics query).
 func zones_at(pos: Vector2) -> Array:
-	var query := PhysicsPointQueryParameters2D.new()
-	query.position = pos
-	query.collision_mask = PhysicsLayers.ZONES
-	query.collide_with_areas = true
-	query.collide_with_bodies = false
 	var ids := {}
-	for hit in get_world_2d().direct_space_state.intersect_point(query, int(_cfg.get("max_zone_hits", 1))):
-		var area: Object = hit.get("collider")
-		if area is LevelZone and is_ancestor_of(area):
-			ids[(area as LevelZone).zone_id()] = true
+	for child in $Zones.get_children():
+		if child is Zone and (child as Zone).zone_id != "" and (child as Zone).contains_point(pos):
+			ids[(child as Zone).zone_id] = true
 	var out := ids.keys()
 	out.sort()
 	return out
 
 
-func get_bounds() -> Rect2:
+## Level bounds in world coordinates (group level_bounds contract of the EntityRegistry).
+func get_bounds_rect() -> Rect2:
 	return _bounds
 
 
@@ -419,13 +433,20 @@ func is_walkable_cell(cell: Vector2i) -> bool:
 	return get_world_2d().direct_space_state.intersect_shape(query, 1).is_empty()
 
 
+## Walkable land cells, except cells whose centre lies in a respawn_area (closed pockets, see docs/levels.md).
 func walkable_cells() -> Array:
 	var cells := {}
 	for layer_name in LAND_LAYERS:
 		for cell in (get_node(layer_name) as TileMapLayer).get_used_cells():
 			cells[cell] = true
+	var pockets: Array = []
+	for area in get_tree().get_nodes_in_group(EntityRegistry.RESPAWN_AREA_GROUP):
+		if is_ancestor_of(area):
+			pockets.append(area)
 	var out: Array = []
 	for cell in cells:
+		if pockets.any(func(area: Node) -> bool: return Zone.area_contains(area, cell_center(cell))):
+			continue
 		if is_walkable_cell(cell):
 			out.append(cell)
 	out.sort()

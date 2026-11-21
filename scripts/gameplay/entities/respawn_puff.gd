@@ -23,6 +23,8 @@ static func spawn(parent: Node, pos: Vector2, config: EntityConfig) -> RespawnPu
 
 func _ready() -> void:
 	add_to_group(GROUP)
+	# Animated in _process only, so it is not physics-interpolated.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	for i in maxi(1, int(cfg.puff_frames)):
 		var path := FRAME_PATTERN % i
 		if ResourceLoader.exists(path):

@@ -36,7 +36,7 @@ func test_animals_and_items_are_at_least_24_px_at_720p() -> void:
 		for node in tree().get_nodes_in_group(group):
 			if not level.is_ancestor_of(node):
 				continue
-			var sprite := node.get_node("Visual") as Sprite2D
+			var sprite := node.get_node("Visual/Body") as Sprite2D
 			var size := _screen_size(sprite, Vector2(1280, 720))
 			check(minf(size.x, size.y) >= 24.0, "%s %s px at 1280x720" % [node.name, size])
 			count += 1

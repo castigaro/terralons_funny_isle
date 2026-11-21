@@ -194,6 +194,19 @@ class RepoAssetsTest(unittest.TestCase):
         sources = (common.REPO / "assets" / "SOURCES.md").read_text(encoding="utf-8")
         self.assertIn("`graphics/pirate-pack/`", sources)
 
+    def test_derived_grass_edges_are_listed_imported_and_used(self):
+        rel = "assets/graphics/pirate-pack-derived/grass_edges@2.png"
+        self.assertTrue((common.REPO / rel).is_file())
+        self.assertTrue((common.REPO / (rel + ".import")).is_file(), "imported")
+        sources = (common.REPO / "assets" / "SOURCES.md").read_text(encoding="utf-8")
+        row = [ln for ln in sources.splitlines() if ln.startswith("| `graphics/pirate-pack-derived/` |")]
+        self.assertEqual(len(row), 1, "SOURCES.md row")
+        self.assertIn("CC0 1.0", row[0])
+        self.assertIn("derive_grass_edges.gd", row[0])
+        tileset = (common.REPO / "scenes" / "levels" / "island_tileset.tres").read_text(encoding="utf-8")
+        self.assertIn("res://" + rel, tileset)
+        self.assertTrue((common.REPO / "tools" / "derive_grass_edges.gd").is_file())
+
     def test_asset_map_names_every_category(self):
         text = (common.REPO / "docs" / "asset_map.md").read_text(encoding="utf-8").lower()
         for word in ("castaway", "animals", "items", "tiles", "ui", "fonts", "particles", "music", "sfx"):

@@ -42,7 +42,7 @@ func test_markers_zones_and_bounds() -> void:
 	var bounds_body := level.get_node("Bounds") as StaticBody2D
 	check_eq(bounds_body.collision_layer, PhysicsLayers.BOUNDS, "bounds layer")
 	check_eq(bounds_body.get_child_count(), 4, "four bound shapes")
-	var b := level.get_bounds()
+	var b := level.get_bounds_rect()
 	var enclosing := Rect2()
 	for cs in bounds_body.get_children():
 		var shape := (cs as CollisionShape2D).shape as RectangleShape2D
@@ -55,7 +55,7 @@ func test_markers_zones_and_bounds() -> void:
 func test_bounds_equal_land_rect() -> void:
 	await open_level()
 	# Land is columns 1..22 and rows 1..12 of the 24x14 layout at 128 px per tile.
-	check_eq(level.get_bounds(), Rect2(128, 128, 22 * 128, 12 * 128), "bounds")
+	check_eq(level.get_bounds_rect(), Rect2(128, 128, 22 * 128, 12 * 128), "bounds")
 
 
 func test_camera_is_child_of_level() -> void:

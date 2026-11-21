@@ -20,7 +20,7 @@ func _run(start: Vector2, dir: Vector2, dash: bool = true) -> Vector2:
 		var pos := castaway.global_position
 		if _overlaps(pos, SOLID_MASK, castaway.cfg.body_radius - 1.0):
 			_bad_overlap += 1
-		if not level.get_bounds().has_point(pos):
+		if not level.get_bounds_rect().has_point(pos):
 			_outside += 1
 	move = Vector2.ZERO
 	return castaway.global_position
@@ -77,7 +77,7 @@ func test_rock_boulder_and_palm_block() -> void:
 	var boulder := (level.get_node("Actors/Boulder1") as Node2D).global_position
 	var at_boulder := await _run(boulder + Vector2(0, 200), Vector2.UP)
 	check(at_boulder.y > boulder.y + 44.0, "boulder blocks: %s" % at_boulder)
-	var palm := (level.get_node("Actors/Prop2") as Node2D).global_position
+	var palm := (level.get_node("Actors/Palm2") as Node2D).global_position
 	var at_palm := await _run(palm + Vector2(-220, 0), Vector2.RIGHT)
 	check(at_palm.x < palm.x - 22.0, "palm trunk blocks: %s" % at_palm)
 	check_eq(_bad_overlap, 0, "ticks overlapping water or solids")
@@ -93,6 +93,10 @@ func test_bounds_hold_with_dashes_in_all_directions() -> void:
 func test_surfaces() -> void:
 	check_eq(level.get_surface_at(level.cell_center(Vector2i(2, 10))), "sand", "sand")
 	check_eq(level.get_surface_at(level.cell_center(Vector2i(5, 7))), "grass", "grass")
+	check_eq(level.get_surface_at(level.cell_center(Vector2i(4, 6))), "grass", "grass outer corner cell")
+	check_eq(level.get_surface_at(level.cell_center(Vector2i(4, 6)) + Vector2(-60, -60)), "grass",
+			"an edge tile reports grass for its whole cell")
+	check_eq(level.get_surface_at(level.cell_center(Vector2i(17, 4))), "sand", "shore inner corner sand")
 	check_eq(level.get_surface_at(level.cell_center(Vector2i(12, 3))), "stone", "stone")
 	check_eq(level.get_surface_at(level.cell_center(Vector2i(1, 5))), "sand", "shore sand")
 	check_eq(level.get_surface_at(level.cell_center(Vector2i(0, 0))), "water", "water")

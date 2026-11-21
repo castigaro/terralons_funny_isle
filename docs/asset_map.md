@@ -48,6 +48,8 @@ Island tiles 128×128 px from the pirate pack (`assets/graphics/pirate-pack/PNG/
 
 - Sand island with shoreline: `tile_01`–`tile_03`, `tile_17`–`tile_19`, `tile_33`–`tile_35` (for example `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_18.png`)
 - Grass on sand: `tile_06`–`tile_09`, `tile_22`–`tile_25`, `tile_38`–`tile_41`, `tile_54`–`tile_57`; full grass `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_23.png`
+- Derived transitions (BI-5): `assets/graphics/pirate-pack-derived/grass_edges@2.png` (4×4 tiles of 128 px, atlas source 1 of `island_tileset.tres`), built once by `tools/derive_grass_edges.gd` from the tilesheet. Row 0: grass edges with sand to the N, S, W, E; row 1: grass outer corners NW, NE, SW, SE; row 2: grass inner corners (sand only on that diagonal); row 3: shore inner corners (water only on that diagonal) with a water collision square. The pack has no stand-alone grass-to-sand transitions (its blob edges are baked into the shore ring) and no shore inner corners.
+- Palm crowns (top-down): `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_70.png`, `tile_71`, `tile_72` (tilesheet atlas (5–7, 4)) in `scenes/levels/props/palm.tscn`; the foliage pack has no palms, its deciduous trees (`foliagePack_008`, `foliagePack_010` …) stay available as jungle trees.
 - Water (animate by UV scroll or shader): `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_73.png`
 - Stone ground (volcano cliffs): `tile_10`–`tile_12`, `tile_26`–`tile_28`, `tile_42`–`tile_44`, `tile_58`, `tile_59`, `tile_74`, `tile_75`
 - Rocks: `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_49.png`, `tile_50`, `tile_51`, mossy `tile_65`–`tile_67`

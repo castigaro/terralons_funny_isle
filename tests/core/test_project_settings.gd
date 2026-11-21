@@ -108,3 +108,23 @@ func test_level_interpolation_modes() -> void:
 	check(layers.size() >= 2, "overlay layers found")
 	for layer in layers:
 		check_eq(layer.physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF, "%s interpolation off" % layer.name)
+
+
+func test_entity_interpolation_modes() -> void:
+	for path in ["res://scenes/entities/animal.tscn", "res://scenes/entities/item.tscn"]:
+		var node := (load(path) as PackedScene).instantiate()
+		node.set("kind", "chicken" if path.contains("animal") else "coconut")
+		add_node(node)
+		await physics_frames(1)
+		check_ne(node.physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF, "%s body interpolated" % path)
+		for child in node.get_children():
+			# World-space particles (local_coords off) manage their own interpolation.
+			if child is CanvasItem and not child is CPUParticles2D:
+				check_ne((child as CanvasItem).physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF,
+						"%s/%s follows the physics-animated body" % [path, child.name])
+		node.queue_free()
+	var cfg := EntityConfig.from_balance()
+	var puff := RespawnPuff.spawn(root(), Vector2(100, 100), cfg)
+	await frames(1)
+	check_eq(puff.physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF, "respawn puff (_process) not interpolated")
+	puff.queue_free()
