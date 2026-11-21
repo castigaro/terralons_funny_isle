@@ -1,6 +1,6 @@
 extends "res://tests/support/level_case.gd"
 ## Beach Camp teaches the controls in place: move, grab, throw and use prompts sit at the castaway, the first
-## chicken, the first coconut and the cage, each disappears once its action was used (also after a restart), the
+## chicken, the first coconut and the cage gate, each disappears once its action was used (also after a restart), the
 ## texts follow the locale and the key caps come from the input map. Farm Meadow shows no basic prompts.
 
 const L1 := "res://scenes/levels/l1_beach_camp.tscn"
@@ -27,7 +27,7 @@ func test_four_prompts_at_their_anchors() -> void:
 	await frames(1)
 	check_eq(_actions(), ["grab", "move", "throw", "use"], "prompt actions")
 	var anchors := {"move": castaway, "grab": level.entity_registry().find_uid("chicken_1"),
-			"throw": level.entity_registry().find_uid("coconut_1"), "use": level.zone("cage")}
+			"throw": level.entity_registry().find_uid("coconut_1"), "use": level.get_node("Actors/CageGate")}
 	for action in anchors:
 		var p := _prompt(action)
 		check(p != null and p.anchor() == anchors[action], "%s prompt anchored" % action)
@@ -35,6 +35,13 @@ func test_four_prompts_at_their_anchors() -> void:
 			check(p.visible, "%s prompt visible" % action)
 			check(p.global_position.distance_to((anchors[action] as Node2D).global_position) < 200.0, "%s prompt near its anchor" % action)
 			check(p.key_cap() != null, "%s key cap" % action)
+	check_eq(level.prompt_problems(), [], "every prompt anchor resolves")
+	var use := _prompt("use")
+	if use != null:
+		var gate := level.get_node("Actors/CageGate")
+		check(gate is PenTarget and String(gate.get("target_kind")) == "cage", "use prompt at the cage PenTarget")
+		check(use.global_position.distance_to(gate.global_position) <= castaway.cfg.use_radius + 1.0,
+				"use prompt within use_radius of the gate")
 	check(level.spawn_position().distance_to(level.entity_registry().find_uid("chicken_1").global_position) <= 3.0 * 128.0,
 			"first chicken within three tiles of the spawn")
 
@@ -81,3 +88,9 @@ func test_farm_meadow_has_no_basic_prompts() -> void:
 	await frames(1)
 	check_eq(level.level_def().prompts.size(), 0, "no prompts in level 2")
 	check(level.prompts().is_empty(), "no prompt nodes")
+
+
+func test_target_anchor_resolves_by_target_kind() -> void:
+	await open_level(L1)
+	check(level.resolve_anchor("target:cage") == level.get_node("Actors/CageGate"), "target:cage -> the cage gate")
+	check(level.resolve_anchor("target:unicorn") == null, "unknown target kind -> null")

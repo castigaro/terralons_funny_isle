@@ -81,7 +81,7 @@ A task is done when all of its `conditions` and all of its `modifiers` hold at t
 
 | Type | Effects |
 |---|---|
-| `parrot_steal_hat` | `take_worn` |
+| `parrot_steal_hat` | `steal_wearable` |
 | `goat_stampede` (param `lane` required) | `relocate_entities`, `stun_player` |
 | `coconut_throw` | `stun_player`, `take_held` |
 | `rain_panic` | `panic_animals`, `relocate_entities` |

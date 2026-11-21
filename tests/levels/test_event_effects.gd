@@ -20,20 +20,81 @@ func _effects() -> EventEffects:
 	return level.event_effects()
 
 
-func test_parrot_takes_an_unprotected_hat_to_the_flee_zone() -> void:
-	await open_level(L1, {"autostart": false})
-	var hat := level.entity_registry().find_uid("hat_1")
-	var goat := level.entity_registry().find_uid("goat_1")
-	hat.call("wear_on", goat, "goat")
-	await physics_frames(1)
-	var time_before := level.level_session().time_left()
-	await _trigger("parrot_raid")
-	check_eq(String(hat.get("worn_by")), "", "hat taken off")
+func _done_map() -> Dictionary:
+	var out := {}
+	for e in level.level_session().task_progress():
+		out[String(e["id"])] = bool(e["done"])
+	return out
+
+
+func _near_flee(pos: Vector2) -> bool:
 	var flee := level.zone("parrot_flee").global_position
-	var limit := Balance.get_float("events", "flee_drop_radius_px") + 128.0
-	check(hat.global_position.distance_to(flee) <= limit, "hat dropped near the flee zone (%s)" % hat.global_position)
-	check_eq(level.level_session().get_state(), LevelSession.State.READY, "session untouched")
-	check_eq(level.level_session().time_left(), time_before, "timer untouched")
+	return pos.distance_to(flee) <= Balance.get_float("events", "flee_drop_radius_px") + 128.0
+
+
+func test_parrot_steals_the_loose_hat_while_the_session_runs() -> void:
+	await open_level(L1)
+	var session := level.level_session()
+	check_eq(session.get_state(), LevelSession.State.RUNNING, "session running")
+	var hat := level.entity_registry().find_uid("hat_1")
+	check(hat.call("is_free"), "hat lies loose at its home")
+	var done_before := _done_map()
+	var time_before := session.time_left()
+	await _trigger("parrot_raid")
+	check_eq(String(hat.get("worn_by")), "", "hat not worn")
+	check(_near_flee(hat.global_position), "hat dropped near the flee zone (%s)" % hat.global_position)
+	check(_effects().last_relocations().has("hat_1"), "relocation recorded: %s" % str(_effects().last_relocations()))
+	check_eq(session.get_state(), LevelSession.State.RUNNING, "state untouched")
+	check(session.time_left() < time_before, "timer keeps running")
+	check_eq(_done_map(), done_before, "no task changed")
+
+
+func test_parrot_snatches_the_carried_hat() -> void:
+	await open_level(L1)
+	var hat := level.entity_registry().find_uid("hat_1")
+	await place_castaway(hat.global_position + Vector2(-50, 0), 0.0)
+	press_interact()
+	await physics_frames(2)
+	check(castaway.get_carried() == hat, "carrying the hat")
+	await _trigger("parrot_raid")
+	check(castaway.get_carried() == null, "hat snatched from the hands")
+	check(_near_flee(hat.global_position), "carried hat dropped near the flee zone (%s)" % hat.global_position)
+	check(hat.call("is_free"), "hat lies on the ground")
+
+
+func test_stolen_hat_can_be_put_on_the_goat_again() -> void:
+	await open_level(L1)
+	var hat := level.entity_registry().find_uid("hat_1")
+	await _trigger("parrot_raid")
+	check(_near_flee(hat.global_position), "hat stolen first")
+	await place_castaway(hat.global_position + Vector2(-50, 0), 0.0)
+	press_interact()
+	await physics_frames(2)
+	check(castaway.get_carried() == hat, "hat picked up again")
+	var wear := level.get_node("Actors/Goat1/WearTarget") as Node2D
+	castaway.global_position = wear.global_position + Vector2(-60, 0)
+	castaway.reset_physics_interpolation()
+	await physics_frames(1)
+	check_eq(castaway.get_interact_verb(), CastawayLogic.VERB_USE, "the goat takes the hat")
+	press_interact()
+	await physics_frames(3)
+	check_eq(String(hat.get("worn_by")), "goat", "goat wears the hat")
+	check(_done_map().get("hat_on_goat", false), "hat task done")
+	var state := level.level_session().get_state()
+	check(state == LevelSession.State.RUNNING or state == LevelSession.State.WON, "state stays running: %d" % state)
+
+
+func test_parrot_drop_point_is_deterministic_per_seed() -> void:
+	await open_level(L1)
+	var hat := level.entity_registry().find_uid("hat_1")
+	await _trigger("parrot_raid")
+	var first := hat.global_position
+	EventBus.event_ended.emit("parrot_raid")
+	level.restart_level()
+	await physics_frames(2)
+	check(hat.global_position != first, "hat back home after the restart")
+	await _trigger("parrot_raid")
+	check_eq(hat.global_position, first, "same seed, same drop point")
 
 
 func test_parrot_spares_a_hat_of_a_done_task() -> void:
@@ -44,10 +105,14 @@ func test_parrot_spares_a_hat_of_a_done_task() -> void:
 	await physics_frames(3)
 	var done := level.level_session().task_progress().filter(func(e: Dictionary) -> bool: return e["done"])
 	check_eq(done.size(), 1, "hat task done")
-	await _trigger("parrot_raid")
+	EventBus.event_triggered.emit("parrot_raid")
+	await physics_frames(2)
+	check_false(_effects().actor_nodes().is_empty(), "the parrot still flies")
+	await physics_frames(_impact_ticks())
 	check_eq(String(hat.get("worn_by")), "goat", "protected hat stays on")
 	done = level.level_session().task_progress().filter(func(e: Dictionary) -> bool: return e["done"])
 	check_eq(done.size(), 1, "task stays done")
+	check_false(_effects().last_relocations().has("hat_1"), "protected hat not relocated")
 
 
 func test_coconut_volley_stuns_and_drops_the_carried_object() -> void:

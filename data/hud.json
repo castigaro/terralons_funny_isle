@@ -24,7 +24,7 @@
 		"event_stole": {
 			"key": "hud.cue.event_stole",
 			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_anger.png",
-			"triggers": [{"signal": "event_triggered", "effects": ["take_held", "take_worn"]}]
+			"triggers": [{"signal": "event_triggered", "effects": ["take_held", "take_worn", "steal_wearable"]}]
 		}
 	},
 	"priority": ["time_up"],

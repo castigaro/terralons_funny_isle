@@ -36,7 +36,7 @@ TASK_OPTIONAL = ("modifiers", "title_key")
 # Contextual key prompts (BI-6); the level scene checks that zone and entity anchors exist.
 PROMPT_FIELDS = ("id", "anchor", "action", "text_key")
 PROMPT_ACTIONS = ("move", "dash", "grab", "throw", "use")
-ANCHOR_RE = re.compile(r"^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*)$")
+ANCHOR_RE = re.compile(r"^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*|target:[a-z][a-z0-9_]*)$")
 EVENT_REQUIRED = ("id", "type", "window", "duration_s")
 EVENT_OPTIONAL = ("params",)
 
@@ -58,7 +58,8 @@ ANIMALS_FILE = "data/animals.json"
 ITEMS_FILE = "data/items.json"
 AUDIO_FILE = "data/audio.json"
 
-EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground")
+EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground",
+           "steal_wearable")
 PARAM_TYPES = ("string", "int", "float", "bool")
 
 
@@ -262,7 +263,7 @@ def _check_prompts(prompts, catalog: dict, err) -> None:
                 seen[pid] = ppath
         anchor = prompt.get("anchor")
         if "anchor" in prompt and (not isinstance(anchor, str) or not ANCHOR_RE.match(anchor)):
-            err(ppath + ".anchor", "must be player, zone:<name> or entity:<uid>, got %s" % (anchor,))
+            err(ppath + ".anchor", "must be player, zone:<name>, entity:<uid> or target:<kind>, got %s" % (anchor,))
         action = prompt.get("action")
         if "action" in prompt and action not in PROMPT_ACTIONS:
             err(ppath + ".action", "unknown action %s (one of %s)" % (action, ", ".join(PROMPT_ACTIONS)))

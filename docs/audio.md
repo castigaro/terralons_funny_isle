@@ -63,5 +63,6 @@ their persistence, title/level select/credits screens and menu click sounds belo
 
 `tests/audio/` checks buses and volumes, loop flags, music allocation, the map against the EventBus and the
 data, throttling, the announcer queue, ducking, captions and robustness. Tests set `Audio.manual_clock` and call
-`Audio.advance(delta)` instead of waiting for real playback; the runner waits briefly in real time before it quits
+`Audio.advance(delta)` instead of waiting for real playback; `Audio.sfx_requests()` lists the sound ids requested
+via `play_sfx` since the last `level_started` (also those the throttle dropped, capped at 64); the runner waits briefly in real time before it quits
 so the mixer releases stopped playbacks.

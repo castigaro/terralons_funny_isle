@@ -1,6 +1,7 @@
 extends "res://tests/support/level_case.gd"
 ## watchdog: 240
-## Beach Camp can be completed with scripted input only (move, dash, interact) while its events are active.
+## Beach Camp can be completed with scripted input only (move, dash, interact) while its events are active; the
+## parrot really steals the loose hat while the bot waits, and the hat still ends up on the goat.
 
 const LEVEL := "res://scenes/levels/l1_beach_camp.tscn"
 const LevelDriver := preload("res://tests/support/level_driver.gd")
@@ -41,7 +42,10 @@ func test_all_tasks_complete_with_events_active() -> void:
 	driver.attach()
 	var session := level.level_session()
 	var ticks := 0
+	var hat_stolen := false
 	while ticks < LIMIT_TICKS:
+		if level.event_effects().last_relocations().has("hat_1"):
+			hat_stolen = true
 		var state := session.get_state()
 		if state == LevelSession.State.WON or state == LevelSession.State.LOST:
 			break
@@ -55,3 +59,5 @@ func test_all_tasks_complete_with_events_active() -> void:
 	check(events("event_ended").size() >= 1, "an event ended")
 	var stunned := events("castaway_dizzy_started").filter(func(e: Array) -> bool: return e[1][0] == "event")
 	check_false(stunned.is_empty(), "the coconut volley stunned the castaway")
+	check(hat_stolen, "the parrot stole the hat during the run")
+	check(driver.task_done("hat_on_goat"), "hat_on_goat completed after the theft")

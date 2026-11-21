@@ -37,7 +37,7 @@ H (action `hint`) or the hint button shows the hint of the first open required t
 | `item_lost_sea` | `entity_lost` with an item kind and reason `water` or `bounds` |
 | `time_up` | `level_lost` (priority: never replaced while visible) |
 | `dizzy_hit` | `castaway_dizzy_started` |
-| `event_stole` | `event_triggered` of a scheduled event whose type has `take_held` (castaway holds something) or `take_worn` (castaway wears something) |
+| `event_stole` | `event_triggered` of a scheduled event whose type has `take_held` (castaway holds something), `take_worn` (castaway wears something) or `steal_wearable` (castaway wears something or holds a wearable item); a loose item stolen from the ground shows no cue (warning cue, actor, sound and popup tell it) |
 
 An `event_warning` shows the cue `hud.cue.warn.<event_type>` (exclamation icon) for `cue_seconds` (2.5 s) through the same throttle; types without a key show nothing. The warning sound stays at the trigger (BI-9).
 
@@ -45,7 +45,7 @@ An open task whose conditions name the involved kind replaces the generic text w
 
 ## Contextual prompts
 
-Level data may list prompts: `{"id": "pr_move", "anchor": "player" | "zone:<id>" | "entity:<uid>", "action": "move" | "dash" | "grab" | "throw" | "use", "text_key": "..."}`. `LevelBase` spawns one `ContextPrompt` per entry under `Prompts`. Once the action is used (`castaway_step`, `castaway_dashed`, `object_grabbed`, `object_thrown`, `object_used`), every prompt with that action disappears for the rest of the game process, also after restarts. An anchor that does not exist in the scene is skipped, listed in `LevelBase.prompt_problems()` and printed once; the level keeps running. `tools/validate_levels.py` and `LevelDef` check the fields, ids, anchor pattern, action and EN/DE texts.
+Level data may list prompts: `{"id": "pr_move", "anchor": "player" | "zone:<id>" | "entity:<uid>" | "target:<target_kind>", "action": "move" | "dash" | "grab" | "throw" | "use", "text_key": "..."}`. `LevelBase` spawns one `ContextPrompt` per entry under `Prompts`. Once the action is used (`castaway_step`, `castaway_dashed`, `object_grabbed`, `object_thrown`, `object_used`), every prompt with that action disappears for the rest of the game process, also after restarts. `target:<target_kind>` resolves to the first use target of the level (group `use_target`, tree order) with that `target_kind`. An anchor that does not exist in the scene is skipped, listed in `LevelBase.prompt_problems()` and printed once; the level keeps running. `tools/validate_levels.py` and `LevelDef` check the fields, ids, anchor pattern, action and EN/DE texts.
 
 ## Finish banner (D-3)
 

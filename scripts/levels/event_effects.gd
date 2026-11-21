@@ -4,7 +4,8 @@ extends Node2D
 ## event_triggered starts the event presentation (actor animation, overlays) and, actor_impact_seconds later, the
 ## effects on animals, items, the castaway and the ground; event_ended and restarts stop everything again. Effects
 ## only move or nudge things: they never touch the session, the timer or a task, and they spare protected entities
-## (counting for a done task) as well as carried, flying and worn ones. No level, task or event id appears here:
+## (counting for a done task) as well as carried, flying and worn ones – except the thief effects, which take an
+## unprotected worn or carried thing. No level, task or event id appears here:
 ## everything comes from the level JSON (params) and the scene (Zones, EventAnchors).
 
 const EVENTS_SECTION := "events"
@@ -15,10 +16,13 @@ const SPLAT_FRAME_COUNT := 8  # balance-exempt: frames of the splat set in the a
 const RAIN_TEXTURE := "res://assets/graphics/particles/PNG/circle_01.png"
 const COCONUT_KIND := "coconut"
 const STUN_CAUSE := "event"
+## Where a thief looks for a wearable, most tempting first.
+const STEAL_ORDER := ["worn", "carried", "loose"]
 ## Effect name of data/events.json -> handler method.
 const EFFECT_HANDLERS := {
 	"take_worn": "_effect_take_worn",
 	"take_held": "_effect_take_held",
+	"steal_wearable": "_effect_steal_wearable",
 	"stun_player": "_effect_stun_player",
 	"panic_animals": "_effect_panic_animals",
 	"relocate_entities": "_effect_relocate_entities",
@@ -190,6 +194,52 @@ func _effect_take_worn(entry: Dictionary) -> void:
 		EventBus.fx_anchor.emit(String(item.get("kind")), pos)
 
 
+## The one wearable a thief grabs: a worn unprotected one, else the castaway's carried one, else one lying free;
+## never a protected or flying item, ties broken by uid. Returns null when there is none.
+func _steal_target() -> Node2D:
+	var reg := _registry()
+	if reg == null:
+		return null
+	var castaway := _level.castaway()
+	var carried: Node2D = castaway.get_carried() if castaway != null and castaway.has_method("get_carried") else null
+	var best: Node2D = null
+	var best_rank := STEAL_ORDER.size()
+	for item in reg.items():
+		if not item.call("is_wearable") or item.call("is_flying") or reg.is_protected(item):
+			continue
+		var place := ""
+		if String(item.get("worn_by")) != "":
+			place = "worn"
+		elif item == carried:
+			place = "carried"
+		elif item.call("is_free"):
+			place = "loose"
+		var rank := STEAL_ORDER.find(place)
+		if rank < 0:
+			continue
+		if best == null or rank < best_rank or (rank == best_rank and String(item.get("uid")) < String(best.get("uid"))):
+			best = item
+			best_rank = rank
+	return best
+
+
+func _effect_steal_wearable(entry: Dictionary) -> void:
+	var item := _steal_target()
+	if item == null:
+		return
+	var castaway := _level.castaway()
+	if String(item.get("worn_by")) != "":
+		item.call("take_off")
+	elif castaway != null and castaway.has_method("get_carried") and castaway.get_carried() == item:
+		castaway.call("drop_carried")
+	var params: Dictionary = entry.get("params", {})
+	var centre := _place_of(String(params.get("flee_zone", "")), String(entry["id"]))
+	var pos := _free_point_near(centre, float(_cfg.get("flee_drop_radius_px", 0.0)), _rng(entry))
+	item.call("relocate_to", pos)
+	_relocations[String(item.get("uid"))] = pos
+	EventBus.fx_anchor.emit(String(item.get("kind")), pos)
+
+
 func _effect_take_held(_entry: Dictionary) -> void:
 	var castaway := _level.castaway() if _level != null else null
 	if castaway != null and castaway.has_method("drop_carried"):
@@ -267,17 +317,14 @@ func _actor(entry: Dictionary, sprite_scale: float) -> EventActor:
 	return actor
 
 
-## Parrot: swoops in from the anchor over the first wearer (or the castaway) and off to the flee zone.
+## Parrot: swoops in from the anchor over the wearable it will steal (or the castaway) and off to the flee zone.
 func _present_flyover(entry: Dictionary) -> void:
 	var event_id := String(entry["id"])
 	var start := _anchor_pos(event_id)
 	var over := _level.castaway().global_position if _level.castaway() != null else start
-	var reg := _registry()
-	if reg != null:
-		for item in reg.items():
-			if String(item.get("worn_by")) != "" and not reg.is_protected(item):
-				over = item.global_position
-				break
+	var target := _steal_target()
+	if target != null:
+		over = target.global_position
 	var flee := _place_of(String(entry.get("params", {}).get("flee_zone", "")), event_id)
 	var actor := _actor(entry, float(_cfg.get("actor_scale", 1.0)))
 	var fly := float(_cfg.get("actor_fly_seconds", 1.0))

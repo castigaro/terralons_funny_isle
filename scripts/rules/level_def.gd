@@ -16,7 +16,7 @@ const TASK_OPTIONAL := ["modifiers", "title_key"]
 ## Contextual key prompts (BI-6): {id, anchor, action, text_key}; anchors are checked again by LevelBase.
 const PROMPT_FIELDS := ["id", "anchor", "action", "text_key"]
 const PROMPT_ACTIONS := ["move", "dash", "grab", "throw", "use"]
-const ANCHOR_PATTERN := "^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*)$"
+const ANCHOR_PATTERN := "^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*|target:[a-z][a-z0-9_]*)$"
 const EVENT_REQUIRED := ["id", "type", "window", "duration_s"]
 const EVENT_OPTIONAL := ["params"]
 const RULE_KEYS := ["timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max", "events_min"]
@@ -33,7 +33,8 @@ const MODIFIER_ONLY := {"before_event": [{"event": "event"}, {}]}
 ## Condition fields that name an entity kind (checked against the known kinds, except "player").
 const ENTITY_FIELDS := {"in_zone": ["entity"], "held": ["entity"], "delivered_to": ["entity"], "worn": ["item", "wearer"]}
 const PARAM_TYPES := ["string", "int", "float", "bool"]
-const EFFECTS := ["relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground"]
+const EFFECTS := ["relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground",
+		"steal_wearable"]
 
 static var _id_re: RegEx = null
 static var _anchor_re: RegEx = null
@@ -357,7 +358,7 @@ static func _check_prompts(raw: Variant, messages: Dictionary, err: Callable) ->
 				seen[pid] = ppath
 		var anchor: Variant = prompt.get("anchor")
 		if prompt.has("anchor") and (not anchor is String or _anchor_re.search(anchor) == null):
-			err.call(ppath + ".anchor", "must be player, zone:<name> or entity:<uid>, got %s" % str(anchor))
+			err.call(ppath + ".anchor", "must be player, zone:<name>, entity:<uid> or target:<kind>, got %s" % str(anchor))
 		var action: Variant = prompt.get("action")
 		if prompt.has("action") and not PROMPT_ACTIONS.has(action):
 			err.call(ppath + ".action", "unknown action %s (one of %s)" % [str(action), ", ".join(PROMPT_ACTIONS)])

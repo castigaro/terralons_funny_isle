@@ -5,7 +5,7 @@
 			"params": {
 				"flee_zone": {"type": "string", "required": false}
 			},
-			"effects": ["take_worn"]
+			"effects": ["steal_wearable"]
 		},
 		"goat_stampede": {
 			"params": {

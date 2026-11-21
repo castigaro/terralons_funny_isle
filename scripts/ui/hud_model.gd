@@ -200,6 +200,11 @@ func _match(trigger: Dictionary, args: Array, ctx: Dictionary) -> Variant:
 			return held
 		if trigger["effects"].has("take_worn") and effects.has("take_worn") and worn != "":
 			return worn
+		if trigger["effects"].has("steal_wearable") and effects.has("steal_wearable"):
+			if worn != "":
+				return worn
+			if _items.has(held) and bool(EntityDefs.get_item(held).get("wearable", false)):
+				return held
 		return null
 	return kind if trigger.has("kind_class") else ""
 

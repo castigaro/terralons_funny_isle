@@ -1,8 +1,8 @@
 extends "res://tests/support/level_case.gd"
 ## watchdog: 200
 ## Every event of the shipped levels is presented: a warning (EventBus event_warning, HUD warning cue for at least
-## 2 s, feedback at the event anchor), then at the trigger an actor or overlay of EventEffects and a funny reaction
-## from the feedback director. Runs with the earliest schedule so the events come quickly.
+## 2 s, feedback at the event anchor), then at the trigger an actor or overlay of EventEffects, its event sound
+## request and a funny reaction from the feedback director. Runs with the earliest schedule so the events come quickly.
 
 const LEVELS := ["l1_beach_camp", "l2_farm_meadow"]
 const WARN_PREFIX := "hud.cue.warn."
@@ -38,6 +38,9 @@ func test_events_warn_animate_and_react() -> void:
 			check(warned, "%s: %s warned" % [id, event_id])
 			check(cue_seconds >= 1.9, "%s: warning cue for %s visible %.2f s" % [id, event_id, cue_seconds])
 			check(presented, "%s: %s has an actor or overlay" % [id, event_id])
+			var sfx := String(Audio.audio_map().resolve("event_triggered", [String(entry["type"]), event_id]).get("sfx", ""))
+			check(sfx != "", "%s: %s maps to a sound" % [id, event_id])
+			check_has(Audio.sfx_requests(), sfx, "%s: %s requested its sound" % [id, event_id])
 			var anchor := (level.get_node("EventAnchors/%s" % event_id) as Node2D).global_position
 			var at_anchor := level.feedback_director().last_effects().filter(
 					func(fx: Dictionary) -> bool: return fx["position"] is Vector2 and _near_anchor(fx["position"], anchor))

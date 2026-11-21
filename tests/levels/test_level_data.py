@@ -1,4 +1,5 @@
 """Levels 1 and 2 follow the default allocation, the timer and workload rules and have no tutorial or level ids in code."""
+import csv
 import json
 import re
 import sys
@@ -87,8 +88,18 @@ class LevelDataTest(unittest.TestCase):
         self.assertEqual(anchors["move"], "player")
         self.assertTrue(anchors["grab"].startswith("entity:"))
         self.assertTrue(anchors["throw"].startswith("entity:"))
-        self.assertTrue(anchors["use"].startswith("zone:"))
+        self.assertEqual(anchors["use"], "target:cage")
         self.assertFalse(self.l2.get("prompts"))
+
+    def test_hints_use_en_dashes(self):
+        with (REPO / "i18n" / "level.csv").open(encoding="utf-8", newline="") as handle:
+            rows = [row for row in csv.DictReader(handle) if row["key"].endswith(".hint")]
+        self.assertTrue(rows)
+        for row in rows:
+            for lang in ("en", "de"):
+                with self.subTest(key=row["key"], lang=lang):
+                    self.assertNotIn(" - ", row[lang])
+                    self.assertNotIn("—", row[lang])
 
     def test_no_tutorial_anywhere(self):
         for top in ("data", "scenes", "scripts", "i18n"):

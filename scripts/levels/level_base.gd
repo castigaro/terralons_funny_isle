@@ -25,6 +25,7 @@ const PROMPT_SCENE := preload("res://scenes/ui/context_prompt.tscn")
 const ANCHOR_PLAYER := "player"
 const ANCHOR_ZONE := "zone:"
 const ANCHOR_ENTITY := "entity:"
+const ANCHOR_TARGET := "target:"
 
 ## Level file (res:// path), validated by LevelDef.
 @export_file("*.json") var level_json_path := ""
@@ -239,7 +240,8 @@ func text_in(key: String, locale: String) -> String:
 
 # --- Contextual prompts -----------------------------------------------------------------------------------
 
-## The node a prompt anchor names: player -> castaway, zone:<id> -> Zone, entity:<uid> -> animal or item.
+## The node a prompt anchor names: player -> castaway, zone:<id> -> Zone, entity:<uid> -> animal or item,
+## target:<kind> -> the first use target of the level with that target_kind (tree order).
 func resolve_anchor(anchor: String) -> Node2D:
 	if anchor == ANCHOR_PLAYER:
 		return _castaway
@@ -247,6 +249,11 @@ func resolve_anchor(anchor: String) -> Node2D:
 		return zone(anchor.trim_prefix(ANCHOR_ZONE))
 	if anchor.begins_with(ANCHOR_ENTITY) and _registry != null:
 		return _registry.find_uid(anchor.trim_prefix(ANCHOR_ENTITY))
+	if anchor.begins_with(ANCHOR_TARGET) and is_inside_tree():
+		var kind := anchor.trim_prefix(ANCHOR_TARGET)
+		for node in get_tree().get_nodes_in_group(UseTarget.GROUP):
+			if node is Node2D and is_ancestor_of(node) and String(node.get("target_kind")) == kind:
+				return node as Node2D
 	return null
 
 

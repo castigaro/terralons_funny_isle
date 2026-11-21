@@ -101,7 +101,7 @@
 		},
 		{
 			"id": "pr_use",
-			"anchor": "zone:cage",
+			"anchor": "target:cage",
 			"action": "use",
 			"text_key": "level.prompt.use"
 		}

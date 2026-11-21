@@ -104,3 +104,27 @@ func test_balance_override_is_observed() -> void:
 		check(audio.call("active_voices", "step") <= 1, "limit 1")
 	check_eq(played, 1, "only one voice")
 	check_eq(audio.call("sfx_players", "step").size(), 1, "pool of one")
+
+
+func test_sfx_request_log_counts_dropped_requests_is_capped_and_cleared() -> void:
+	var audio := _audio()
+	var bus := root().get_node("EventBus")
+	bus.level_started.emit("l1_beach_camp")
+	check_eq(audio.call("sfx_requests"), [], "cleared on level_started")
+	var played := 0
+	for i in 5:
+		if audio.call("play_sfx", "step"):
+			played += 1
+	check(played < 5, "the throttle drops some of the burst (%d played)" % played)
+	check_eq(audio.call("sfx_requests"), ["step", "step", "step", "step", "step"], "every request logged")
+	var cap: int = audio.get_script().get_script_constant_map()["SFX_REQUEST_LOG"]
+	for i in cap + 10:
+		audio.call("play_sfx", "bonk")
+	var entries: Array = audio.call("sfx_requests")
+	check_eq(entries.size(), cap, "log capped at %d" % cap)
+	check_false(entries.has("step"), "oldest requests dropped first")
+	entries.clear()
+	check_eq(audio.call("sfx_requests").size(), cap, "getter returns a copy")
+	bus.level_started.emit("l1_beach_camp")
+	check_eq(audio.call("sfx_requests"), [], "cleared again on the next level_started")
+	audio.call("reset_for_tests")
