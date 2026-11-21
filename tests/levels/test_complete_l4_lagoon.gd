@@ -5,41 +5,21 @@ extends "res://tests/support/level_case.gd"
 
 const LEVEL := "res://scenes/levels/l4_lagoon.tscn"
 const LevelDriver := preload("res://tests/support/level_driver.gd")
+const BotPlans := preload("res://tests/support/bot_plans.gd")
+const BotPlanner := preload("res://tests/support/bot_planner.gd")
 const LIMIT_TICKS := 60 * 255
 
 ## TFI_BOT_NO_HOLD=1 skips holding the last task (only for measuring the pure bot time for docs/playtest.md).
 var hold := OS.get_environment("TFI_BOT_NO_HOLD") == ""
 var driver: RefCounted
+var planner: RefCounted
 
 
 func _plan() -> Dictionary:
-	var held: String = driver.carried_kind()
-	var castle_done: bool = driver.task_done("sandcastle_before_wave")
-	var hat_done: bool = driver.task_done("hat_on_penguin")
-	var penguin_done: bool = driver.task_done("penguin_to_beach")
-	var ducks_done: bool = driver.task_done("ducks_in_lagoon")
-	if held == "sand_pail" and not castle_done:
-		return {"action": "use", "node": level.get_node("Actors/Sandcastle")}
-	if held == "hat" and not hat_done:
-		return {"action": "use", "node": level.get_node("Actors/Penguin1/WearTarget")}
-	if held == "penguin" and not penguin_done:
-		return {"action": "use", "node": level.get_node("Actors/BeachFlag")}
-	if held == "duck" and not ducks_done:
-		return {"action": "use", "node": level.get_node("Actors/LagoonJetty")}
-	if held != "":
-		return {"action": "throw"}
-	if hold and driver.open_tasks() == 1 and driver.events_pending():
-		return {}
-	var next: Node2D = null
-	if not castle_done:
-		next = driver.nearest_free("sand_pail")
-	elif not hat_done:
-		next = driver.nearest_free("hat")
-	elif not penguin_done:
-		next = driver.nearest_free("penguin", "beach")
-	elif not ducks_done:
-		next = driver.nearest_free("duck", "lagoon")
-	return {"action": "grab", "node": next} if next != null else {}
+	if planner == null:
+		var opts := {"hold": hold, "hold_style": BotPlanner.HOLD_IDLE}
+		planner = BotPlanner.new(driver, BotPlans.plan("l4_lagoon"), opts)
+	return planner.goal()
 
 
 func test_all_tasks_complete_with_events_active() -> void:

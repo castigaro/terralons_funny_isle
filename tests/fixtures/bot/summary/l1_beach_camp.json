@@ -1,0 +1,9 @@
+{
+	"level": "l1_beach_camp",
+	"runs": [
+		{"variant": "plain", "mode": "seeded", "seed": 1101, "tasks_done": 3, "tasks_total": 3, "time_left": 225.467,
+			"stars": 3, "result": "pass", "reason": "", "written_at": 2000.0},
+		{"variant": "hold", "mode": "latest", "seed": 1101, "tasks_done": 3, "tasks_total": 3, "time_left": 146.3,
+			"stars": 3, "result": "pass", "reason": "", "written_at": 500.0}
+	]
+}

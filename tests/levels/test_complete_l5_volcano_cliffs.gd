@@ -5,43 +5,21 @@ extends "res://tests/support/level_case.gd"
 
 const LEVEL := "res://scenes/levels/l5_volcano_cliffs.tscn"
 const LevelDriver := preload("res://tests/support/level_driver.gd")
+const BotPlans := preload("res://tests/support/bot_plans.gd")
+const BotPlanner := preload("res://tests/support/bot_planner.gd")
 const LIMIT_TICKS := 60 * 245
 
 ## TFI_BOT_NO_HOLD=1 skips holding the last task (only for measuring the pure bot time for docs/playtest.md).
 var hold := OS.get_environment("TFI_BOT_NO_HOLD") == ""
 var driver: RefCounted
+var planner: RefCounted
 
 
 func _plan() -> Dictionary:
-	var held: String = driver.carried_kind()
-	var hat_done: bool = driver.task_done("hat_on_pig")
-	var feed_done: bool = driver.task_done("feed_penguin")
-	var pig_done: bool = driver.task_done("pig_to_mud_pool")
-	var flock_done: bool = driver.task_done("shelter_flock")
-	if held == "hat" and not hat_done:
-		return {"action": "use", "node": level.get_node("Actors/Pig1/WearTarget")}
-	if held == "bucket" and not feed_done:
-		return {"action": "use", "node": level.get_node("Actors/Penguin1/DeliveryTarget")}
-	if held == "pig" and not pig_done:
-		return {"action": "use", "node": level.get_node("Actors/MudGate")}
-	if (held == "chicken" or held == "goat") and not flock_done:
-		return {"action": "use", "node": level.get_node("Actors/ShelterGate")}
-	if held != "":
-		return {"action": "throw"}
-	if hold and driver.open_tasks() == 1 and driver.events_pending():
-		return {}
-	var next: Node2D = null
-	if not hat_done:
-		next = driver.nearest_free("hat")
-	elif not feed_done:
-		next = driver.nearest_free("bucket")
-	elif not pig_done:
-		next = driver.nearest_free("pig", "mud_pool")
-	elif not flock_done:
-		next = driver.nearest_free("chicken", "shelter")
-		if next == null:
-			next = driver.nearest_free("goat", "shelter")
-	return {"action": "grab", "node": next} if next != null else {}
+	if planner == null:
+		var opts := {"hold": hold, "hold_style": BotPlanner.HOLD_IDLE}
+		planner = BotPlanner.new(driver, BotPlans.plan("l5_volcano_cliffs"), opts)
+	return planner.goal()
 
 
 func test_all_tasks_complete_with_overlapping_events() -> void:

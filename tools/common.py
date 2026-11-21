@@ -10,6 +10,8 @@ GODOT_VERSION_NAME = "Godot_v4.7.2-stable_win64"
 WINGET_SUBDIR = "Microsoft/WinGet/Packages/GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe"
 APP_USERDATA_NAME = "Terralon's Funny Isle"
 ALLOWLIST_FILE = REPO / "tools" / "godot_error_allowlist.txt"
+# Folder below the run_tests testdata base where the bot playthrough writes its per-level summaries.
+BOT_REPORT_SUBDIR = "bot"
 
 _ANSI_RE = re.compile(r"\x1b\[[0-9;?]*[ -/]*[@-~]")
 _ERROR_RE = re.compile(r"^\s*(SCRIPT ERROR|USER ERROR|ERROR):")
@@ -51,13 +53,14 @@ def find_godot(console: bool = True):
 
 
 def godot_env(base: Path) -> dict:
-    """Return a copy of os.environ with APPDATA, LOCALAPPDATA and TFI_DATA_DIR redirected below base."""
+    """Return a copy of os.environ with APPDATA, LOCALAPPDATA, TFI_DATA_DIR and TFI_BOT_REPORT_DIR below base."""
     base = Path(base)
     env = dict(os.environ)
     dirs = {
         "APPDATA": base / "appdata",
         "LOCALAPPDATA": base / "localappdata",
         "TFI_DATA_DIR": base / "data",
+        "TFI_BOT_REPORT_DIR": base / BOT_REPORT_SUBDIR,
     }
     for key, path in dirs.items():
         path.mkdir(parents=True, exist_ok=True)

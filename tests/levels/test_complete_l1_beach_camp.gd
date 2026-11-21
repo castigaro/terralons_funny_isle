@@ -5,34 +5,19 @@ extends "res://tests/support/level_case.gd"
 
 const LEVEL := "res://scenes/levels/l1_beach_camp.tscn"
 const LevelDriver := preload("res://tests/support/level_driver.gd")
+const BotPlans := preload("res://tests/support/bot_plans.gd")
+const BotPlanner := preload("res://tests/support/bot_planner.gd")
 const LIMIT_TICKS := 60 * 235
 
 var driver: RefCounted
+var planner: RefCounted
 
 
 func _plan() -> Dictionary:
-	var held: String = driver.carried_kind()
-	var chickens_done: bool = driver.task_done("chickens_in_cage")
-	var coconuts_done: bool = driver.task_done("coconuts_to_monkey")
-	var hat_done: bool = driver.task_done("hat_on_goat")
-	if held == "chicken" and not chickens_done:
-		return {"action": "use", "node": level.get_node("Actors/CageGate")}
-	if held == "coconut" and not coconuts_done:
-		return {"action": "use", "node": level.get_node("Actors/Monkey1/DeliveryTarget")}
-	if held == "hat" and not hat_done:
-		return {"action": "use", "node": level.get_node("Actors/Goat1/WearTarget")}
-	if held != "":
-		return {"action": "throw"}
-	if driver.open_tasks() == 1 and driver.events_pending():
-		return {}
-	var next: Node2D = null
-	if not chickens_done:
-		next = driver.nearest_free("chicken", "cage")
-	elif not coconuts_done:
-		next = driver.nearest_free("coconut")
-	elif not hat_done:
-		next = driver.nearest_free("hat")
-	return {"action": "grab", "node": next} if next != null else {}
+	if planner == null:
+		var opts := {"hold": true, "hold_style": BotPlanner.HOLD_IDLE}
+		planner = BotPlanner.new(driver, BotPlans.plan("l1_beach_camp"), opts)
+	return planner.goal()
 
 
 func test_all_tasks_complete_with_events_active() -> void:

@@ -5,36 +5,21 @@ extends "res://tests/support/level_case.gd"
 
 const LEVEL := "res://scenes/levels/l3_jungle.tscn"
 const LevelDriver := preload("res://tests/support/level_driver.gd")
+const BotPlans := preload("res://tests/support/bot_plans.gd")
+const BotPlanner := preload("res://tests/support/bot_planner.gd")
 const LIMIT_TICKS := 60 * 195
 
 ## TFI_BOT_NO_HOLD=1 skips holding the last task (only for measuring the pure bot time for docs/playtest.md).
 var hold := OS.get_environment("TFI_BOT_NO_HOLD") == ""
 var driver: RefCounted
+var planner: RefCounted
 
 
 func _plan() -> Dictionary:
-	var held: String = driver.carried_kind()
-	var goat_done: bool = driver.task_done("goat_before_stampede")
-	var parrot_done: bool = driver.task_done("parrot_to_perch")
-	var frogs_done: bool = driver.task_done("frogs_to_pond")
-	if held == "goat" and not goat_done:
-		return {"action": "use", "node": level.get_node("Actors/PenGate")}
-	if held == "parrot" and not parrot_done:
-		return {"action": "use", "node": level.get_node("Actors/PerchGate")}
-	if held == "frog" and not frogs_done:
-		return {"action": "use", "node": level.get_node("Actors/PondJetty")}
-	if held != "":
-		return {"action": "throw"}
-	if hold and driver.open_tasks() == 1 and driver.events_pending():
-		return {}
-	var next: Node2D = null
-	if not goat_done:
-		next = driver.nearest_free("goat", "goat_pen")
-	elif not parrot_done:
-		next = driver.nearest_free("parrot", "perch")
-	elif not frogs_done:
-		next = driver.nearest_free("frog", "pond")
-	return {"action": "grab", "node": next} if next != null else {}
+	if planner == null:
+		var opts := {"hold": hold, "hold_style": BotPlanner.HOLD_IDLE}
+		planner = BotPlanner.new(driver, BotPlans.plan("l3_jungle"), opts)
+	return planner.goal()
 
 
 func test_all_tasks_complete_with_events_active() -> void:
