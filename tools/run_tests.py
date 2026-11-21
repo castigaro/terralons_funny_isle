@@ -1,11 +1,16 @@
-"""Check command: syntax, Godot import, GDScript tests, Python tests, smoke run, validators, hygiene.
+"""Check command: syntax, Godot import, GDScript tests, bot summary, Python tests, smoke run, validators, hygiene.
 
 Usage: python tools/run_tests.py [-k <substring>]
 Exit codes: 0 all green, 1 any failure, 2 Godot binary missing.
+
+The bot stage reads the per-level summaries that the bot playthrough tests (tests/bot/test_bot_<level>.gd) write to
+<testdata>/run_tests/bot/<level>.json, prints one table row per run of this test run and fails when a selected level
+wrote no fresh run or a run failed.
 """
 import argparse
 import ast
 import importlib.util
+import json
 import os
 import re
 import shutil
@@ -17,7 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (  # noqa: E402
-    REPO, TESTDATA, find_godot, godot_env, load_allowlist, parse_results,
+    BOT_REPORT_SUBDIR, REPO, TESTDATA, find_godot, godot_env, load_allowlist, parse_results,
     real_app_userdata, run_godot, scan_output,
 )
 
@@ -32,6 +37,9 @@ RUN_FPS_HEADER_LINES = 5
 # subprocess timeout of at least s + WATCHDOG_MARGIN real seconds (long level playthroughs).
 WATCHDOG_RE = re.compile(r"^##\s*watchdog:\s*([0-9]+)\s*$")
 WATCHDOG_MARGIN = 30
+# Bot playthrough test files per level; their level id names the summary file.
+BOT_TEST_RE = re.compile(r"^res://tests/bot/test_bot_(l\d+_[a-z0-9_]+)\.gd$")
+BOT_TABLE_COLUMNS = ("level", "variant", "mode", "seed", "tasks", "time_left", "stars", "result")
 
 
 class Stage:
@@ -217,6 +225,79 @@ def _run_gdscript_file(stage, godot, env, allowlist, res, fps):
         stage.ok()
 
 
+def bot_levels(files):
+    """Return the sorted level ids of the selected bot playthrough test files."""
+    levels = set()
+    for res in files:
+        match = BOT_TEST_RE.match(res)
+        if match:
+            levels.add(match.group(1))
+    return sorted(levels)
+
+
+def read_bot_summaries(report_dir, since):
+    """Load <report_dir>/<level>.json and keep the runs written at or after since: {level: [run, ...]}."""
+    summaries = {}
+    folder = Path(report_dir)
+    if not folder.is_dir():
+        return summaries
+    for path in sorted(folder.glob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        runs = [r for r in data.get("runs", []) if isinstance(r, dict) and float(r.get("written_at", 0)) >= since]
+        if runs:
+            summaries[data.get("level", path.stem)] = runs
+    return summaries
+
+
+def format_bot_table(summaries):
+    """Render one row per run: level, variant, mode, seed, tasks done/total, time left, stars and result."""
+    rows = [BOT_TABLE_COLUMNS]
+    for level in sorted(summaries):
+        for run in summaries[level]:
+            rows.append((
+                level, str(run.get("variant", "")), str(run.get("mode", "")), str(run.get("seed", "")),
+                "%s/%s" % (run.get("tasks_done", "?"), run.get("tasks_total", "?")),
+                "%.1f" % float(run.get("time_left", 0.0)), str(run.get("stars", "")),
+                str(run.get("result", "")) + ("" if run.get("result") == "pass" else " " + str(run.get("reason", ""))),
+            ))
+    widths = [max(len(row[i]) for row in rows) for i in range(len(BOT_TABLE_COLUMNS))]
+    return "\n".join("  ".join(cell.ljust(widths[i]) for i, cell in enumerate(row)).rstrip() for row in rows)
+
+
+def bot_problems(expected_levels, summaries):
+    """Name each expected level without a fresh run and each run whose result is not 'pass'."""
+    problems = ["%s: no bot summary written in this run" % level for level in expected_levels if level not in summaries]
+    for level in sorted(summaries):
+        if level not in expected_levels:
+            continue
+        for run in summaries[level]:
+            if run.get("result") != "pass":
+                problems.append("%s %s %s seed=%s: %s" % (level, run.get("variant"), run.get("mode"), run.get("seed"),
+                                                          run.get("reason", "fail")))
+    return problems
+
+
+def stage_bot(stage, files, report_dir, since):
+    levels = bot_levels(files)
+    if not levels:
+        print("  no bot tests selected")
+        stage.ok()
+        return
+    summaries = read_bot_summaries(report_dir, since)
+    shown = {level: runs for level, runs in summaries.items() if level in levels}
+    if shown:
+        print(format_bot_table(shown))
+    print("  summaries: %s" % report_dir)
+    problems = bot_problems(levels, summaries)
+    if problems:
+        stage.fail("bot playthrough", "\n".join(problems))
+    else:
+        stage.ok()
+
+
 def stage_python(stage, files):
     suite = unittest.TestSuite()
     loader = unittest.defaultTestLoader
@@ -289,6 +370,7 @@ def main(argv=None) -> int:
     parser.add_argument("-k", dest="filter", default="", help="only run test files whose path contains this text")
     opts = parser.parse_args(argv)
     os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    run_start = time.time()
 
     stages = []
     before_git = git_status()
@@ -313,9 +395,17 @@ def main(argv=None) -> int:
     stage_import(stage, godot, env, allowlist)
     stage.report()
 
+    gd_files = gd_test_files(opts.filter)
     stage = Stage("gdscript")
     stages.append(stage)
-    stage_gdscript(stage, godot, env, allowlist, gd_test_files(opts.filter))
+    start = time.time()
+    stage_gdscript(stage, godot, env, allowlist, gd_files)
+    stage.report()
+    print("   (%.0f s)" % (time.time() - start))
+
+    stage = Stage("bot")
+    stages.append(stage)
+    stage_bot(stage, gd_files, base / BOT_REPORT_SUBDIR, run_start)
     stage.report()
 
     stage = Stage("python")

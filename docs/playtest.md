@@ -28,3 +28,34 @@ Unchanged (25–45 s and 20–40 s first windows). With the estimated first runs
 ## Windowed check
 
 The three new levels were rendered with the windowed binary (`python tools/capture_level.py --level res://scenes/levels/<id>.tscn`, output in the testdata folder): castaway 98 px (L3, L5) and 146 px (L4) tall at 1080p, the theme mix (jungle grass and trees, sand ring and lagoon, rock clusters) reads as intended. An interactive play-through by a person was not possible in this autonomous run.
+
+## Bot playthrough (BI-12)
+
+`tests/bot/test_bot_<level>.gd` play every shipped level headless on the 60 fps fixed clock. The bot only feeds the real input actions: `tests/support/action_input.gd` presses `move_*` (analog per axis), `dash` and `interact` through `Input.action_press` before the castaway reads them and sends `finish` as an `InputEventAction`; it never sets an input source, moves an entity or calls the session (`tests/core/test_bot_input_only.py` scans for that). A press reaches the castaway one physics tick later, so the driver stands still for two ticks after a throw press. The level knowledge sits in `tests/support/bot_plans.gd` (steps per task: kinds, target zone, use target); `bot_planner.gd` turns it into goals for `level_driver.gd`, `bot_run.gd` runs one level and checks it.
+
+Matrix per level (six runs, L1 eight):
+
+| Run | Schedule | Check |
+|---|---|---|
+| `plain` × 3 | seeded: the level seed plus two extra seeds from `tests/fixtures/bot/seeds.json` (pairwise different schedules, checked in `test_bot_selftest.gd`) | won, every task done, 3 stars |
+| `hold` earliest / latest | every event at the start or end of its window | as `plain`, and every scheduled event triggered and ended before the win |
+| `inject` | level seed | every task entity the bot grabs is thrown into open water once; non-swimmers must be lost with reason `water` and respawn at a reachable point within throw flight + respawn delay + 1 s, swimmers must be free and grabbable again within 25 s; won with every task done |
+| `finish_off` (L1) | level seed, `auto_finish_when_all_done` off | REQUIRED_DONE and not won while the bot keeps `finish` back, then the finish action wins with 3 stars |
+| `determinism` (L1) | level seed twice | equal entries except `wall_seconds` |
+
+Worst case: the `hold` runs keep the final unit of the last open task back until every scheduled event has ended ("staged" hold: the bot carries the unit to a waiting band of 1.5–2.5 × `use_radius` around the target, so it never sits inside the target zone, and delivers it right after the last event). Throw spots for the injection are found by ray and motion queries only: a reachable cell, a direction, the castaway walking on to the shore line, and a predicted landing on water inside the bounds and outside the thrown kind's own target zones (a throw never counts as a delivery). A kind with no water at all outside its target zones is recorded under `inject_skipped` (L3: the frogs, whose pond is the only water inside the bounds); a kind without a spot in a level that has such water fails the run.
+
+Results of the BI-12 run (elapsed game seconds until the win, 3-star limit in brackets):
+
+| Level | Plain (3 seeds) | Hold earliest | Hold latest | Inject (respawns) |
+|---|---|---|---|---|
+| `l1_beach_camp` (180 s) | 14.5 / 14.5 / 14.5 | 61.0 | 93.7 | 57.7 (5) |
+| `l2_farm_meadow` (157 s) | 35.0 / 35.0 / 35.0 | 78.4 | 108.4 | 58.0 (2) |
+| `l3_jungle` (150 s) | 38.0 / 37.2 / 37.9 | 98.4 | 118.4 | 53.5 (2, frogs skipped) |
+| `l4_lagoon` (195 s) | 62.6 / 59.6 / 65.7 | 158.4 | 178.4 | 81.2 (3) |
+| `l5_volcano_cliffs` (187 s) | 63.0 / 63.0 / 63.0 | 98.2 | 101.0 | 145.8 (6) |
+| Total | – | – | – | about 3.5 min wall time for all 32 runs |
+
+L4 latest is the tightest case: the big wave ends at 178 s, the staged hold wins at 178.4 s, 16.6 s inside the 3-star limit. L1 and L5 finish their plain runs before or between the events, so their seeds give the same times. All runs end with 3 stars, the injection runs included.
+
+Each test writes its run to `<testdata>/run_tests/bot/<level>.json` (`TFI_BOT_REPORT_DIR`, set by `tools/common.py`): `{level, runs: [...]}`, one entry per (variant, mode, seed) with result, reason, state, tasks done/total, done ids, time left, elapsed, three-star time, stars, triggered, ended and scheduled event ids, respawns, throws, inject errors and skips, stuck task, last goal, carried kind, `wall_seconds` and `written_at`. `python tools/run_tests.py` prints the fresh runs as a table in its `bot` stage and fails on a missing level or a failed run; a failing test prints `BOT FAIL level=… mode=… seed=… variant=… reason=… stuck_task=… goal=… carried=… elapsed=… tasks=… time_left=…`. `TFI_BOT_TRACE=1` prints goals, throws, losses and respawns of every run.

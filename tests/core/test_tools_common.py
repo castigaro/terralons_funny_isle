@@ -38,10 +38,15 @@ class GodotEnvTest(unittest.TestCase):
     def test_redirects_below_base(self):
         base = scratch()
         env = common.godot_env(base)
-        for key in ("APPDATA", "LOCALAPPDATA", "TFI_DATA_DIR"):
+        for key in ("APPDATA", "LOCALAPPDATA", "TFI_DATA_DIR", "TFI_BOT_REPORT_DIR"):
             path = Path(env[key])
             self.assertTrue(path.is_dir(), key)
             self.assertIn(base.resolve(), path.resolve().parents)
+
+    def test_bot_report_dir(self):
+        base = scratch()
+        env = common.godot_env(base)
+        self.assertEqual(Path(env["TFI_BOT_REPORT_DIR"]), base / "bot")
 
     def test_find_godot_honours_env(self):
         exe = scratch() / "fake_godot.exe"

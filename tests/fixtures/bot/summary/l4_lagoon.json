@@ -1,0 +1,7 @@
+{
+	"level": "l4_lagoon",
+	"runs": [
+		{"variant": "hold", "mode": "latest", "seed": 4404, "tasks_done": 4, "tasks_total": 4, "time_left": 63.8,
+			"stars": 2, "result": "fail", "reason": "not_3_stars", "written_at": 2000.0}
+	]
+}
