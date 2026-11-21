@@ -6,8 +6,10 @@ extends RefCounted
 
 enum State { READY, RUNNING, PAUSED, REQUIRED_DONE, WON, LOST }
 
-const TRIGGER := 0
-const END := 1
+## Timeline point kinds, in their order at equal time: the warning comes before its trigger.
+const WARN := 0
+const TRIGGER := 1
+const END := 2
 
 var _def: LevelDef
 var _bus: Object
@@ -15,6 +17,7 @@ var _run_seed := 0
 var _mode := EventScheduler.MODE_SEEDED
 var _share := 0.0
 var _auto_finish := false
+var _warn_lead := 0.0
 var _timer: LevelTimer
 var _state := State.READY
 var _prior := State.READY
@@ -42,6 +45,7 @@ func _init(def: LevelDef, bus: Object, rules: Dictionary, options: Dictionary = 
 	_mode = str(options.get("schedule_mode", EventScheduler.MODE_SEEDED))
 	_share = def.three_star_share if def.three_star_share > 0.0 else float(rules.get("three_star_time_share", 0.0))
 	_auto_finish = bool(rules.get("auto_finish_when_all_done", false))
+	_warn_lead = maxf(0.0, float(rules.get("event_warning_lead_seconds", 0.0)))
 	_timer = LevelTimer.new(def.timer_seconds, float(rules.get("timer_warning_seconds", 0.0)))
 	var all_conds: Array = []
 	for task in def.tasks:
@@ -68,6 +72,7 @@ func _reset_state() -> void:
 	_schedule = EventScheduler.build(_def.events, _run_seed, _mode)
 	_timeline.clear()
 	for pos in _schedule.size():
+		_timeline.append([maxf(0.0, float(_schedule[pos]["start"]) - _warn_lead), WARN, pos])
 		_timeline.append([_schedule[pos]["start"], TRIGGER, pos])
 		_timeline.append([_schedule[pos]["end"], END, pos])
 	_timeline.sort_custom(_point_before)
@@ -161,7 +166,9 @@ func _run_events() -> void:
 	while _cursor < _timeline.size() and _timeline[_cursor][0] <= _elapsed:
 		var point: Array = _timeline[_cursor]
 		var entry: Dictionary = _schedule[point[2]]
-		if point[1] == TRIGGER:
+		if point[1] == WARN:
+			_emit("event_warning", [entry["id"], entry["type"], maxf(0.0, float(entry["start"]) - _elapsed)])
+		elif point[1] == TRIGGER:
 			_fired[entry["id"]] = true
 			_emit("event_triggered", [entry["id"]])
 		else:

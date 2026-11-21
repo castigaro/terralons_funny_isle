@@ -21,6 +21,8 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
     wounded token, no exact hp token and no token starting with injur in .gd identifiers and .tscn node names below
     scripts/, scenes/, ui/ and tests/, in balance file names and keys, in the keys of data/animals.json and
     data/items.json or in i18n keys. The engine call .kill( (Tween.kill) stays allowed.
+(i) Engine.time_scale is global (hit-stop): only scripts/feedback/feedback_director.gd may assign it; files below
+    tests/ are exempt (they restore it between tests).
 Comments and string literals never count as code.
 """
 import argparse
@@ -82,6 +84,8 @@ HARM = {"damage", "damaged", "death", "dead", "die", "died", "dies", "kill", "ki
 HARM_PREFIXES = ("injur",)
 HARM_GD_DIRS = ("scripts", "scenes", "ui", "tests")
 HARM_DATA_FILES = ("data/animals.json", "data/items.json")
+TIME_SCALE_RE = re.compile(r"\bEngine\s*\.\s*time_scale\s*(?:[-+*/]?=)(?!=)")
+TIME_SCALE_WRITER = "scripts/feedback/feedback_director.gd"
 INPUT_SECTION_RE = re.compile(r"^\[input\]\n(.*?)(?=^\[|\Z)", re.M | re.S)
 INPUT_ACTION_RE = re.compile(r"^(\w+)=\{", re.M)
 
@@ -469,12 +473,27 @@ def check_harm(root: Path) -> list:
     return errors
 
 
+# --- (i) single writer of Engine.time_scale ----------------------------------------------------------
+
+def check_time_scale(root: Path) -> list:
+    errors = []
+    for path in code_files(root, ".gd"):
+        rel = _rel(root, path)
+        if rel == TIME_SCALE_WRITER or rel.startswith("tests/"):
+            continue
+        _nc, bare, _strings = gd_strip(_read(path))
+        for match in TIME_SCALE_RE.finditer(bare):
+            errors.append("%s:%d: Engine.time_scale may only be set by %s (hit-stop owner)"
+                          % (rel, _line(bare, match.start()), TIME_SCALE_WRITER))
+    return errors
+
+
 def validate(root: Path = REPO) -> list:
     """Return every code-rule error below root (empty = valid)."""
     root = Path(root)
     return (check_comments(root) + check_magic_numbers(root) + check_networking(root) + check_third_party(root)
             + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root)
-            + check_harm(root))
+            + check_harm(root) + check_time_scale(root))
 
 
 def main(argv=None) -> int:

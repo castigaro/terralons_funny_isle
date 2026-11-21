@@ -348,6 +348,9 @@
 		"all_required_done": "covered by the task jingle and level_won",
 		"castaway_dizzy_ended": "end of a state, no sound",
 		"event_ended": "the event start is already warned",
-		"announcer_line": "emitted by the Audio autoload itself"
+		"announcer_line": "emitted by the Audio autoload itself",
+		"event_warning": "visual pre-warning only, the event start plays the warning sound",
+		"fx_anchor": "position carrier for the feedback director, no action",
+		"fx_anchor_node": "position carrier for the feedback director, no action"
 	}
 }

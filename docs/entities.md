@@ -11,7 +11,6 @@ Animals and items live in `scripts/gameplay/entities/` and `scenes/entities/`. E
 | `item.gd` | `Item` | Item scene shell: idle bob, wearing, hop-away. |
 | `respawn_guard.gd` | `RespawnGuard` | Pure respawn timer. |
 | `flight_watch.gd` | `FlightWatch` | Notices the castaway's `ThrowFlight` child and samples it. |
-| `respawn_puff.gd` | `RespawnPuff` | White smoke puff that frees itself. |
 | `zone.gd` | `Zone` | Named level zone, containment from the shape geometry. |
 | `entity_registry.gd` | `EntityRegistry` | Per-level hub: perception, queries, impacts, snapshot, event effects, restart. |
 | `entity_protection.gd` | `EntityProtection` | Keeps entities that count for a finished task safe. |
@@ -64,7 +63,7 @@ Its fixtures are in `tests/fixtures/entities/`. Every file holds `{"animals": �
 | `body_radius_factor` | Collision radius = smaller sprite side × `sprite_scale` × factor. |
 | `wander_pause_min`, `wander_pause_max`, `wander_arrive_distance`, `wander_retarget_seconds` | Wandering. |
 | `panic_turn_interval`, `lure_arrive_distance`, `settle_margin` | Panic turns, lure stop, how far inside a pen an animal must be to settle. |
-| `waddle_*`, `hop_*`, `idle_hop_interval`, `panic_hop_interval`, `wiggle_*`, `star_*`, `speed_line_amount`, `emote_*`, `shadow_scale`, `item_bob_*`, `puff_*` | Look. |
+| `waddle_*`, `hop_*`, `idle_hop_interval`, `panic_hop_interval`, `wiggle_*`, `star_*`, `speed_line_amount`, `shadow_scale`, `item_bob_*` | Look (emote and puff timings live in `data/balance/feedback.json`, see `docs/feedback.md`). |
 
 The castaway balance has two more keys: `carry_weight_min` (0.5) and `carry_weight_max` (2.0).
 
@@ -86,7 +85,7 @@ The castaway balance has two more keys: `carry_weight_min` (0.5) and `carry_weig
 - `water`: water surface or water body, for non-swimmers only;
 - `""` when the entity can be reached.
 
-An entity that is free (not carried, flying or worn) and unreachable for `respawn_delay` seconds without a break respawns. In one tick it emits `entity_lost(kind, reason)`, shows a smoke puff where it was and at home, returns home with every state cleared, and emits `entity_respawned(kind, home)` (D4). Grabbing it before the delay cancels the respawn without a signal. Non-swimmers have water in their collision mask, so they only get into water by a throw or a relocation.
+An entity that is free (not carried, flying or worn) and unreachable for `respawn_delay` seconds without a break respawns. In one tick it emits `fx_anchor(kind, lost_at)` and `entity_lost(kind, reason)`, returns home with every state cleared, and emits `entity_respawned(kind, home)` (D4). The level's FeedbackDirector shows the smoke puffs where it was and at home. Grabbing it before the delay cancels the respawn without a signal. Non-swimmers have water in their collision mask, so they only get into water by a throw or a relocation.
 
 **Protection:** `EntityProtection.new(session, def)` decides which entities count towards a finished task. An entity is protected when a done task has an `in_zone` condition with the entity's kind and a zone the entity is in, or a `worn` condition with this worn item. Hand it to the registry with `set_protection(protection.is_protected, protection.confine_zone)`. A protected entity is never respawned or relocated, and the animal stays inside its zone.
 
@@ -101,7 +100,7 @@ An entity that is free (not carried, flying or worn) and unreachable for `respaw
 
 ## Signals
 
-`animal_fled(kind)`, `animal_bonked(kind, cause)` (the cause is the thrown kind), `animal_panicked(kind)`, `animal_caught(kind)`, `animal_lured(kind)`, `entity_lost(kind, reason)` and `entity_respawned(kind, position)`. Animals do not use `object_bonked`, which stays the castaway's BONK hook (D9).
+`animal_fled(kind)`, `animal_bonked(kind, cause)` (the cause is the thrown kind), `animal_panicked(kind)`, `animal_caught(kind)`, `animal_lured(kind)`, `entity_lost(kind, reason)` and `entity_respawned(kind, position)`. Animals do not use `object_bonked`, which stays the castaway's BONK hook (D9). Before each reaction signal and before `animal_caught` the animal emits `fx_anchor_node(kind, self)`, so the feedback can follow it. Animals and items implement the feedback hooks `fx_squash(sx, sy, seconds)` and `fx_recoil(offset, seconds)`, which are composed into their own sprite animation.
 
 ## Test arena
 
@@ -130,4 +129,4 @@ Run it windowed with `Godot_v4.7.2-stable_win64.exe --path . res://tests/scenes/
 - D12: the castaway joins group `castaway`.
 - Carry weight: heavier loads slow the castaway (`carry_speed_factor / weight`) and fly shorter (`throw_range / weight`). Weight 1.0 keeps the BI-2 numbers.
 - The coconut, hat, bucket and sand pail sprites are the closest item-pack shapes (the pack has no real coconut or hat).
-- The emotes come straight from the emote pack. A later feedback item may route them through its own data.
+- Emotes, puffs and popups come from the FeedbackDirector and `data/feedback.json` (BI-8); speed lines and dizzy stars stay attached to the body.

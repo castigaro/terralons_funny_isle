@@ -60,6 +60,14 @@ signal animal_lured(kind: String)
 signal entity_lost(kind: String, reason: String)
 @warning_ignore("unused_signal")
 signal entity_respawned(kind: String, position: Vector2)
+# Feedback (BI-8): a warning shortly before an event starts, and position anchors emitted right before a
+# position-less signal so the feedback director knows where to play it (consumed by the next gameplay signal).
+@warning_ignore("unused_signal")
+signal event_warning(event_id: String, event_type: String, seconds_until: float)
+@warning_ignore("unused_signal")
+signal fx_anchor(kind: String, position: Vector2)
+@warning_ignore("unused_signal")
+signal fx_anchor_node(kind: String, node: Node2D)
 # Announcer caption (BI-9): emitted by the Audio autoload when a line starts; seconds is how long to show it.
 @warning_ignore("unused_signal")
 signal announcer_line(line_id: String, caption_key: String, seconds: float)

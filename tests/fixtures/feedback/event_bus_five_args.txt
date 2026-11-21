@@ -1,0 +1,5 @@
+extends Node
+## Fixture for tests/feedback/test_validate_feedback.py: a signal with five arguments.
+
+signal level_started(level_id: String)
+signal too_many(a: int, b: int, c: int, d: int, e: int)

@@ -28,6 +28,13 @@ var _bob_time := 0.0
 var _hop: Tween
 var _hop_height := 0.0
 var _shadow_base := Vector2.ONE
+var _body_scale := Vector2.ONE
+var _fx_squash := Vector2.ONE
+var _fx_squash_left := 0.0
+var _fx_squash_total := 0.0
+var _fx_recoil := Vector2.ZERO
+var _fx_recoil_left := 0.0
+var _fx_recoil_total := 0.0
 
 @onready var shadow: Sprite2D = $Shadow
 @onready var visual: Node2D = $Visual
@@ -52,7 +59,8 @@ func setup(new_kind: String, config: EntityConfig = null) -> void:
 	var path := String(def.get("sprite", ""))
 	if path != "" and ResourceLoader.exists(path):
 		body.texture = load(path)
-	body.scale = Vector2.ONE * float(def.get("sprite_scale", 1.0))
+	_body_scale = Vector2.ONE * float(def.get("sprite_scale", 1.0))
+	body.scale = _body_scale
 	var marker := get_node_or_null(home_marker) as Node2D if not home_marker.is_empty() else null
 	home = marker.global_position if marker != null else global_position
 	_guard = RespawnGuard.new(cfg.respawn_delay)
@@ -68,6 +76,7 @@ func _reset_shadow() -> void:
 func _physics_process(delta: float) -> void:
 	if _guard == null:
 		return
+	_fx_step(delta)
 	var reg := registry()
 	if _watch.active():
 		if reg != null and _watch.skimming(cfg.skim_min_progress, cfg.skim_height):
@@ -82,7 +91,7 @@ func _physics_process(delta: float) -> void:
 		take_off()
 	_bob_time += delta
 	if _hop == null or not _hop.is_running():
-		body.position = Vector2(0.0, -absf(sin(_bob_time * cfg.item_bob_frequency)) * cfg.item_bob_amplitude)
+		body.position = Vector2(0.0, -absf(sin(_bob_time * cfg.item_bob_frequency)) * cfg.item_bob_amplitude) 				+ _fx_recoil_offset()
 	var reason: String = reg.call("unreachable_reason", self) if reg != null else ""
 	var protected: bool = reg.call("is_protected", self) if reg != null else false
 	var guard := _guard.tick(delta, reason, is_free(), protected)
@@ -91,11 +100,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _respawn(reason: String) -> void:
-	var lost_at := global_position
+	EventBus.fx_anchor.emit(kind, global_position)
 	EventBus.entity_lost.emit(kind, reason)
-	var parent := get_parent() if get_parent() != null else self
-	RespawnPuff.spawn(parent, lost_at, cfg)
-	RespawnPuff.spawn(parent, home, cfg)
 	reset_to_home()
 	EventBus.entity_respawned.emit(kind, home)
 
@@ -209,6 +215,9 @@ func reset_to_home() -> void:
 	relocate_to(home)
 	visual.position = Vector2.ZERO
 	visual.scale = Vector2.ONE
+	_fx_squash_left = 0.0
+	_fx_recoil_left = 0.0
+	body.scale = _body_scale
 	_reset_shadow()
 	_guard.reset()
 
@@ -242,6 +251,38 @@ func is_swimmer() -> bool:
 
 func is_animal() -> bool:
 	return false
+
+
+## Feedback hook (duck-typed FeedbackDirector contract): a short squash and stretch of the item sprite.
+func fx_squash(sx: float, sy: float, seconds: float) -> void:
+	if seconds > 0.0:
+		_fx_squash = Vector2(sx, sy)
+		_fx_squash_total = seconds
+		_fx_squash_left = seconds
+
+
+## Feedback hook: a short visual recoil of the item sprite while it lies on the ground.
+func fx_recoil(offset: Vector2, seconds: float) -> void:
+	if seconds > 0.0:
+		_fx_recoil = offset
+		_fx_recoil_total = seconds
+		_fx_recoil_left = seconds
+
+
+func _fx_step(delta: float) -> void:
+	_fx_recoil_left = maxf(0.0, _fx_recoil_left - delta)
+	if _fx_squash_left <= 0.0:
+		return
+	_fx_squash_left = maxf(0.0, _fx_squash_left - delta)
+	var share := _fx_squash_left / _fx_squash_total
+	body.scale = _body_scale * Vector2.ONE.lerp(_fx_squash, share * share)
+
+
+func _fx_recoil_offset() -> Vector2:
+	if _fx_recoil_left <= 0.0:
+		return Vector2.ZERO
+	var share := _fx_recoil_left / _fx_recoil_total
+	return _fx_recoil * share * share
 
 
 func get_guard() -> RespawnGuard:

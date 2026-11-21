@@ -88,6 +88,7 @@ Foliage (`assets/graphics/foliage/PNG/Retina/`), sway by a shader:
 - Dust and speed lines: `assets/graphics/particles/PNG/dirt_01.png` to `dirt_03`, `assets/graphics/particles/PNG/trace_01.png` to `trace_07`
 - Water drops and rain: `assets/graphics/particles/PNG/circle_01.png` to `circle_05`
 - Never use `muzzle_*`, `scorch_*`, `slash_*` or `fire_*` (deny list or scary).
+- Feedback (`data/feedback.json`, BI-8): popups in `assets/ui/ui-pack/Font/Kenney Future.ttf`; emotes `emote_exclamation`, `emote_heart`, `emote_swirl`, `emote_question`, `emote_anger`, `emote_stars` and `emote_laugh` from `assets/graphics/emotes/PNG/Vector/Style 1/`; puffs `whitePuff00`–`whitePuff11`, fart `fart00`–`fart08`, flash `flash00`–`flash07`, splats `splat00`–`splat07` tinted mud, water or sand; particles `dirt_01`, `trace_01`, `star_01`, `spark_01` and `circle_01`.
 
 ## Music
 

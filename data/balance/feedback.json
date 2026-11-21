@@ -1,0 +1,96 @@
+{
+	"schema_version": 1,
+	"fx_scale": 1.0,
+	"hitstop_scale": 1.0,
+	"reduce_motion_factor": 0.0,
+	"hitstop_max_ms": 80,
+	"hitstop_time_scale": 0.05,
+	"hitstop_cooldown_ms": 250,
+	"hitstop_safety_grace_ms": 34,
+	"flash_min_interval_ms": 334,
+	"shake_decay_per_second": 2.2,
+	"shake_noise_speed": 38,
+	"shake_seed": 4711,
+	"popup_font_size": 48,
+	"popup_outline_size": 14,
+	"popup_rise_px": 60,
+	"popup_seconds": 0.8,
+	"popup_pop_seconds": 0.12,
+	"popup_pop_scale": 1.35,
+	"popup_face_offset": [0, -96],
+	"popup_screen_offset": [0, -180],
+	"popup_stack_px": 46,
+	"popup_stack_radius": 160,
+	"emote_seconds": 0.9,
+	"emote_pop_seconds": 0.12,
+	"emote_scale": 1.8,
+	"emote_height": 78,
+	"puff_seconds": 0.5,
+	"puff_scale": 0.25,
+	"splat_seconds": 2.5,
+	"splat_fade_seconds": 0.8,
+	"splat_scale": 0.35,
+	"splat_alpha": 0.85,
+	"flash_seconds": 0.25,
+	"flash_scale": 0.35,
+	"particle_lifetime_margin": 0.1,
+	"z": {"splat": 0, "fx": 20, "popup": 40},
+	"screen_layer": 5,
+	"caps": {
+		"popup": 6,
+		"splat": 10,
+		"puff": 8,
+		"particles": 6,
+		"emote": 6,
+		"shake": 3,
+		"flash": 2,
+		"squash": 8,
+		"recoil": 8
+	},
+	"strengths": {
+		"shake": {
+			"small": {"amplitude": 8, "trauma": 0.5},
+			"medium": {"amplitude": 14, "trauma": 0.6},
+			"bonk": {"amplitude": 24, "trauma": 0.8}
+		},
+		"hitstop": {
+			"light": {"ms": 50},
+			"bonk": {"ms": 70}
+		},
+		"squash": {
+			"pop": {"x": 1.3, "y": 0.75, "seconds": 0.22},
+			"squish": {"x": 0.75, "y": 1.3, "seconds": 0.25}
+		},
+		"particles": {
+			"dirt": {"amount": 6, "lifetime": 0.35, "speed": 60, "spread": 180, "scale": 0.06},
+			"trace": {"amount": 8, "lifetime": 0.3, "speed": 140, "spread": 30, "scale": 0.07},
+			"star": {"amount": 10, "lifetime": 0.6, "speed": 180, "spread": 180, "scale": 0.08},
+			"circle": {"amount": 10, "lifetime": 0.45, "speed": 150, "spread": 180, "scale": 0.05},
+			"spark": {"amount": 12, "lifetime": 0.5, "speed": 220, "spread": 180, "scale": 0.08}
+		},
+		"flash": {
+			"small": {"alpha": 0.3},
+			"task": {"alpha": 0.4}
+		},
+		"popup": {
+			"normal": {"scale": 1.0},
+			"small": {"scale": 0.75},
+			"big": {"scale": 1.6}
+		},
+		"puff": {
+			"normal": {"scale": 1.0},
+			"big": {"scale": 1.6}
+		},
+		"splat": {
+			"normal": {"scale": 1.0},
+			"big": {"scale": 1.4}
+		},
+		"emote": {
+			"normal": {"scale": 1.0}
+		},
+		"recoil": {
+			"bonk": {"px": 14, "seconds": 0.18},
+			"light": {"px": 8, "seconds": 0.14}
+		}
+	}
+}

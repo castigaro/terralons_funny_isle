@@ -1,0 +1,644 @@
+{
+	"format_version": 1,
+	"materials": {
+		"mud": "#7a5230",
+		"water": "#5ec8f0",
+		"sand": "#e6cd8a"
+	},
+	"no_visual": {
+		"level_timer_tick": "the HUD timer shows it (BI-6)",
+		"settings_changed": "not gameplay",
+		"interact_verb_changed": "the HUD prompt shows it",
+		"castaway_dizzy_ended": "the dizzy stars on the castaway body end by themselves",
+		"task_progress": "the HUD task counter shows it",
+		"event_ended": "event actors leave by themselves",
+		"fx_anchor": "anchor carrier for the next signal",
+		"fx_anchor_node": "anchor carrier for the next signal",
+		"announcer_line": "the announcer caption shows it (BI-9)"
+	},
+	"signals": {
+		"level_started": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.go",
+					"strength": "big",
+					"anchor": "screen"
+				}
+			]
+		},
+		"task_completed": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.nice",
+					"strength": "big",
+					"anchor": "screen"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/star_01.png",
+					"strength": "star",
+					"anchor": "screen"
+				},
+				{
+					"effect": "flash",
+					"frames": "res://assets/graphics/smoke/PNG/Flash/flash%02d.png",
+					"frame_count": 8,
+					"strength": "task",
+					"anchor": "screen"
+				}
+			]
+		},
+		"all_required_done": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.yay",
+					"strength": "big",
+					"anchor": "screen"
+				}
+			]
+		},
+		"level_won": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.yay",
+					"strength": "big",
+					"anchor": "screen"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/spark_01.png",
+					"strength": "spark",
+					"anchor": "screen"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/star_01.png",
+					"strength": "star",
+					"anchor": "screen"
+				}
+			]
+		},
+		"level_lost": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.uhoh",
+					"strength": "big",
+					"anchor": "screen"
+				},
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "big",
+					"anchor": "screen"
+				}
+			]
+		},
+		"event_triggered": {
+			"default": [
+				{
+					"effect": "shake",
+					"strength": "small"
+				}
+			]
+		},
+		"timer_warning": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.hurry",
+					"strength": "big",
+					"anchor": "screen"
+				},
+				{
+					"effect": "flash",
+					"frames": "res://assets/graphics/smoke/PNG/Flash/flash%02d.png",
+					"frame_count": 8,
+					"strength": "small",
+					"anchor": "screen"
+				}
+			]
+		},
+		"object_grabbed": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.yoink",
+					"strength": "small"
+				},
+				{
+					"effect": "squash",
+					"strength": "pop"
+				}
+			]
+		},
+		"object_thrown": {
+			"default": [
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/trace_01.png",
+					"strength": "trace"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.whoosh",
+					"strength": "small"
+				}
+			]
+		},
+		"object_bonked": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.bonk",
+					"strength": "normal"
+				},
+				{
+					"effect": "shake",
+					"strength": "bonk"
+				},
+				{
+					"effect": "hitstop",
+					"strength": "bonk"
+				},
+				{
+					"effect": "recoil",
+					"strength": "bonk"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/star_01.png",
+					"strength": "star"
+				},
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				}
+			]
+		},
+		"object_used": {
+			"default": [
+				{
+					"effect": "flash",
+					"frames": "res://assets/graphics/smoke/PNG/Flash/flash%02d.png",
+					"frame_count": 8,
+					"strength": "small"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.poof",
+					"strength": "normal"
+				},
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				}
+			]
+		},
+		"object_landed": {
+			"variant_arg": "surface",
+			"default": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.boing",
+					"strength": "small"
+				}
+			],
+			"variants": {
+				"water": [
+					{
+						"effect": "splat",
+						"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+						"frame_count": 8,
+						"material": "water",
+						"strength": "normal"
+					},
+					{
+						"effect": "particles",
+						"asset": "res://assets/graphics/particles/PNG/circle_01.png",
+						"strength": "circle",
+						"material": "water"
+					},
+					{
+						"effect": "popup",
+						"word": "fx.splash",
+						"strength": "normal"
+					}
+				],
+				"sand": [
+					{
+						"effect": "splat",
+						"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+						"frame_count": 8,
+						"material": "sand",
+						"strength": "normal"
+					},
+					{
+						"effect": "puff",
+						"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+						"frame_count": 12,
+						"strength": "normal"
+					},
+					{
+						"effect": "popup",
+						"word": "fx.plop",
+						"strength": "small"
+					}
+				],
+				"mud": [
+					{
+						"effect": "splat",
+						"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+						"frame_count": 8,
+						"material": "mud",
+						"strength": "normal"
+					},
+					{
+						"effect": "popup",
+						"word": "fx.splat",
+						"strength": "normal"
+					}
+				]
+			}
+		},
+		"castaway_dashed": {
+			"default": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/trace_01.png",
+					"strength": "trace"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.whoosh",
+					"strength": "small"
+				}
+			]
+		},
+		"castaway_step": {
+			"variant_arg": "surface",
+			"default": [
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/dirt_01.png",
+					"strength": "dirt"
+				}
+			],
+			"variants": {
+				"water": [
+					{
+						"effect": "particles",
+						"asset": "res://assets/graphics/particles/PNG/circle_01.png",
+						"strength": "circle",
+						"material": "water"
+					}
+				],
+				"sand": [
+					{
+						"effect": "particles",
+						"asset": "res://assets/graphics/particles/PNG/dirt_01.png",
+						"strength": "dirt",
+						"material": "sand"
+					}
+				],
+				"mud": [
+					{
+						"effect": "particles",
+						"asset": "res://assets/graphics/particles/PNG/dirt_01.png",
+						"strength": "dirt",
+						"material": "mud"
+					}
+				]
+			}
+		},
+		"castaway_dizzy_started": {
+			"default": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_stars.png",
+					"strength": "normal",
+					"anchor": "follow"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.oof",
+					"strength": "small"
+				}
+			]
+		},
+		"animal_fled": {
+			"default": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png",
+					"strength": "normal",
+					"anchor": "follow"
+				},
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				}
+			]
+		},
+		"animal_bonked": {
+			"default": [
+				{
+					"effect": "popup",
+					"word": "fx.bonk",
+					"strength": "normal"
+				},
+				{
+					"effect": "squash",
+					"strength": "squish"
+				},
+				{
+					"effect": "recoil",
+					"strength": "light"
+				},
+				{
+					"effect": "hitstop",
+					"strength": "light"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/star_01.png",
+					"strength": "star"
+				}
+			]
+		},
+		"animal_panicked": {
+			"default": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_swirl.png",
+					"strength": "normal",
+					"anchor": "follow"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/trace_01.png",
+					"strength": "trace"
+				}
+			]
+		},
+		"animal_caught": {
+			"default": [
+				{
+					"effect": "squash",
+					"strength": "pop"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.yoink",
+					"strength": "small"
+				}
+			]
+		},
+		"animal_lured": {
+			"default": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_heart.png",
+					"strength": "normal",
+					"anchor": "follow"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.aww",
+					"strength": "small"
+				}
+			]
+		},
+		"entity_lost": {
+			"default": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.poof",
+					"strength": "normal"
+				}
+			]
+		},
+		"entity_respawned": {
+			"default": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal"
+				}
+			]
+		}
+	},
+	"events": {
+		"parrot_steal_hat": {
+			"warning": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.uhoh",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			],
+			"start": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			]
+		},
+		"goat_stampede": {
+			"warning": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_anger.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "shake",
+					"strength": "small"
+				}
+			],
+			"start": [
+				{
+					"effect": "shake",
+					"strength": "medium"
+				},
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/White puff/whitePuff%02d.png",
+					"frame_count": 12,
+					"strength": "big",
+					"anchor": "event_zone"
+				}
+			]
+		},
+		"coconut_throw": {
+			"warning": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_question.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.uhoh",
+					"strength": "small",
+					"anchor": "event_zone"
+				}
+			],
+			"start": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_laugh.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			]
+		},
+		"rain_panic": {
+			"warning": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_swirl.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/circle_01.png",
+					"strength": "circle",
+					"material": "water",
+					"anchor": "event_zone"
+				}
+			],
+			"start": [
+				{
+					"effect": "particles",
+					"asset": "res://assets/graphics/particles/PNG/circle_01.png",
+					"strength": "circle",
+					"material": "water",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.splash",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			]
+		},
+		"wave_wash": {
+			"warning": [
+				{
+					"effect": "emote",
+					"asset": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png",
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "splat",
+					"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+					"frame_count": 8,
+					"material": "water",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			],
+			"start": [
+				{
+					"effect": "splat",
+					"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+					"frame_count": 8,
+					"material": "water",
+					"strength": "big",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.splash",
+					"strength": "big",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "shake",
+					"strength": "medium"
+				}
+			]
+		},
+		"mud_trail": {
+			"warning": [
+				{
+					"effect": "puff",
+					"frames": "res://assets/graphics/smoke/PNG/Fart/fart%02d.png",
+					"frame_count": 9,
+					"strength": "normal",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "splat",
+					"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+					"frame_count": 8,
+					"material": "mud",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			],
+			"start": [
+				{
+					"effect": "splat",
+					"frames": "res://assets/graphics/splats/PNG/Default (256px)/splat%02d.png",
+					"frame_count": 8,
+					"material": "mud",
+					"strength": "big",
+					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.splat",
+					"strength": "normal",
+					"anchor": "event_zone"
+				}
+			]
+		}
+	}
+}
