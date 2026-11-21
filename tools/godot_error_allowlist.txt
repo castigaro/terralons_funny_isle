@@ -1,0 +1,2 @@
+# Regexes for harmless Godot engine error lines that run_tests.py may ignore.
+# One regex per line; '#' starts a comment. Keep this list empty unless a line is proven harmless.

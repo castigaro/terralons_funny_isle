@@ -1,0 +1,8 @@
+.godot/
+*.translation
+*.import
+!i18n/*.csv.import
+.venv/
+__pycache__/
+*.pyc
+build/
