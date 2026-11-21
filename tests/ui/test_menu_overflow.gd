@@ -83,3 +83,34 @@ func test_clip_check_flags_a_small_button() -> void:
 	var joined := "\n".join(errors)
 	check_has(joined, "needs width", "too narrow button found")
 	check_has(joined, "leaves the viewport", "off-screen label found")
+
+
+func test_button_columns_share_one_width() -> void:
+	use_data_dir("button_columns")
+	install_fixture_translations()
+	for locale in ["en", "de"]:
+		I18n.set_locale(locale)
+		for size in SIZES:
+			for screen_name in ["title", "pause"]:
+				var host := Control.new()
+				host.size = size
+				add_node(host)
+				var node := (load(SCENES[screen_name]) as PackedScene).instantiate() as MenuScreen
+				host.add_child(node)
+				await frames(2)
+				var column := node.find_child("Buttons", true, false) as VBoxContainer
+				var where := "%s %s@%dx%d" % [screen_name, locale, size.x, size.y]
+				check_ne(column, null, "%s has a button column" % where)
+				if column != null:
+					var widest := 0.0
+					for child in column.get_children():
+						widest = maxf(widest, (child as Control).get_combined_minimum_size().x)
+					check(column.get_child_count() >= 4, "%s stacks its buttons in the column" % where)
+					for child in column.get_children():
+						var button := child as Button
+						check(absf(button.size.x - column.size.x) < 0.5, "%s: %s fills the column" % [where, button.name])
+						check(absf(button.size.x - widest) < 0.5, "%s: %s has the widest width" % [where, button.name])
+						check(button.size.x >= Balance.get_float("flow", "button_min_width"), "%s: min width" % where)
+				host.queue_free()
+				await frames(1)
+	I18n.set_locale("en")

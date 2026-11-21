@@ -65,6 +65,14 @@ class CreditsTest(unittest.TestCase):
         self.assertTrue(any("font_size_body" in e for e in errors), errors)
         self.assertTrue(any("intro_guard_s" in e for e in errors), errors)
 
+    def test_flow_without_intro_auto_close(self):
+        path = self.root / "data" / "balance" / "flow.json"
+        flow = json.loads(path.read_text(encoding="utf-8"))
+        self.assertNotIn("intro_auto_s", flow)
+        flow["intro_auto_s"] = 0.1
+        path.write_text(json.dumps(flow), encoding="utf-8")
+        self.assertEqual(validate_credits.check_flow_balance(self.root), [])
+
 
 if __name__ == "__main__":
     unittest.main()

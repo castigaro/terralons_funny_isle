@@ -21,7 +21,7 @@ func test_win_content_and_progress() -> void:
 	check_eq(result.call("star_count"), 1, "one star for the required task")
 	var left := session().time_left()
 	check_eq((result.get("time_label") as Label).text, "Time left %s" % FlowRules.format_time(left, true), "time")
-	check_true((result.get("best_label") as Label).visible, "first win is a new best")
+	check_false((result.get("best_label") as Label).visible, "a first win shows no 'New best!'")
 	check_false((result.get("missing_label") as Label).visible, "no missing list on a win")
 	check_true(Progress.model().is_won(SAMPLE), "win recorded")
 	check_eq(Progress.model().best_stars(SAMPLE), 1, "stars recorded")
@@ -49,7 +49,7 @@ func test_loss_content_and_retry_focus() -> void:
 	check_eq(result.call("star_count"), 0, "no stars")
 	var missing: Label = result.get("missing_label")
 	check_true(missing.visible, "missing list")
-	check_eq(missing.text, "Missing: Run to zone A.", "only the required task")
+	check_eq(missing.text, "Missing: Visit zone A", "only the required task")
 	check_false(Progress.model().is_won(SAMPLE), "loss records nothing")
 	check_false(FileAccess.file_exists(Progress.file_path()), "no file on a loss")
 	check_true((result.get("next_button") as Button).disabled, "Next disabled before the delay")
@@ -112,3 +112,31 @@ func test_credits_after_winning_the_last_level() -> void:
 	await key(KEY_SPACE)
 	check_eq(screen(), FlowRules.Screen.LEVEL_SELECT, "back to the level select after the campaign")
 	check_eq(Audio.current_music(), "title", "title music again")
+
+
+
+func _best_shown() -> bool:
+	return (screen_node().get("best_label") as Label).visible
+
+
+## Wins the sample level (one star) over an earlier record of record_stars and record_time seconds.
+func _win_over(sub: String, record_stars: int, record_time: float) -> bool:
+	await open_flow(sub)
+	Progress.record_win(SAMPLE, record_stars, record_time)
+	await _start()
+	await win_level()
+	check_eq(screen(), FlowRules.Screen.RESULT, "result")
+	return _best_shown()
+
+
+func test_worse_run_shows_no_new_best() -> void:
+	check_false(await _win_over("result_best_worse", 1, 0.001), "slower with the same stars: no mark")
+
+
+func test_faster_run_shows_new_best() -> void:
+	check_true(await _win_over("result_best_faster", 1, 999.0), "faster: mark")
+
+
+func test_more_stars_but_slower_shows_new_best() -> void:
+	check_true(await _win_over("result_best_stars", 0, 0.001), "more stars, slower: mark")
+	check_eq(Progress.model().best_time(SAMPLE), 0.001, "time record kept")

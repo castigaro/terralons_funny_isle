@@ -15,14 +15,16 @@ func test_garbage_gives_defaults() -> void:
 
 
 func test_unknown_ids_and_wrong_types_dropped() -> void:
+	var bad_won := ProgressModel.from_dict({"schema_version": 1, "levels": {"a": {"won": "yes", "best_stars": 3}}},
+			IDS)
+	check_false(bad_won.is_won("a"), "won as string dropped")
 	var data := {"schema_version": 1, "levels": {
 		"zzz": {"won": true, "best_stars": 3, "best_time_s": 10.0},
-		"a": {"won": "yes", "best_stars": 3},
+		"a": {"won": true, "best_stars": 1, "best_time_s": 30.0},
 		"b": {"won": true, "best_stars": "3", "best_time_s": 0},
 		"c": {"won": true, "best_stars": 7.0, "best_time_s": -5.0},
 	}}
 	var m := ProgressModel.from_dict(data, IDS)
-	check_false(m.is_won("a"), "won as string dropped")
 	check_true(m.is_won("b"), "b won")
 	check_eq(m.best_stars("b"), 0, "stars as string dropped")
 	check_eq(m.best_time("b"), -1.0, "zero time dropped")
@@ -55,3 +57,15 @@ func test_round_trip() -> void:
 	var parsed: Variant = JSON.parse_string(JSON.stringify(dict))
 	var again := ProgressModel.from_dict(parsed, IDS)
 	check_eq(again.to_dict(), dict, "round trip equal")
+
+
+func test_win_after_gap_dropped() -> void:
+	var data := {"schema_version": 1, "levels": {"a": {"won": true, "best_stars": 2, "best_time_s": 40.0},
+			"c": {"won": true, "best_stars": 3, "best_time_s": 20.0}}}
+	var m := ProgressModel.from_dict(data, IDS)
+	check_true(m.is_won("a"), "a kept")
+	check_false(m.is_won("c"), "c after the unwon b dropped")
+	check_false(m.is_unlocked("c"), "c locked")
+	check_eq(m.best_stars("c"), 0, "no stars on a locked level")
+	check_false(m.to_dict()["levels"].has("c"), "c not saved")
+	check_eq(m.unlocked_ids(), ["a", "b"], "only a and b open")

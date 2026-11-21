@@ -10,7 +10,6 @@ signal quit_pressed
 
 const ICON_RESUME := "res://assets/ui/ui-pack/PNG/Extra/Default/icon_play_light.png"
 const ICON_RESTART := "res://assets/ui/ui-pack/PNG/Extra/Default/icon_repeat_light.png"
-const ICON_SETTINGS := "res://assets/ui/ui-pack/PNG/Yellow/Default/slide_hangle.png"
 const ICON_LEVELS := "res://assets/ui/ui-pack/PNG/Yellow/Default/arrow_basic_w.png"
 const ICON_QUIT := "res://assets/ui/ui-pack/PNG/Yellow/Default/icon_cross.png"
 
@@ -24,18 +23,19 @@ var quit_button: Button
 func _build() -> void:
 	var box := make_panel()
 	box.add_child(make_label("menu.pause.title", {}, MenuTheme.VARIATION_HEADING))
-	resume_button = _add(box, make_button("menu.resume", ICON_RESUME), resume_pressed)
-	restart_button = _add(box, make_button("menu.restart", ICON_RESTART), restart_pressed)
-	settings_button = _add(box, make_button("menu.settings", ICON_SETTINGS), settings_pressed)
-	level_select_button = _add(box, make_button("menu.level_select", ICON_LEVELS), level_select_pressed)
-	quit_button = _add(box, make_button("menu.quit", ICON_QUIT), quit_pressed)
+	var column := make_button_column(box)
+	resume_button = _add(column, make_button("menu.resume", ICON_RESUME), resume_pressed)
+	restart_button = _add(column, make_button("menu.restart", ICON_RESTART), restart_pressed)
+	settings_button = _add(column, make_button("menu.settings"), settings_pressed)
+	level_select_button = _add(column, make_button("menu.level_select", ICON_LEVELS), level_select_pressed)
+	quit_button = _add(column, make_button("menu.quit", ICON_QUIT), quit_pressed)
 	_first_focus = resume_button
 
 
-func _add(box: Control, button: Button, sig: Signal) -> Button:
-	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+func _add(column: Control, button: Button, sig: Signal) -> Button:
+	button.size_flags_horizontal = Control.SIZE_FILL
 	button.pressed.connect(sig.emit)
-	box.add_child(button)
+	column.add_child(button)
 	return button
 
 

@@ -41,3 +41,19 @@ func test_menu_texts_have_no_en_dash() -> void:
 		if String(key).begins_with("menu."):
 			for loc in I18n.LOCALES:
 				check_false(I18n.text_in(key, loc).contains("–"), "%s (%s) has an en dash" % [key, loc])
+
+
+func test_slider_focus_cue_in_theme() -> void:
+	var cfg := Balance.get_section("flow")
+	var theme := MenuTheme.build(cfg)
+	var grabber := theme.get_icon("grabber", "HSlider")
+	var highlight := theme.get_icon("grabber_highlight", "HSlider")
+	check_ne(highlight.resource_path, grabber.resource_path, "hovered or focused grabber has its own texture")
+	check_eq(highlight.resource_path, MenuTheme.SLIDER_GRABBER_FOCUS, "yellow grabber")
+	check_ne(theme.get_stylebox("grabber_area_highlight", "HSlider"), theme.get_stylebox("grabber_area", "HSlider"),
+			"highlighted fill differs")
+	var ring := MenuTheme.focus_style(cfg)
+	var button_focus := theme.get_stylebox("focus", "Button") as StyleBoxFlat
+	check_eq(ring.border_width_left, button_focus.border_width_left, "same width as the button outline")
+	check_eq(ring.border_color, button_focus.border_color, "same colour as the button outline")
+	check_false(ring.draw_center, "outline only")

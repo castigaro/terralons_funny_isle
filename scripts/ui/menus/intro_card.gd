@@ -1,7 +1,8 @@
 extends MenuScreen
 ## Level intro card (D-9): level title, every task marked required or optional and the 3-star time goal before
-## "Go!". Any key or click after a short guard closes it, and it closes by itself after intro_auto_s, so a level
-## starts two clicks after the title. The level timer only starts when the card is gone.
+## "Go!". It waits as long as the player needs (no auto-close). A key or mouse press after a short guard arms it and
+## the release of that same key or button closes it, so the dismiss key is up again when the level starts and never
+## moves the castaway. Presses during the guard or from before the card never arm. The timer starts after the card.
 
 signal dismissed
 
@@ -14,12 +15,12 @@ var hint_label: Label
 var task_rows: Array = []
 var _tasks_box: VBoxContainer
 var _closed := false
-var _auto_s := 0.0
+## The press that will close the card on its release: {"key": physical or logical keycode} or {"mouse": index}.
+var _armed := {}
 
 
 func _build() -> void:
 	guard_s = float(cfg.get("intro_guard_s", 0))
-	_auto_s = float(cfg.get("intro_auto_s", 0))
 	var box := make_panel()
 	title_label = make_label("", {}, MenuTheme.VARIATION_HEADING)
 	box.add_child(title_label)
@@ -39,10 +40,7 @@ func setup(def: LevelDef, three_star_s: float) -> void:
 	bind_text(title_label, def.title_key)
 	clear_tasks()
 	for task in def.tasks:
-		var key := String(task.get("title_key", ""))
-		if key == "":
-			key = String(task.get("hint_key", ""))
-		add_task_row(key, bool(task.get("required", false)))
+		add_task_row(HudModel.task_title_key(task), bool(task.get("required", false)))
 	bind_text(goal_label, "menu.intro.three_star", {"time": FlowRules.format_time(three_star_s, true)})
 
 
@@ -88,11 +86,13 @@ func is_closed() -> bool:
 	return _closed
 
 
+func is_armed() -> bool:
+	return not _armed.is_empty()
+
+
 func _tick(_delta: float) -> void:
 	if hint_label != null and guard_passed():
 		hint_label.modulate.a = 1.0
-	if not _closed and _auto_s > 0.0 and age() >= _auto_s:
-		close()
 
 
 func close() -> void:
@@ -102,16 +102,28 @@ func close() -> void:
 	dismissed.emit()
 
 
+static func _key_id(event: InputEventKey) -> int:
+	return int(event.physical_keycode) if event.physical_keycode != KEY_NONE else int(event.keycode)
+
+
+## Every key counts as "any key"; all key events are consumed so none reaches the level or the flow keys.
 func handle_input(event: InputEvent) -> bool:
-	if not is_key_press(event):
+	if not event is InputEventKey or event.is_echo():
 		return false
-	if guard_passed():
+	if is_key_press(event):
+		if guard_passed() and _armed.is_empty():
+			_armed = {"key": _key_id(event)}
+	elif is_key_release(event) and int(_armed.get("key", -1)) == _key_id(event):
 		close()
 	return true
 
 
 func _gui_input(event: InputEvent) -> void:
-	if is_click(event) and guard_passed():
+	if not event is InputEventMouseButton:
+		return
+	if event.pressed:
+		if guard_passed() and _armed.is_empty():
+			_armed = {"mouse": int(event.button_index)}
+	elif int(_armed.get("mouse", -1)) == int(event.button_index):
 		close()
-		accept_event()
-
+	accept_event()

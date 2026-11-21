@@ -92,3 +92,16 @@ func test_quit_from_pause() -> void:
 	screen_node().get("quit_button").grab_focus()
 	await key(KEY_ENTER)
 	check_eq(quit_calls, 1, "quit path called")
+
+
+func test_r_and_escape_ignored_during_intro_guard() -> void:
+	await open_flow("pause_intro_guard")
+	flow.call("start_level_flow", SAMPLE, true)
+	await frames(1)
+	await key(KEY_R)
+	await key(KEY_ESCAPE)
+	check_eq(screen(), FlowRules.Screen.INTRO, "R and Esc during the guard ignored")
+	check_eq(session().get_state(), LevelSession.State.READY, "still READY")
+	await wait_guard()
+	await key(KEY_ESCAPE)
+	check_eq(screen(), FlowRules.Screen.PLAYING, "Esc after the guard counts as any key")

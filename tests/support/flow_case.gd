@@ -119,6 +119,16 @@ func key(code: Key, frames_after: int = 1) -> void:
 	await frames(frames_after)
 
 
+## Only the press (pressed = true) or only the release of a key.
+func key_edge(code: Key, pressed: bool, frames_after: int = 1) -> void:
+	var ev := InputEventKey.new()
+	ev.keycode = code
+	ev.physical_keycode = code
+	ev.pressed = pressed
+	root().push_input(ev, true)
+	await frames(frames_after)
+
+
 func center_of(control: Control) -> Vector2:
 	return control.get_global_rect().get_center()
 

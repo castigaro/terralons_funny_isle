@@ -72,6 +72,7 @@ func _slider_row(box: Control, key: String, setting: String) -> Array:
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	slider.value = _percent(float(Settings.get_value(setting)))
 	slider.mouse_entered.connect(_on_hover.bind(slider))
+	add_focus_ring(slider)
 	row.add_child(slider)
 	var value := make_label("menu.percent", {"value": int(slider.value)})
 	value.custom_minimum_size.x = float(cfg.get("value_label_width", 0))

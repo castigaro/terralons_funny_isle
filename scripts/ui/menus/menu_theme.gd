@@ -11,6 +11,7 @@ const TILE_TEX := "res://assets/ui/ui-pack/PNG/Blue/Default/button_square_depth_
 const SLIDER_TRACK := "res://assets/ui/ui-pack/PNG/Blue/Default/slide_horizontal_grey.png"
 const SLIDER_FILL := "res://assets/ui/ui-pack/PNG/Blue/Default/slide_horizontal_color.png"
 const SLIDER_GRABBER := "res://assets/ui/ui-pack/PNG/Blue/Default/slide_hangle.png"
+const SLIDER_GRABBER_FOCUS := "res://assets/ui/ui-pack/PNG/Yellow/Default/slide_hangle.png"
 const CHECK_ON := "res://assets/ui/ui-pack/PNG/Blue/Default/check_square_color_checkmark.png"
 const CHECK_OFF := "res://assets/ui/ui-pack/PNG/Blue/Default/check_square_grey.png"
 const VARIATION_TITLE := "TitleLabel"
@@ -34,6 +35,17 @@ static func heading_font() -> FontFile:
 
 static func body_font() -> FontFile:
 	return load(FONT_BODY) as FontFile
+
+
+## The high-contrast focus outline of buttons, checkboxes and the slider focus ring (MenuScreen.add_focus_ring).
+static func focus_style(cfg: Dictionary) -> StyleBoxFlat:
+	var focus := StyleBoxFlat.new()
+	focus.draw_center = false
+	focus.set_border_width_all(int(cfg.get("focus_outline_px", 0)))
+	focus.border_color = ArtPalette.color("ui_accent")
+	focus.set_corner_radius_all(int(cfg.get("button_texture_margin", 0)))
+	focus.set_expand_margin_all(float(cfg.get("focus_expand_px", 0)))
+	return focus
 
 
 static func build(cfg: Dictionary) -> Theme:
@@ -61,12 +73,7 @@ static func build(cfg: Dictionary) -> Theme:
 	theme.set_font_size("font_size", VARIATION_ACCENT, int(cfg.get("font_size_button", 0)))
 	theme.set_color("font_color", VARIATION_ACCENT, accent)
 
-	var focus := StyleBoxFlat.new()
-	focus.draw_center = false
-	focus.set_border_width_all(int(cfg.get("focus_outline_px", 0)))
-	focus.border_color = accent
-	focus.set_corner_radius_all(int(cfg.get("button_texture_margin", 0)))
-	focus.set_expand_margin_all(float(cfg.get("focus_expand_px", 0)))
+	var focus := focus_style(cfg)
 
 	for type_name in ["Button", "CheckBox"]:
 		theme.set_font("font", type_name, heading)
@@ -98,10 +105,12 @@ static func build(cfg: Dictionary) -> Theme:
 		box.content_margin_bottom = float(cfg.get("slider_height", 0)) / 2.0
 	theme.set_stylebox("slider", "HSlider", track)
 	theme.set_stylebox("grabber_area", "HSlider", fill)
-	theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
-	theme.set_stylebox("focus", "HSlider", focus)
+	var fill_light := fill.duplicate() as StyleBoxTexture
+	fill_light.modulate_color = Color.html(String(cfg.get("slider_highlight_tint", "#ffffff")))
+	theme.set_stylebox("grabber_area_highlight", "HSlider", fill_light)
+	# Sliders draw no focus box; MenuScreen.add_focus_ring adds the outline, the yellow grabber is a second cue.
 	theme.set_icon("grabber", "HSlider", load(SLIDER_GRABBER))
-	theme.set_icon("grabber_highlight", "HSlider", load(SLIDER_GRABBER))
+	theme.set_icon("grabber_highlight", "HSlider", load(SLIDER_GRABBER_FOCUS))
 	theme.set_icon("grabber_disabled", "HSlider", load(SLIDER_GRABBER))
 
 	var panel := StyleBoxFlat.new()

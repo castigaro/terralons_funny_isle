@@ -9,7 +9,6 @@ signal credits_pressed
 signal quit_pressed
 
 const ICON_PLAY := "res://assets/ui/ui-pack/PNG/Extra/Default/icon_play_light.png"
-const ICON_SETTINGS := "res://assets/ui/ui-pack/PNG/Yellow/Default/slide_hangle.png"
 const ICON_CREDITS := "res://assets/ui/ui-pack/PNG/Yellow/Default/star.png"
 const ICON_QUIT := "res://assets/ui/ui-pack/PNG/Yellow/Default/icon_cross.png"
 const ANIMALS := ["chicken", "pig", "goat", "duck", "monkey", "penguin"]
@@ -38,18 +37,19 @@ func _build() -> void:
 		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		animals.add_child(pic)
 	box.add_child(animals)
-	play_button = _add(box, make_button("menu.play", ICON_PLAY), play_pressed)
-	settings_button = _add(box, make_button("menu.settings", ICON_SETTINGS), settings_pressed)
-	language_button = _add(box, make_button(""), language_pressed)
-	credits_button = _add(box, make_button("menu.credits", ICON_CREDITS), credits_pressed)
-	quit_button = _add(box, make_button("menu.quit", ICON_QUIT), quit_pressed)
+	var column := make_button_column(box)
+	play_button = _add(column, make_button("menu.play", ICON_PLAY), play_pressed)
+	settings_button = _add(column, make_button("menu.settings"), settings_pressed)
+	language_button = _add(column, make_button(""), language_pressed)
+	credits_button = _add(column, make_button("menu.credits", ICON_CREDITS), credits_pressed)
+	quit_button = _add(column, make_button("menu.quit", ICON_QUIT), quit_pressed)
 	_first_focus = play_button
 
 
-func _add(box: Control, button: Button, sig: Signal) -> Button:
-	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+func _add(column: Control, button: Button, sig: Signal) -> Button:
+	button.size_flags_horizontal = Control.SIZE_FILL
 	button.pressed.connect(sig.emit)
-	box.add_child(button)
+	column.add_child(button)
 	return button
 
 

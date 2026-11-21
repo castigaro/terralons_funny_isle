@@ -54,7 +54,8 @@ func test_best_values_are_independent() -> void:
 func test_unknown_id_and_clamping() -> void:
 	var m := ProgressModel.defaults(IDS)
 	var res := m.record_win("nope", 3, 10.0)
-	check_eq(res, {"new_best_stars": false, "new_best_time": false, "unlocked_id": ""}, "unknown id")
+	check_eq(res, {"new_best_stars": false, "new_best_time": false, "first_win": false, "unlocked_id": ""},
+			"unknown id")
 	check_eq(m.to_dict()["levels"], {}, "nothing stored")
 	m.record_win("a", 9, 10.0)
 	check_eq(m.best_stars("a"), Stars.MAX_STARS, "clamped high")
@@ -72,3 +73,25 @@ func test_first_open_id_when_all_won() -> void:
 	check_eq(m.unlocked_ids(), IDS, "all open")
 	var last := ProgressModel.defaults(IDS)
 	check_eq(last.record_win("e", 1, 5.0)["unlocked_id"], "", "last level unlocks nothing")
+
+
+func test_first_win_flag() -> void:
+	var m := ProgressModel.defaults(IDS)
+	var first := m.record_win("a", 1, 80.0)
+	check_true(first["first_win"], "first win flagged")
+	check_true(first["new_best_stars"] and first["new_best_time"], "best flags unchanged on the first win")
+	var second := m.record_win("a", 2, 70.0)
+	check_false(second["first_win"], "second win is no first win")
+	check_true(second["new_best_stars"] and second["new_best_time"], "better second win")
+	check_false(m.record_win("a", 1, 99.0)["first_win"], "worse win is no first win")
+
+
+func test_unlock_needs_the_predecessor_won() -> void:
+	var m := ProgressModel.defaults(IDS)
+	check_true(m.is_unlocked("a"), "level 1 always open")
+	m.record_win("a", 1, 50.0)
+	check_true(m.is_unlocked("b"), "b open after a")
+	check_false(m.is_unlocked("c"), "c needs b")
+	m.record_win("b", 1, 50.0)
+	check_true(m.is_unlocked("c"), "c open after b")
+	check_false(m.is_unlocked("d"), "d needs c")

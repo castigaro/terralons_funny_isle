@@ -51,7 +51,7 @@ func test_language_switch_is_live_on_every_screen() -> void:
 	Settings.set_value(SettingsModel.KEY_LOCALE, "en")
 	await frames(1)
 	check_has(_texts(result), I18n.text_in("menu.result.lost", "en"), "result back to English")
-	check_has(_texts(result), I18n.t("menu.result.missing", {"tasks": [{"key": "fixture.reach_a_hint"}]}),
+	check_has(_texts(result), I18n.t("menu.result.missing", {"tasks": [{"key": "fixture.reach_a_title"}]}),
 			"missing tasks re-rendered")
 
 

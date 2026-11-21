@@ -10,11 +10,11 @@ func test_two_clicks_from_title_to_level() -> void:
 	await click(screen_node().call("tile_button", SAMPLE))
 	check_eq(screen(), FlowRules.Screen.INTRO, "click 2: level loaded with its intro card")
 	check_ne(level(), null, "level instance")
-	var auto := Balance.get_float("flow", "intro_auto_s")
-	screen_node().advance_time(auto)
-	await frames(1)
-	check_eq(screen(), FlowRules.Screen.PLAYING, "intro card closes by itself")
-	check_eq(session().get_state(), LevelSession.State.RUNNING, "running without a third click")
+	check_eq(session().get_state(), LevelSession.State.READY, "the card waits; timer not running")
+	await wait_guard()
+	await click(screen_node())
+	check_eq(screen(), FlowRules.Screen.PLAYING, "a click on the card is the deliberate Go")
+	check_eq(session().get_state(), LevelSession.State.RUNNING, "running")
 
 
 func test_click_on_locked_tile_does_nothing() -> void:

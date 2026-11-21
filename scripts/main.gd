@@ -270,7 +270,9 @@ func _on_level_won(event_level_id: String, stars: int) -> void:
 	var time_left := _level.level_session().time_left()
 	var completion := FlowRules.completion_time(_level.level_def().timer_seconds, time_left)
 	var rec := Progress.record_win(_level_id, stars, completion)
-	_show_result(true, stars, time_left, bool(rec["new_best_stars"]) or bool(rec["new_best_time"]), [])
+	# A first win only shows its values; "New best!" needs an earlier record that was beaten.
+	var new_best := (bool(rec["new_best_stars"]) or bool(rec["new_best_time"])) and not bool(rec["first_win"])
+	_show_result(true, stars, time_left, new_best, [])
 
 
 func _on_level_lost(event_level_id: String, open_tasks: Array) -> void:
@@ -279,8 +281,7 @@ func _on_level_lost(event_level_id: String, open_tasks: Array) -> void:
 	var keys: Array = []
 	for task in _level.level_def().tasks:
 		if open_tasks.has(task["id"]) and bool(task["required"]):
-			var key := String(task.get("title_key", ""))
-			keys.append(key if key != "" else String(task["hint_key"]))
+			keys.append(HudModel.task_title_key(task))
 	_show_result(false, 0, _level.level_session().time_left(), false, keys)
 
 

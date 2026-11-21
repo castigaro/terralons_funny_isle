@@ -83,3 +83,59 @@ func test_locked_and_coming_soon_tiles_start_nothing() -> void:
 
 func check_null_level() -> void:
 	check_eq(level(), null, "no level loaded")
+
+
+func _ring(slider: Control) -> Panel:
+	return slider.get_node_or_null("FocusRing") as Panel
+
+
+func _down_until(target: Control, limit: int = 8) -> void:
+	for i in limit:
+		if focused() == target:
+			return
+		await key(KEY_DOWN)
+
+
+func _check_ring_drawn(slider: HSlider, label: String) -> void:
+	var ring := _ring(slider)
+	check_ne(ring, null, "%s has a focus ring" % label)
+	if ring == null:
+		return
+	check_true(ring.is_visible_in_tree(), "%s ring visible while focused" % label)
+	var style := ring.get_theme_stylebox("panel") as StyleBoxFlat
+	check_ne(style, null, "%s ring is a flat outline" % label)
+	if style == null:
+		return
+	var px := Balance.get_int("flow", "focus_outline_px")
+	check(px > 0, "outline width above 0")
+	for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
+		check_eq(style.get_border_width(side), px, "%s border width on side %d" % [label, side])
+	check_eq(style.border_color.a, 1.0, "%s opaque border" % label)
+	check_false(style.draw_center, "%s outline only" % label)
+	var grow := Balance.get_float("flow", "focus_expand_px")
+	check_true(ring.get_global_rect().encloses(slider.get_global_rect().grow(grow)),
+			"%s ring encloses the slider plus %s px" % [label, grow])
+	check(ring.modulate.a > 0.0 and ring.self_modulate.a > 0.0, "%s ring not transparent" % label)
+
+
+func test_slider_focus_ring_renders() -> void:
+	await open_flow("nav_keys_slider_ring")
+	var settings: MenuScreen = flow.call("show_screen", FlowRules.Screen.SETTINGS, FlowRules.Screen.TITLE)
+	await frames(1)
+	var music: HSlider = settings.get("music_slider")
+	var effects: HSlider = settings.get("effects_slider")
+	check_false(_ring(music).visible, "music ring hidden before focus")
+	await _down_until(music)
+	check_eq(focused(), music, "arrows reach the music slider")
+	_check_ring_drawn(music, "music")
+	check_false(_ring(effects).visible, "effects ring hidden")
+	var before := music.value
+	await key(KEY_LEFT)
+	check_eq(music.value, maxf(before - Balance.get_float("flow", "slider_step_percent"), 0.0), "Left steps down")
+	await _down_until(effects)
+	check_eq(focused(), effects, "arrows reach the effects slider")
+	_check_ring_drawn(effects, "effects")
+	check_false(_ring(music).visible, "music ring hidden after focus moved on")
+	await _down_until(settings.get("reduce_toggle"))
+	check_eq(focused(), settings.get("reduce_toggle"), "arrows reach the checkbox")
+	check_false(_ring(effects).visible, "effects ring hidden on the checkbox")

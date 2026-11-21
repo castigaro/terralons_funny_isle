@@ -5,7 +5,7 @@ Usage: python tools/validate_credits.py [--root <dir>]   (exit code 1 on any err
 (a) data/credits.json equals what tools/build_credits.py builds from assets/SOURCES.md (no drift), lists every
     pack and has no en dash (the menu fonts lack the glyph).
 (b) data/balance/flow.json: result_input_delay_s in (0, 2] and not above result_input_delay_max_s (<= 2), guards
-    and the debounce non-negative, every font size at least font_size_min, intro_auto_s above intro_guard_s.
+    and the debounce non-negative, every font size at least font_size_min.
 """
 import argparse
 import json
@@ -77,10 +77,6 @@ def check_flow_balance(root: Path) -> list:
         value = num(key)
         if value is not None and minimum is not None and value < minimum:
             errors.append("flow.json: %s below font_size_min" % key)
-    guard = num("intro_guard_s")
-    auto = num("intro_auto_s")
-    if guard is not None and auto is not None and auto <= guard:
-        errors.append("flow.json: intro_auto_s must be above intro_guard_s")
     return errors
 
 

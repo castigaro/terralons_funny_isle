@@ -140,6 +140,41 @@ func make_button(key: String, icon_path: String = "", args: Dictionary = {}) -> 
 	return button
 
 
+## A centred column for a vertical button stack: buttons added to it fill its width, so all of them take the width
+## of the widest button in the current language (button_min_width stays the floor).
+func make_button_column(parent: Control) -> VBoxContainer:
+	var column := VBoxContainer.new()
+	column.name = "Buttons"
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	parent.add_child(column)
+	return column
+
+
+## Adds the theme's focus outline as a child panel of a control that draws no focus box itself (sliders); the
+## ring is shown while the control has focus.
+func add_focus_ring(control: Control) -> Panel:
+	var ring := Panel.new()
+	ring.name = "FocusRing"
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ring.focus_mode = Control.FOCUS_NONE
+	ring.show_behind_parent = false
+	ring.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var grow := float(cfg.get("focus_expand_px", 0))
+	ring.offset_left = -grow
+	ring.offset_top = -grow
+	ring.offset_right = grow
+	ring.offset_bottom = grow
+	var style := MenuTheme.focus_style(cfg)
+	style.set_expand_margin_all(0.0)
+	ring.add_theme_stylebox_override("panel", style)
+	control.add_child(ring)
+	ring.visible = control.has_focus()
+	control.focus_entered.connect(func() -> void: ring.visible = true)
+	control.focus_exited.connect(func() -> void: ring.visible = false)
+	return ring
+
+
 func wire_button(button: BaseButton) -> void:
 	button.mouse_entered.connect(_on_hover.bind(button))
 	button.pressed.connect(play_click)
@@ -201,6 +236,10 @@ func _on_locale_changed(_code: String) -> void:
 
 static func is_key_press(event: InputEvent) -> bool:
 	return event is InputEventKey and event.pressed and not event.is_echo()
+
+
+static func is_key_release(event: InputEvent) -> bool:
+	return event is InputEventKey and not event.pressed and not event.is_echo()
 
 
 static func is_click(event: InputEvent) -> bool:

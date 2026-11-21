@@ -18,6 +18,8 @@ static func defaults(ids: Array) -> ProgressModel:
 
 
 ## Builds a model from parsed progress.json; every field is checked on its own and bad values are dropped.
+## Wins are read in campaign order and stop at the first level that is not won, so a hand-edited file can never
+## put stars on a locked level.
 static func from_dict(data: Variant, ids: Array) -> ProgressModel:
 	var model := defaults(ids)
 	if not data is Dictionary:
@@ -31,7 +33,7 @@ static func from_dict(data: Variant, ids: Array) -> ProgressModel:
 	for level_id in ids:
 		var raw: Variant = levels.get(level_id)
 		if not raw is Dictionary or not raw.get("won") is bool or not raw["won"]:
-			continue
+			break
 		var entry := {"won": true, "best_stars": 0, "best_time_s": -1.0}
 		var stars: Variant = raw.get("best_stars")
 		if _is_number(stars):
@@ -63,7 +65,7 @@ func is_unlocked(level_id: String) -> bool:
 	var i := _ids.find(level_id)
 	if i < 0:
 		return false
-	return i == 0 or is_won(level_id) or is_won(String(_ids[i - 1]))
+	return i == 0 or is_won(String(_ids[i - 1]))
 
 
 func unlocked_ids() -> Array:
@@ -97,15 +99,17 @@ func first_open_id() -> String:
 
 
 ## Records a win; best stars and best time are independent records. Returns
-## {new_best_stars: bool, new_best_time: bool, unlocked_id: String ("" when nothing new opened)}.
+## {new_best_stars: bool, new_best_time: bool, first_win: bool (no earlier entry), unlocked_id: String ("" when
+## nothing new opened)}.
 func record_win(level_id: String, stars: int, completion_s: float) -> Dictionary:
-	var result := {"new_best_stars": false, "new_best_time": false, "unlocked_id": ""}
+	var result := {"new_best_stars": false, "new_best_time": false, "first_win": false, "unlocked_id": ""}
 	var i := _ids.find(level_id)
 	if i < 0:
 		return result
 	var next := String(_ids[i + 1]) if i + 1 < _ids.size() else ""
 	var next_was_open := next != "" and is_unlocked(next)
 	var had := _levels.has(level_id)
+	result["first_win"] = not had
 	var entry: Dictionary = _levels[level_id] if had else {"won": true, "best_stars": 0, "best_time_s": -1.0}
 	var clamped := clampi(stars, 0, Stars.MAX_STARS)
 	if not had or clamped > int(entry["best_stars"]):
