@@ -19,7 +19,7 @@ Every action and every mishap explodes into funny feedback: squash and stretch, 
 
 ## Placement (D1)
 
-The director is level-scoped, not an autoload. Every level scene adds one `FeedbackDirector` node (BI-10). Test arenas add one too: `tests/scenes/fx_arena.tscn`, and `tests/support/entity_scene_case.gd` puts one into the entity arena with `hitstop_scale` 0. Scene tests without a director keep exact frame timing. Freeing the director (level unload) restores `Engine.time_scale` and the camera offset.
+The director is level-scoped, not an autoload. Every level scene adds one `FeedbackDirector` node (BI-10: the shipped levels put it at index 5, before `Actors`, and place one `EventAnchor` per event under `EventAnchors`). Test arenas add one too: `tests/scenes/fx_arena.tscn`, and `tests/support/entity_scene_case.gd` puts one into the entity arena with `hitstop_scale` 0. Scene tests without a director keep exact frame timing. Freeing the director (level unload) restores `Engine.time_scale` and the camera offset.
 
 The director builds four layers as children: `GroundLayer` (splats, `z.splat`, below actors), `FxLayer` (puffs, particles, emotes, flashes, `z.fx`), `PopupLayer` (`z.popup`) and the CanvasLayer `ScreenLayer` (`screen_layer`) for screen-anchored effects. The HUD (BI-6) should use a higher CanvasLayer. None of the layers y-sorts. The director runs with `PROCESS_MODE_ALWAYS` and does not animate effects while the tree is paused.
 

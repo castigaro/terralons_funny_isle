@@ -482,6 +482,12 @@
 					"frame_count": 12,
 					"strength": "normal",
 					"anchor": "event_zone"
+				},
+				{
+					"effect": "popup",
+					"word": "fx.squawk",
+					"strength": "normal",
+					"anchor": "event_zone"
 				}
 			]
 		},
@@ -635,7 +641,7 @@
 				},
 				{
 					"effect": "popup",
-					"word": "fx.splat",
+					"word": "fx.slip",
 					"strength": "normal",
 					"anchor": "event_zone"
 				}

@@ -40,6 +40,31 @@ class RunTestsArgsTest(unittest.TestCase):
         self.assertEqual(stage.failed, 0)
         self.assertIn("--fixed-fps", self.calls[0])
 
+    def test_watchdog_header_raises_runner_watchdog_and_timeout(self):
+        res = "res://tests/levels/test_complete_l1_beach_camp.gd"
+        seconds = run_tests.watchdog_seconds(res)
+        self.assertIsNotNone(seconds)
+        timeouts = []
+
+        def fake_run_godot(godot, args, env, timeout=120):
+            self.calls.append(list(args))
+            timeouts.append(timeout)
+            return 0, "RESULT %s passed=1 failed=0\n" % res
+
+        run_tests.run_godot = fake_run_godot
+        stage = run_tests.Stage("args")
+        with contextlib.redirect_stdout(io.StringIO()):
+            run_tests.stage_gdscript(stage, "godot", {}, [], [res])
+        self.assertEqual(stage.failed, 0)
+        self.assertIn("--watchdog=%d" % seconds, self.calls[0])
+        self.assertEqual(self.calls[0][-1], res)
+        self.assertEqual(timeouts[0], max(run_tests.GD_TIMEOUT, seconds + run_tests.WATCHDOG_MARGIN))
+
+    def test_no_watchdog_header_keeps_defaults(self):
+        self.assertIsNone(run_tests.watchdog_seconds(RES))
+        self.assertEqual(run_tests.gd_timeout(None), run_tests.GD_TIMEOUT)
+        self.assertFalse(any(a.startswith("--watchdog") for a in run_tests.gdscript_args(RES)))
+
     def test_run_fps_header_yields_one_run_per_value(self):
         res = "res://tests/levels/test_level_camera_follow.gd"
         self.assertEqual(run_tests.run_fps_values(res), [60, 144])

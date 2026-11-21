@@ -116,6 +116,19 @@ func bonk(cause: String, from_direction: Vector2) -> bool:
 	return true
 
 
+## Drops the carried thing at the castaway's feet without a bonk (an event snatched it); returns it or null.
+func drop_carried() -> Node2D:
+	var dropped: Object = _logic.release_carried()
+	if dropped == null or not is_instance_valid(dropped):
+		return null
+	if dropped is Node2D:
+		dropped.global_position = global_position
+	if dropped.has_method("on_released"):
+		dropped.call("on_released")
+	_emit_verb()
+	return dropped as Node2D
+
+
 ## Puts the castaway back to a spawn point with every state cleared (level start and instant restart).
 func reset_to(spawn_position: Vector2, facing: float) -> void:
 	var held: Object = _logic.carried

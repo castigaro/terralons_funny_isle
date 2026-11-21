@@ -117,6 +117,23 @@ func _inline_ctx(data: Dictionary, kinds: Dictionary) -> Dictionary:
 	return LevelDef.make_context(H.rules(), H.event_types(), messages, kinds)
 
 
+func test_target_prompt_anchor() -> void:
+	var ctx := _ctx()
+	var res := LevelDef.load_file(FIXTURES.path_join("valid_prompt_target_anchor.json"), ctx)
+	check(res["ok"], "target:cage anchor valid: %s" % str(res["errors"]))
+	if res["ok"]:
+		var anchors: Array = (res["def"] as LevelDef).prompts.map(func(p: Dictionary) -> String: return p["anchor"])
+		check_has(anchors, "target:cage", "anchor kept")
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURES.path_join("valid_prompt_target_anchor.json")))
+	for bad in ["target:", "target:Cage"]:
+		data["prompts"][4]["anchor"] = bad
+		var out := LevelDef.parse(data, ctx, "")
+		check_false(out["ok"], "%s rejected" % bad)
+		check(str(out["errors"]).contains("prompts[4].anchor"), "%s names the field: %s" % [bad, str(out["errors"])])
+	var old := LevelDef.load_file(FIXTURES.path_join("invalid_prompt_bad_anchor.json"), ctx)
+	check_false(old["ok"], "invalid_prompt_bad_anchor stays invalid")
+
+
 func test_music_id_checked_against_audio_map() -> void:
 	var ctx := _ctx()
 	var bad := LevelDef.load_file(FIXTURES.path_join("invalid_unknown_music.json"), ctx)

@@ -1,0 +1,109 @@
+{
+	"format_version": 1,
+	"id": "l1_beach_camp",
+	"title_key": "level.l1_beach_camp.title",
+	"theme": "beach_camp",
+	"music": "level_1",
+	"seed": 1101,
+	"timer_seconds": 240,
+	"notes": "Default allocation (BI-10, no sprite swap): required – two chickens in the cage, two coconuts to the monkey; optional – hat on the goat; events – the monkey throws coconuts, the parrot steals the hat. Workload 5 units in 240 s (48 s per unit).",
+	"tasks": [
+		{
+			"id": "chickens_in_cage",
+			"required": true,
+			"title_key": "level.l1_beach_camp.chickens_in_cage.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "cage",
+					"count": 2
+				}
+			],
+			"hint_key": "level.l1_beach_camp.chickens_in_cage.hint",
+			"fail_key": "level.l1_beach_camp.chickens_in_cage.fail"
+		},
+		{
+			"id": "coconuts_to_monkey",
+			"required": true,
+			"title_key": "level.l1_beach_camp.coconuts_to_monkey.title",
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "coconut",
+					"target": "monkey",
+					"count": 2
+				}
+			],
+			"hint_key": "level.l1_beach_camp.coconuts_to_monkey.hint",
+			"fail_key": "level.l1_beach_camp.coconuts_to_monkey.fail"
+		},
+		{
+			"id": "hat_on_goat",
+			"required": false,
+			"title_key": "level.l1_beach_camp.hat_on_goat.title",
+			"conditions": [
+				{
+					"type": "worn",
+					"item": "hat",
+					"wearer": "goat"
+				}
+			],
+			"hint_key": "level.l1_beach_camp.hat_on_goat.hint",
+			"fail_key": "level.l1_beach_camp.hat_on_goat.fail"
+		}
+	],
+	"events": [
+		{
+			"id": "coconut_volley",
+			"type": "coconut_throw",
+			"window": [
+				25,
+				45
+			],
+			"duration_s": 3,
+			"params": {
+				"thrower_zone": "monkey_perch",
+				"throws": 3
+			}
+		},
+		{
+			"id": "parrot_raid",
+			"type": "parrot_steal_hat",
+			"window": [
+				50,
+				80
+			],
+			"duration_s": 6,
+			"params": {
+				"flee_zone": "parrot_flee"
+			}
+		}
+	],
+	"prompts": [
+		{
+			"id": "pr_move",
+			"anchor": "player",
+			"action": "move",
+			"text_key": "level.prompt.move"
+		},
+		{
+			"id": "pr_grab",
+			"anchor": "entity:chicken_1",
+			"action": "grab",
+			"text_key": "level.prompt.grab"
+		},
+		{
+			"id": "pr_throw",
+			"anchor": "entity:coconut_1",
+			"action": "throw",
+			"text_key": "level.prompt.throw"
+		},
+		{
+			"id": "pr_use",
+			"anchor": "target:cage",
+			"action": "use",
+			"text_key": "level.prompt.use"
+		}
+	]
+}

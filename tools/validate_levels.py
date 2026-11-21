@@ -30,13 +30,13 @@ RULE_KEYS = ("timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max",
 
 LEVEL_REQUIRED = ("format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
                   "events")
-LEVEL_OPTIONAL = ("three_star_share", "prompts")
+LEVEL_OPTIONAL = ("three_star_share", "prompts", "notes")
 TASK_REQUIRED = ("id", "required", "conditions", "hint_key", "fail_key")
 TASK_OPTIONAL = ("modifiers", "title_key")
 # Contextual key prompts (BI-6); the level scene checks that zone and entity anchors exist.
 PROMPT_FIELDS = ("id", "anchor", "action", "text_key")
 PROMPT_ACTIONS = ("move", "dash", "grab", "throw", "use")
-ANCHOR_RE = re.compile(r"^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*)$")
+ANCHOR_RE = re.compile(r"^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*|target:[a-z][a-z0-9_]*)$")
 EVENT_REQUIRED = ("id", "type", "window", "duration_s")
 EVENT_OPTIONAL = ("params",)
 
@@ -58,7 +58,8 @@ ANIMALS_FILE = "data/animals.json"
 ITEMS_FILE = "data/items.json"
 AUDIO_FILE = "data/audio.json"
 
-EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground")
+EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground",
+           "steal_wearable")
 PARAM_TYPES = ("string", "int", "float", "bool")
 
 
@@ -262,7 +263,7 @@ def _check_prompts(prompts, catalog: dict, err) -> None:
                 seen[pid] = ppath
         anchor = prompt.get("anchor")
         if "anchor" in prompt and (not isinstance(anchor, str) or not ANCHOR_RE.match(anchor)):
-            err(ppath + ".anchor", "must be player, zone:<name> or entity:<uid>, got %s" % (anchor,))
+            err(ppath + ".anchor", "must be player, zone:<name>, entity:<uid> or target:<kind>, got %s" % (anchor,))
         action = prompt.get("action")
         if "action" in prompt and action not in PROMPT_ACTIONS:
             err(ppath + ".action", "unknown action %s (one of %s)" % (action, ", ".join(PROMPT_ACTIONS)))
@@ -315,6 +316,8 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
             timer = None
         elif not (tmin <= timer <= tmax):
             err("timer_seconds", "%s outside %s..%s" % (timer, tmin, tmax))
+    if "notes" in data and not isinstance(data["notes"], str):
+        err("notes", "must be a string")
     if "three_star_share" in data:
         share = data["three_star_share"]
         if not is_number(share) or not (0 < share < 1):

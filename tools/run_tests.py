@@ -28,6 +28,10 @@ EXCLUDED_GD_PARTS = ("support", "fixtures")
 # A GD test file whose first lines contain "## run-fps: 60,144" runs once per value (frame-rate dependent checks).
 RUN_FPS_RE = re.compile(r"^##\s*run-fps:\s*([0-9][0-9,\s]*)$")
 RUN_FPS_HEADER_LINES = 5
+# A GD test file whose first lines contain "## watchdog: <s>" gets a longer runner watchdog (game seconds) and a
+# subprocess timeout of at least s + WATCHDOG_MARGIN real seconds (long level playthroughs).
+WATCHDOG_RE = re.compile(r"^##\s*watchdog:\s*([0-9]+)\s*$")
+WATCHDOG_MARGIN = 30
 
 
 class Stage:
@@ -102,15 +106,39 @@ def py_test_files(filter_text):
     return files
 
 
-def gdscript_args(res, fps=None):
+def gdscript_args(res, fps=None, watchdog=None):
     """Return the Godot arguments that run one GDScript test file with the headless runner.
 
     Without fps the file runs on the default 60 fps clock; with fps it runs with --fixed-fps <fps> and the user
-    argument --fps=<fps> (read by TestCase.run_fps()).
+    argument --fps=<fps> (read by TestCase.run_fps()). watchdog adds --watchdog=<s> for the runner.
     """
+    extra = ["--watchdog=%d" % watchdog] if watchdog else []
     if fps is None:
-        return GD_TEST_ARGS + ["--script", "res://tests/runner.gd", "--", res]
-    return ["--fixed-fps", str(fps), "--script", "res://tests/runner.gd", "--", res, "--fps=%d" % fps]
+        return GD_TEST_ARGS + ["--script", "res://tests/runner.gd", "--"] + extra + [res]
+    return ["--fixed-fps", str(fps), "--script", "res://tests/runner.gd", "--"] + extra + [res, "--fps=%d" % fps]
+
+
+def _header(res, repo=None):
+    path = Path(repo or REPO) / res[len("res://"):]
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return [handle.readline().strip() for _ in range(RUN_FPS_HEADER_LINES)]
+    except OSError:
+        return []
+
+
+def watchdog_seconds(res, repo=None):
+    """Return the seconds of a "## watchdog:" header in the first lines of a GD test file, else None."""
+    for line in _header(res, repo):
+        match = WATCHDOG_RE.match(line)
+        if match:
+            return int(match.group(1))
+    return None
+
+
+def gd_timeout(watchdog):
+    """Subprocess timeout for a GD test file: GD_TIMEOUT, raised for files with a long watchdog."""
+    return GD_TIMEOUT if not watchdog else max(GD_TIMEOUT, watchdog + WATCHDOG_MARGIN)
 
 
 def run_fps_values(res, repo=None):
@@ -158,7 +186,8 @@ def stage_gdscript(stage, godot, env, allowlist, files):
 def _run_gdscript_file(stage, godot, env, allowlist, res, fps):
     label = res if fps is None else "%s@%d" % (res, fps)
     start = time.time()
-    code, out = run_godot(godot, gdscript_args(res, fps), env, timeout=GD_TIMEOUT)
+    watchdog = watchdog_seconds(res)
+    code, out = run_godot(godot, gdscript_args(res, fps, watchdog), env, timeout=gd_timeout(watchdog))
     results = parse_results(out)
     hits = scan_output(out, allowlist)
     problems = []

@@ -51,8 +51,9 @@ The rules engine in `scripts/rules/` is pure GDScript (`RefCounted` classes, no 
 
 - `id` equals the file name stem. All ids match `^[a-z][a-z0-9_]*$` and are unique across the level, its tasks and its events. `player`, condition type names and event type names are reserved and cannot be used as ids.
 - `timer_seconds` is an integer within the balance range. `seed` is an integer. `three_star_share` is optional and must be strictly between 0 and 1.
-- There are 3–5 tasks, with at least one required and at least one optional task (A1). Each task has `hint_key` (R-22) and `fail_key` (A9, the reason cue). Both keys must exist with non-empty EN and DE text. Real level texts go to `i18n/levels.csv` (`levels.<level>.<task>.hint|fail`).
+- There are 3–5 tasks, with at least one required and at least one optional task (A1). Each task has `hint_key` (R-22) and `fail_key` (A9, the reason cue). Both keys must exist with non-empty EN and DE text. Real level texts go to `i18n/level.csv` (the key prefix equals the file stem: `level.<level>.<task>.title|hint|fail`, `level.<level>.title`, shared prompts `level.prompt.<action>`).
 - There are at least 2 events. Each has a known `type`, a `window` `[min_s, max_s]` with `0 <= min <= max < timer_seconds`, `duration_s > 0`, and `params` that match the type's parameter schema.
+- `notes` is an optional free-text string for designers (for example the default allocation); it is never shown or translated.
 - Unknown fields are rejected everywhere.
 
 ### Conditions and modifiers
@@ -80,14 +81,14 @@ A task is done when all of its `conditions` and all of its `modifiers` hold at t
 
 | Type | Effects |
 |---|---|
-| `parrot_steal_hat` | `take_worn` |
+| `parrot_steal_hat` | `steal_wearable` |
 | `goat_stampede` (param `lane` required) | `relocate_entities`, `stun_player` |
 | `coconut_throw` | `stun_player`, `take_held` |
 | `rain_panic` | `panic_animals`, `relocate_entities` |
 | `wave_wash` | `relocate_entities` |
 | `mud_trail` | `slippery_ground` |
 
-The effects vocabulary is declarative. Level scenes apply effects to the world when they receive `event_triggered(event_id)`, and stop them on `event_ended(event_id)`. Events never get a session reference, so they cannot end a level, change the timer or undo a completed task (A6, R-20). Effects only move items and animals; deliveries and counters are cumulative and never drop.
+The effects vocabulary is declarative. Level scenes apply effects (the `EventEffects` node, `docs/levels.md`) to the world when they receive `event_triggered(event_id)`, and stop them on `event_ended(event_id)`. Events never get a session reference, so they cannot end a level, change the timer or undo a completed task (A6, R-20). Effects only move items and animals; deliveries and counters are cumulative and never drop.
 
 ## World snapshot (built by the level scene each physics tick, BI-4/BI-5)
 

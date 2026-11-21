@@ -1,7 +1,7 @@
 extends TestCase
 ## Campaign: the real five-level list, the fixture list, availability, navigation and broken files.
 
-const REAL_IDS := ["beach_camp", "farm_meadow", "jungle", "lagoon", "volcano_cliffs"]
+const REAL_IDS := ["l1_beach_camp", "l2_farm_meadow", "l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
 
 
 func test_real_campaign() -> void:
@@ -15,6 +15,8 @@ func test_real_campaign() -> void:
 		check_eq(e["scene"], Campaign.SCENE_DIR + REAL_IDS[i] + ".tscn", "scene path")
 		check_eq(e["json"], Campaign.JSON_DIR + REAL_IDS[i] + ".json", "json path")
 		check_eq(e["available"], ResourceLoader.exists(e["scene"]), "available follows the scene")
+	check_true(c.entry("l1_beach_camp")["available"], "L1 available")
+	check_true(c.entry("l2_farm_meadow")["available"], "L2 available")
 
 
 func test_fixture_campaign_and_navigation() -> void:

@@ -43,5 +43,7 @@
 	"dust_amount": 10,
 	"step_interval": 0.28,
 	"carry_weight_min": 0.5,
-	"carry_weight_max": 2.0
+	"carry_weight_max": 2.0,
+	"slippery_accel_factor": 0.25,
+	"slippery_friction_factor": 0.12
 }

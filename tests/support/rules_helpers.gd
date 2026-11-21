@@ -88,6 +88,14 @@ static func apply_effects(snapshot: Dictionary, effects: Array) -> Dictionary:
 					e["held_by"] = ""
 			"take_worn":
 				out["player"]["worn"] = ""
+			"steal_wearable":
+				var held := String(out["player"]["held"])
+				if held != "" and bool(EntityDefs.get_item(held).get("wearable", false)):
+					out["player"]["held"] = ""
+					for e in out["entities"]:
+						if String(e["kind"]) == held:
+							e["held_by"] = ""
+				out["player"]["worn"] = ""
 			"stun_player":
 				out["player"]["stunned"] = true
 			_:

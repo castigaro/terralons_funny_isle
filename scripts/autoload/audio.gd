@@ -10,6 +10,7 @@ const BUS_NAMES := {"music": "Music", "effects": "Effects"}
 const MUSIC_BUS := "Music"
 const EFFECTS_BUS := "Effects"
 const JINGLE_TOKEN := "jingle"
+const SFX_REQUEST_LOG := 64  # balance-exempt: test log size
 
 ## Directory of the level files used to look up the level music and event types.
 var levels_dir := LEVELS_DIR
@@ -43,6 +44,7 @@ var _caption: Node = null
 var _event_types := {}
 var _streams := {}
 var _connections: Array = []
+var _sfx_requests: Array = []
 
 
 func _ready() -> void:
@@ -172,6 +174,7 @@ func handle_signal(signal_name: String, args: Array) -> void:
 
 
 func _on_level_started(level_id: String) -> void:
+	_sfx_requests.clear()
 	_queue.clear()
 	_announcer_player.stop()
 	var info := AudioMap.level_info(level_id, levels_dir)
@@ -312,6 +315,9 @@ func _apply_music_volumes() -> void:
 
 ## Plays a sound id of data/audio.json unless cooldown or voice limit drop it; returns false when dropped.
 func play_sfx(sound_id: String, pitch_scale: float = 1.0) -> bool:
+	_sfx_requests.append(sound_id)
+	if _sfx_requests.size() > SFX_REQUEST_LOG:
+		_sfx_requests.pop_front()
 	if not _map.sfx.has(sound_id):
 		_warn_once("sfx:" + sound_id, "unknown sound %s" % sound_id)
 		return false
@@ -466,6 +472,11 @@ func sfx_players(sound_id: String) -> Array:
 	return _pool(sound_id)["players"].duplicate() if _map.sfx.has(sound_id) else []
 
 
+## Sound ids requested via play_sfx since the last level start (also dropped ones), oldest first, capped.
+func sfx_requests() -> Array:
+	return _sfx_requests.duplicate()
+
+
 func caption() -> Node:
 	return _caption
 
@@ -479,6 +490,7 @@ func reset_for_tests() -> void:
 	_arbiter.clear()
 	_warned.clear()
 	_warnings.clear()
+	_sfx_requests.clear()
 	_event_types = {}
 	_line_lengths.clear()
 	_now = 0.0

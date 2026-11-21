@@ -46,11 +46,12 @@ EXPECTED = {
     "invalid_unknown_entity": "tasks[0].conditions[0].entity: unknown entity kind dragon",
     "invalid_unknown_music": "music: unknown music id disco_tune",
     "invalid_prompt_unknown_action": "prompts[1].action: unknown action jump",
-    "invalid_prompt_bad_anchor": "prompts[2].anchor: must be player, zone:<name> or entity:<uid>",
+    "invalid_prompt_bad_anchor": "prompts[2].anchor: must be player, zone:<name>, entity:<uid> or target:<kind>",
     "invalid_prompt_duplicate_id": "prompts[3].id: duplicate prompt id pr_move",
     "invalid_prompt_missing_de": "prompts[0].text_key: DE text",
     "invalid_prompt_unknown_field": "prompts[0].colour: unknown field",
     "invalid_title_missing_de": "tasks[0].title_key: DE text",
+    "invalid_notes_type": "notes: must be a string",
 }
 
 
@@ -179,6 +180,16 @@ class ValidateLevelsTest(unittest.TestCase):
         self.assertTrue(any("unknown effect" in e for e in errs), errs)
         self.assertTrue(any("params.zone.type" in e for e in errs), errs)
 
+    def test_steal_wearable_is_an_accepted_effect(self):
+        data = json.loads((REPO / "data" / "events.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["types"]["parrot_steal_hat"]["effects"], ["steal_wearable"])
+        fixture = json.loads(json.dumps(data))
+        fixture["types"]["wave_wash"]["effects"] = ["steal_wearable", "relocate_entities"]
+        self.assertEqual(validate_levels.validate_event_types(fixture), [])
+        fixture["types"]["wave_wash"]["effects"] = ["steal_wearable", "steal_everything"]
+        errs = validate_levels.validate_event_types(fixture)
+        self.assertTrue(any("unknown effect" in e and "steal_everything" in e for e in errs), errs)
+
     def test_entity_kinds_checked_except_player_and_targets(self):
         rules, _errors = validate_levels.load_rules(REPO)
         types = json.loads((REPO / "data" / "events.json").read_text(encoding="utf-8"))["types"]
@@ -238,6 +249,21 @@ class ValidateLevelsTest(unittest.TestCase):
         errs = validate_levels.validate_level(data, "valid_prompts.json", rules, types, catalog)
         self.assertTrue(any("prompts[0].text_key: missing" in e for e in errs), errs)
         self.assertTrue(any("prompts[1].anchor" in e for e in errs), errs)
+
+    def test_target_prompt_anchor(self):
+        rules, _errors = validate_levels.load_rules(REPO)
+        types = json.loads((REPO / "data" / "events.json").read_text(encoding="utf-8"))["types"]
+        catalog = fixture_catalog()
+        data = load_fixture("valid_prompt_target_anchor")
+        self.assertEqual(data["prompts"][4]["anchor"], "target:cage")
+        self.assertEqual(validate_levels.validate_level(data, "valid_prompt_target_anchor.json", rules, types,
+                                                        catalog), [])
+        for bad in ("target:", "target:Cage", "target:1cage", "gate:cage"):
+            with self.subTest(anchor=bad):
+                data["prompts"][4]["anchor"] = bad
+                errs = validate_levels.validate_level(data, "valid_prompt_target_anchor.json", rules, types,
+                                                      catalog)
+                self.assertTrue(any("prompts[4].anchor" in e and "target:<kind>" in e for e in errs), errs)
 
     def test_prefix_convention_matches_gdscript_parity_test(self):
         for path in FIXTURES.glob("*.json"):

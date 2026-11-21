@@ -2,7 +2,20 @@
 
 Every level is a scene that inherits `scenes/levels/level_base.tscn` (`LevelBase`, `scripts/levels/level_base.gd`). The base loads the level JSON (BI-3, `docs/rules.md`) into a `LevelSession`, owns the handcrafted tile layout, the bounds, the spawn, home points, zones, the `EntityRegistry` (BI-4) and the camera, feeds the session a world snapshot every physics tick and runs the instant restart. The whole level is always visible: no fog of war, darkness or reveal logic exists (`tools/validate_code.py` rule (i); placeholder graphics are rule (j)).
 
-`python tools/play.py` still opens the main menu only: the first shipped level arrives with BI-10. Until then the sample levels below are run directly. Art rules are in `docs/art_treatment.md`.
+`python tools/play.py` opens the title (BI-7, `docs/flow.md`); a level is reached through title, level select and intro card. `python tools/play.py -- --level=l1_beach_camp` boots an unlocked level straight to its intro card. Art rules are in `docs/art_treatment.md`.
+
+## Shipped levels (BI-10)
+
+| Id | Theme, music | Tasks | Events |
+|---|---|---|---|
+| `l1_beach_camp` | `beach_camp`, `level_1`; sand island with palms, 240 s | required: two chickens in the cage, two coconuts to the monkey; optional: hat on the goat | `coconut_volley` (coconut_throw: the monkey at `monkey_perch` lobs coconuts, stun and drop), `parrot_raid` (parrot_steal_hat: takes the unprotected hat – worn, carried or lying – to `parrot_flee`; a hat on the goat of a done task is spared) |
+| `l2_farm_meadow` | `farm_meadow`, `level_2`; grass meadow with a pond and trees, 210 s | required: three ducks into the pond, catch the runaway pig; optional: feed bucket to the trough before the rain | `pig_mud` (mud_trail: slippery `mud_lane`), `rain_shower` (rain_panic: chickens panic and scatter) |
+
+- Campaign convention: the level order and ids come from `data/campaign.json` (`Campaign`, `docs/flow.md`). The id is the file stem of `data/levels/<id>.json` with the `lN_` prefix (N = position); the scene is `scenes/levels/<id>.tscn` by default. Each level JSON names its default allocation in the free-text field `notes`.
+- Level 1 teaches the controls in place: move, grab, throw and use prompts at the castaway, the first chicken, the first coconut and the cage gate (`target:cage`); there is no tutorial screen or level. Level 2 has no basic prompts.
+- Workload: L1 5 units in 240 s (48 s per unit), L2 5 units in 210 s (42 s per unit). The headless bot (`tests/levels/test_complete_*.gd`) needs about 15 s of play for L1 and about 30 s for L2 without waiting; the tests hold the last task until every event has ended.
+- Pacing: the first event windows are 25–45 s (L1) and 20–45 s (L2), so a fast first run may finish before an event fires. The windows stay as they are until the playtest of BI-11 (`docs/playtest.md`) confirms or retunes them (assumption A8: windows are tuned by playtest, not by guesswork).
+- Layout texts live in `scenes/levels/layouts/<id>.layout.txt` (painted with `tools/build_level_layout.gd`).
 
 ## Node layout
 
@@ -18,6 +31,11 @@ Every level is a scene that inherits `scenes/levels/level_base.tscn` (`LevelBase
 | `EntityRegistry` | `Node` with `EntityRegistry` | owns the animals and items: perception, snapshot entities, protection, respawn, restart reset |
 | `LevelCamera` | `Camera2D` with `LevelCamera` | the camera, a child of the level and never of the castaway |
 | `Overlay/LevelCue`, `Overlay/LevelErrorPanel` | `CanvasLayer` | restart cue and load error panel |
+| `FeedbackDirector` | `Node` with `FeedbackDirector` | shipped levels: slapstick feedback (index 5, before `Actors`) |
+| `EventAnchors/<event_id>` | `Marker2D` with `EventAnchor` | shipped levels: where an event happens (feedback `event_zone`, actor start) |
+| `EventEffects` | `Node2D` with `EventEffects` | shipped levels: applies the event effects to the world (see below) |
+
+`FeedbackDirector`, `EventAnchors` and `EventEffects` are not in `REQUIRED_CHILDREN` (sample levels stay minimal); `tests/levels/test_shipped_levels.gd` requires them in every shipped level.
 
 ## Groups
 
@@ -88,6 +106,24 @@ Signals: `level_ready(level_id)`, `level_load_failed(path, errors)`, `restarted(
 
 Every teleport must call `reset_physics_interpolation()` on the moved node, otherwise the engine draws an interpolated sweep: `Castaway.reset_to`, the castaway safety net, `LevelCamera.snap` and every `reset_to_home`.
 
+## Event effects (`EventEffects`, `scripts/levels/event_effects.gd`)
+
+`event_triggered` starts the presentation of the event type (parrot fly-over, monkey coconut volley, muddy piglet with mud splats, rain overlay with a gradient tint and particle drops; fewer drops with the reduce toggle) and, `actor_impact_seconds` later, the effects of `data/events.json`: `take_worn` (unprotected worn items to a free cell near `flee_zone`), `steal_wearable` (one wearable – a worn unprotected one, else the one the castaway carries, else one lying free, ties by uid – taken off or dropped and moved to a seeded free cell within `flee_drop_radius_px` of `flee_zone`; the parrot fly-over swoops to that item; a protected item is never taken), `take_held` (`Castaway.drop_carried()`), `stun_player` (`Castaway.bonk("event", ...)`), `panic_animals` (free, unprotected animals of `kind`), `relocate_entities` (entities of `kind`, else in `zone`/`lane`, else free animals, to seeded free cells within `scatter_radius_px` of their home, outside every pen) and `slippery_ground` (surface override `mud` on `zone`). `event_ended`, the restart and leaving the tree stop the event: actors, overlays, pending effects and the override are removed. Effects never touch the session. Actors (`EventActor`) are visual only and never level entities. The seed is `level seed + event index`, so a replay moves the same entities to the same cells. Test API: `active_event_ids()`, `actor_nodes()`, `overlay_nodes()`, `pending_effects()`, `last_relocations()`, `free_cells()`.
+
+Balance (`data/balance/events.json`, namespace `events`): `actor_impact_seconds`, `actor_fly_seconds`, `actor_height_px`, `actor_scale`, `piglet_scale`, `panic_seconds`, `scatter_radius_px`, `flee_drop_radius_px`, `mud_splat_spacing_px`, `mud_splat_scale`, `mud_splat_alpha`, `rain_particle_amount`, `rain_reduced_amount`, `rain_tint_alpha`, `rain_layer`, `rain_drop_speed`, `rain_drop_scale`, `coconut_arc_height`, `coconut_throw_gap_seconds`, `coconut_scale`, `coconut_spread_px`.
+
+Surface overrides: `set_surface_override(key, zone, surface)`, `clear_surface_override(key)`, `clear_surface_overrides()` and `surface_override_keys()`; `get_surface_at` checks the overrides first. `restart_level()` clears them. `report_delivery(entity, target)` forwards a use-target delivery to the session.
+
+## Use targets
+
+Generic `UseTarget` implementations in `scripts/levels/` (base `UseTargetBase`, exports `target_kind` and `accepted_kinds`; an empty `target_kind` takes the parent animal's kind; a target on a carried or flying animal accepts nothing):
+
+- `DeliveryTarget`: reports `delivered_to` and sends the item home (`reset_to_home`), so deliveries repeat. On the monkey (L1, rides along) and at the trough (L2).
+- `WearTarget`: child of an animal; puts a wearable item of an accepted kind on its parent while it wears nothing.
+- `PenTarget`: at a pen gate or jetty; puts a carried animal on the next `Marker2D` slot inside its pen zone (slots cycle). Throwing into the zone works as well.
+
+A target may carry an `Art` sprite (gate, jetty, feed bowl).
+
 ## Camera (`LevelCamera`)
 
 - `setup(target, bounds)`, `snap()`, `follow(delta)`, `target_point()`, `clamp_to_bounds(p)`, `is_fixed_axis(axis)`, `view_size()`.
@@ -142,4 +178,6 @@ Props, zones, markers and entities are placed by editing the scene (see `tests/s
 - The sample levels use the real BI-4 entities: a chicken (`chicken_1`) and a coconut (`coconut_1`); `zone_b` is a pen.
 - Sample levels (tests only, never referenced from `data/levels`): `tests/scenes/sample_level.tscn` (24×14 tiles, scrolling camera) and `tests/scenes/small_level.tscn` (14×8 tiles, fixed camera), painted from `tests/fixtures/levels/*.layout.txt`. Run one windowed with `Godot_v4.7.2-stable_win64.exe --path . res://tests/scenes/sample_level.tscn`.
 - Camera tests read the rendered camera centre from the viewport canvas transform each process frame; in headless runs it already includes the engine's physics interpolation (one frame late, as drawn). `tests/levels/test_level_camera_follow.gd` and `test_level_camera_restart.gd` carry `## run-fps: 60,144`, so `tools/run_tests.py` runs them at both frame rates.
+- Shipped levels: `tests/levels/test_shipped_levels.gd` (load, anchors, director, effects, reachable use targets, own theme and music), `test_event_effects.gd`, `test_event_presentation.gd` (warning, HUD cue, actor, reaction), `test_use_targets.gd`, `test_complete_l1_beach_camp.gd` and `test_complete_l2_farm_meadow.gd` (scripted input via `tests/support/level_driver.gd`, events active), `tests/ui/test_level_prompts.gd`, `tests/flow/test_real_campaign_flow.gd` (real menu path: title, level select, L1 intro, scripted win, result with the final HUD counts, saved progress, Next to L2), `tests/levels/test_level_data.py` (allocation, timers, workload, no tutorial, no level or task ids in `scripts/`, `campaign.json` matches `data/levels`).
+- Long tests carry `## watchdog: <s>` in their first five lines: `tools/run_tests.py` passes `--watchdog=<s>` to the runner (game seconds) and raises the process timeout to `max(120, s + 30)` real seconds.
 - `python tools/capture_level.py [--level <tscn>] [--size 1920x1080] [--focus x,y]` (opt-in) renders a level with the windowed binary, saves `capture_<height>.png` (other levels: `<level>_capture_<height>.png`, with `--focus` the suffix `_focus_<x>_<y>`) in the testdata folder and checks that the castaway is at least 64 px tall at 1080p. `--focus 17,4` centres the camera on the inner-corner notch of the sample level.

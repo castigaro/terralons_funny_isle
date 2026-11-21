@@ -11,6 +11,9 @@ const STAR_EMPTY := "res://assets/ui/ui-pack/PNG/Yellow/Default/star_outline.png
 const ICON_DONE := "res://assets/ui/ui-pack/PNG/Blue/Default/icon_checkmark.png"
 const ICON_MISSED := "res://assets/ui/ui-pack/PNG/Blue/Default/icon_cross.png"
 const ICON_HINT := "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_question.png"
+const ICON_WARN := "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png"
+## Event warning cue key prefix; the event type completes the key (hud.cue.warn.<event_type>).
+const WARN_KEY_PREFIX := "hud.cue.warn."
 const KEY_CAP_SCENE := preload("res://scenes/ui/key_cap.tscn")
 const HINT_BUTTON_KEY := "hud.hint_button"
 const STAR_GOAL_KEY := "hud.star_goal"
@@ -85,6 +88,7 @@ func _ready() -> void:
 	EventBus.level_lost.connect(_on_level_lost)
 	EventBus.castaway_dizzy_started.connect(_on_dizzy_started)
 	EventBus.event_triggered.connect(_on_event_triggered)
+	EventBus.event_warning.connect(_on_event_warning)
 	EventBus.animal_fled.connect(_on_animal_fled)
 	EventBus.interact_verb_changed.connect(_on_verb_changed)
 	EventBus.level_restarted.connect(_on_level_restarted)
@@ -481,11 +485,21 @@ func on_failure_signal(signal_name: String, args: Array) -> void:
 	var cue := _model.classify(signal_name, args, ctx)
 	if cue.is_empty():
 		return
-	var result := _throttle.offer(String(cue["key"]), _clock, _model.is_priority(String(cue["type"])))
+	_show_cue(String(cue["key"]), String(cue.get("icon", "")), _model.is_priority(String(cue["type"])))
+
+
+## Event warning: a short "watch out" cue naming the coming event (hud.cue.warn.<event_type>).
+func _on_event_warning(_event_id: String, event_type: String, _seconds_until: float) -> void:
+	if _session == null or not I18n.has_key(WARN_KEY_PREFIX + event_type):
+		return
+	_show_cue(WARN_KEY_PREFIX + event_type, ICON_WARN, false)
+
+
+func _show_cue(key: String, icon: String, priority: bool) -> void:
+	var result := _throttle.offer(key, _clock, priority)
 	if result == HudModel.CueThrottle.Result.BLOCKED:
 		return
-	_cue_key = String(cue["key"])
-	var icon := String(cue.get("icon", ""))
+	_cue_key = key
 	_cue_icon.texture = load(icon) if icon != "" and ResourceLoader.exists(icon) else null
 	_apply_cue_text()
 	_cue_panel.visible = true
@@ -544,6 +558,8 @@ func _on_level_restarted(_level_id: String) -> void:
 func _on_level_ended() -> void:
 	hide_hint()
 	_banner.visible = false
+	# The flow pauses the tree on the result screen, so the last progress is drawn here and not in _process.
+	refresh()
 
 
 func _on_settings_changed(_key: String) -> void:

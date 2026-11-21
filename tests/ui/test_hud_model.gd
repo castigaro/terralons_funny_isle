@@ -26,7 +26,7 @@ func _progress(done: Array = [], missed: Array = []) -> Array:
 
 func _model() -> HudModel:
 	var cfg := Hud.config()
-	var effects := {"ev_parrot": ["take_worn"], "ev_coconuts": ["stun_player", "take_held"], "ev_rain": ["panic_animals"]}
+	var effects := {"ev_parrot": ["take_worn"], "ev_thief": ["steal_wearable"], "ev_coconuts": ["stun_player", "take_held"], "ev_rain": ["panic_animals"]}
 	return HudModel.new(cfg, EntityDefs.animal_kinds(), EntityDefs.item_kinds(), effects, _tasks)
 
 
@@ -88,6 +88,24 @@ func test_classify_table() -> void:
 	var cue := m.classify("castaway_dizzy_started", ["x"], none)
 	check_eq(cue.get("type"), "dizzy_hit", "type")
 	check(ResourceLoader.exists(String(cue.get("icon"))), "icon exists")
+
+
+func test_steal_wearable_cue_needs_a_held_wearable_or_a_worn_item() -> void:
+	var m := _model()
+	var open := _progress()
+	var held_hat := m.classify("event_triggered", ["ev_thief"], {"player_held": "hat", "progress": open})
+	check_eq(held_hat.get("type"), "event_stole", "held wearable hat -> event_stole")
+	check_eq(held_hat.get("key"), "f.opt_c", "open hat task names its fail key")
+	var all_done := _progress(["t_req_a", "t_req_b", "t_opt_c", "t_opt_d"])
+	check_eq(m.classify("event_triggered", ["ev_thief"], {"player_held": "hat", "progress": all_done}).get("key"),
+			"hud.cue.event_stole", "generic key when the hat task is done")
+	check_eq(m.classify("event_triggered", ["ev_thief"], {"player_worn": "hat", "progress": all_done}).get("key"),
+			"hud.cue.event_stole", "worn item -> event_stole")
+	check_eq(m.classify("event_triggered", ["ev_thief"], {"player_held": "bucket", "progress": open}), {},
+			"non-wearable held item -> no cue")
+	check_eq(m.classify("event_triggered", ["ev_thief"], {"player_held": "chicken", "progress": open}), {},
+			"held animal -> no cue")
+	check_eq(m.classify("event_triggered", ["ev_thief"], {"progress": open}), {}, "loose hat -> no cue")
 
 
 func test_task_fail_key_override() -> void:
