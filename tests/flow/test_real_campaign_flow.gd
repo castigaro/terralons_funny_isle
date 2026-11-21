@@ -1,6 +1,6 @@
 extends "res://tests/support/flow_case.gd"
 ## watchdog: 200
-## The real campaign through the real menus: title, level select (L1 open, L2 locked, L3-L5 coming soon), the L1
+## The real campaign through the real menus: title, level select (L1 open, L2–L5 locked), the L1
 ## intro card, a win by scripted castaway input only, the result screen, saved progress and Next into the L2 intro.
 ## The watchdog is raised because Beach Camp is played for real (about 15-30 s of game time).
 
@@ -8,7 +8,7 @@ const CAMPAIGN := "res://data/campaign.json"
 const REAL_LEVELS := "res://data/levels"
 const L1 := "l1_beach_camp"
 const L2 := "l2_farm_meadow"
-const SOON := ["l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
+const LATER := ["l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
 const LevelDriver := preload("res://tests/support/level_driver.gd")
 const LIMIT_TICKS := 60 * 200
 
@@ -66,8 +66,8 @@ func test_title_to_l1_win_and_next_to_l2() -> void:
 	var select := screen_node()
 	check_eq(select.call("tile_state", L1), "open", "L1 open")
 	check_eq(select.call("tile_state", L2), "locked", "L2 locked")
-	for id in SOON:
-		check_eq(select.call("tile_state", id), "soon", "%s coming soon" % id)
+	for id in LATER:
+		check_eq(select.call("tile_state", id), "locked", "%s locked" % id)
 	check_eq(focused(), select.call("tile_button", L1), "L1 focused")
 	await key(KEY_ENTER)
 	check_eq(screen(), FlowRules.Screen.INTRO, "intro card")

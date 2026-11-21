@@ -56,6 +56,8 @@ Island tiles 128×128 px from the pirate pack (`assets/graphics/pirate-pack/PNG/
 - Rocks: `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_49.png`, `tile_50`, `tile_51`, mossy `tile_65`–`tile_67`
 - Sand details and small plants: `tile_68`, `tile_69`, `tile_70`–`tile_72`, `tile_87`, `tile_88`
 - Props: wrecked boat `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_81.png`, wooden bridge `tile_60` and `tile_76` (BI-10: pen gates use `tile_76`, the pond jetty `tile_60`; the packs have no fence, so pens are framed by bushes)
+- Levels 3–5 (BI-11): the perch, goat pen, shelter and mud pool gates use `tile_76`, the pond and lagoon jetties `tile_60`, the beach landmark of the lagoon (`BeachFlag`) the wrecked boat `tile_81` (the pack's flags sit in the excluded ship parts). The mud pool is a mud-tinted splat `assets/graphics/splats/PNG/Default (256px)/splat03.png`.
+- Sandcastle stages (`BuildTarget`, L4), drawn with a sand tint: empty site `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_68.png`, mound `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_61.png`, tower `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_13.png`, finished tower `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_14.png`; flattened `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_69.png`. The tower tiles are the pack's stone fortress pieces; there is no dedicated sandcastle sprite.
 - Ships, ship parts (cannons, skull sails) and the explosion effects are excluded.
 
 Foliage (`assets/graphics/foliage/PNG/Retina/`), sway by a shader:

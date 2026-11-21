@@ -119,6 +119,23 @@
 			"carry_weight": 1.1,
 			"pitch": 1.0,
 			"name_key": "entities.name_penguin"
+		},
+		"frog": {
+			"sprite": "res://assets/graphics/animals/PNG/Round (outline)/frog.png",
+			"sprite_scale": 0.5,
+			"speed": 140,
+			"wander_radius": 170,
+			"flee_radius": 180,
+			"flee_speed_factor": 2.0,
+			"panic_duration": 1.6,
+			"lure_item": "",
+			"lure_radius": 340,
+			"follow_distance": 90,
+			"herdable": true,
+			"swims": true,
+			"carry_weight": 0.6,
+			"pitch": 1.3,
+			"name_key": "entities.name_frog"
 		}
 	}
 }

@@ -27,6 +27,7 @@ const BOUND_THICKNESS := 200.0
 const ANIMAL_HOMES := {
 	"chicken": Vector2(320, 220), "duck": Vector2(330, 560), "goat": Vector2(560, 240), "pig": Vector2(760, 200),
 	"monkey": Vector2(600, 520), "parrot": Vector2(1250, 230), "penguin": Vector2(180, 420),
+	"frog": Vector2(1000, 520),
 }
 const ITEM_HOMES := {
 	"coconut": Vector2(460, 680), "hat": Vector2(820, 640), "bucket": Vector2(1000, 160),

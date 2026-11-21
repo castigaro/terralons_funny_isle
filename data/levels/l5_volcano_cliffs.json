@@ -1,0 +1,115 @@
+{
+	"format_version": 1,
+	"id": "l5_volcano_cliffs",
+	"title_key": "level.l5_volcano_cliffs.title",
+	"theme": "volcano_cliffs",
+	"music": "level_3",
+	"seed": 5505,
+	"timer_seconds": 250,
+	"notes": "Default allocation (BI-11): earlier animals in new combinations; required – shelter two chickens and the goat, the pig into the mud pool; optional – the hat on the pig, feed the penguin twice from the bucket; events – the parrot steals the hat, a rock-side goat stampede and a monkey coconut volley that overlap. Workload 7 units in 250 s (35.7 s per unit).",
+	"tasks": [
+		{
+			"id": "shelter_flock",
+			"required": true,
+			"title_key": "level.l5_volcano_cliffs.shelter_flock.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "shelter",
+					"count": 2
+				},
+				{
+					"type": "in_zone",
+					"entity": "goat",
+					"zone": "shelter"
+				}
+			],
+			"hint_key": "level.l5_volcano_cliffs.shelter_flock.hint",
+			"fail_key": "level.l5_volcano_cliffs.shelter_flock.fail"
+		},
+		{
+			"id": "pig_to_mud_pool",
+			"required": true,
+			"title_key": "level.l5_volcano_cliffs.pig_to_mud_pool.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "pig",
+					"zone": "mud_pool"
+				}
+			],
+			"hint_key": "level.l5_volcano_cliffs.pig_to_mud_pool.hint",
+			"fail_key": "level.l5_volcano_cliffs.pig_to_mud_pool.fail"
+		},
+		{
+			"id": "hat_on_pig",
+			"required": false,
+			"title_key": "level.l5_volcano_cliffs.hat_on_pig.title",
+			"conditions": [
+				{
+					"type": "worn",
+					"item": "hat",
+					"wearer": "pig"
+				}
+			],
+			"hint_key": "level.l5_volcano_cliffs.hat_on_pig.hint",
+			"fail_key": "level.l5_volcano_cliffs.hat_on_pig.fail"
+		},
+		{
+			"id": "feed_penguin",
+			"required": false,
+			"title_key": "level.l5_volcano_cliffs.feed_penguin.title",
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "bucket",
+					"target": "penguin",
+					"count": 2
+				}
+			],
+			"hint_key": "level.l5_volcano_cliffs.feed_penguin.hint",
+			"fail_key": "level.l5_volcano_cliffs.feed_penguin.fail"
+		}
+	],
+	"events": [
+		{
+			"id": "parrot_raid",
+			"type": "parrot_steal_hat",
+			"window": [
+				20,
+				35
+			],
+			"duration_s": 6,
+			"params": {
+				"flee_zone": "parrot_flee"
+			}
+		},
+		{
+			"id": "rock_rush",
+			"type": "goat_stampede",
+			"window": [
+				70,
+				73
+			],
+			"duration_s": 10,
+			"params": {
+				"lane": "cliff_lane",
+				"goats": 4
+			}
+		},
+		{
+			"id": "ledge_volley",
+			"type": "coconut_throw",
+			"window": [
+				75,
+				79
+			],
+			"duration_s": 4,
+			"params": {
+				"thrower_zone": "monkey_ledge",
+				"throws": 3
+			}
+		}
+	]
+}

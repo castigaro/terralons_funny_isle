@@ -1,9 +1,10 @@
 extends "res://tests/support/level_case.gd"
-## Generic use targets in the shipped levels: DeliveryTarget, WearTarget and PenTarget accept only their kinds and
+## Generic use targets in the shipped levels: DeliveryTarget, WearTarget, PenTarget and BuildTarget accept only their kinds and
 ## feed the generic conditions (delivered_to, worn, in_zone) through the world, never through task ids.
 
 const L1 := "res://scenes/levels/l1_beach_camp.tscn"
 const L2 := "res://scenes/levels/l2_farm_meadow.tscn"
+const L4 := "res://scenes/levels/l4_lagoon.tscn"
 
 
 func _progress(task_index: int) -> Dictionary:
@@ -74,3 +75,61 @@ func test_pond_jetty_and_pig_pen() -> void:
 	check(ducks["done"], "three ducks in the pond")
 	check(pig_entry["done"], "pig in the pen")
 	check_false(jetty.call("accepts", pig), "the jetty takes no pig")
+
+
+func _castle_frame(castle: BuildTarget) -> int:
+	await physics_frames(2)
+	await frames(1)
+	return castle.current_frame()
+
+
+func test_sandcastle_stages_follow_deliveries() -> void:
+	await open_level(L4)
+	var castle := level.get_node("Actors/Sandcastle") as BuildTarget
+	var pail := level.entity_registry().find_uid("sand_pail_1")
+	var hat := level.entity_registry().find_uid("hat_1")
+	check_eq(castle.target_kind, "sandcastle", "target kind")
+	check_eq(castle.stage_frames.size(), 4, "four stage frames")
+	check_eq(await _castle_frame(castle), 0, "empty at the start")
+	var art := castle.get_node("Art") as Sprite2D
+	check(art.texture == castle.stage_frames[0], "first frame shown")
+	check_false(castle.accepts(hat), "rejects a hat")
+	for i in 3:
+		check(castle.accepts(pail), "accepts pail %d" % (i + 1))
+		castle.use(pail)
+		check_eq(await _castle_frame(castle), i + 1, "stage %d after %d pails" % [i + 1, i + 1])
+	check(art.texture == castle.stage_frames[3], "finished frame shown")
+	check(castle.is_finished(), "castle finished")
+	check_false(castle.accepts(pail), "no pail wasted on a finished castle")
+	level.restart_level()
+	check_eq(await _castle_frame(castle), 0, "restart resets the castle")
+	check(art.texture == castle.stage_frames[0], "first frame after the restart")
+
+
+func test_wave_flattens_only_an_unfinished_castle() -> void:
+	for pails in [1, 3]:
+		await open_level(L4, {"session_options": {"schedule_mode": "earliest"}})
+		var castle := level.get_node("Actors/Sandcastle") as BuildTarget
+		var pail := level.entity_registry().find_uid("sand_pail_1")
+		for i in pails:
+			castle.use(pail)
+		await _castle_frame(castle)
+		var session := level.level_session()
+		var wave_start := 0.0
+		for e in session.schedule():
+			if e["type"] == "wave_wash":
+				wave_start = float(e["start"])
+		session.tick(wave_start + 0.5 - session.elapsed(), level.build_snapshot())
+		var frame: int = await _castle_frame(castle)
+		var entry: Dictionary = castle.matching_progress()[0]
+		if pails < 3:
+			check(entry["missed"], "castle task missed after the wave")
+			check(castle.is_flattened(), "unfinished castle flattened")
+			check((castle.get_node("Art") as Sprite2D).texture == castle.flattened_frame, "flattened frame shown")
+			check_eq(entry["current"], 1, "delivery count unchanged")
+		else:
+			check(entry["done"], "castle task done before the wave")
+			check_false(castle.is_flattened(), "finished castle stays")
+			check_eq(frame, 3, "finished frame kept")
+		level.queue_free()
+		await frames(1)

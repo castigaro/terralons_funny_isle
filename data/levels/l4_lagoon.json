@@ -1,0 +1,103 @@
+{
+	"format_version": 1,
+	"id": "l4_lagoon",
+	"title_key": "level.l4_lagoon.title",
+	"theme": "lagoon",
+	"music": "level_2",
+	"seed": 4404,
+	"timer_seconds": 260,
+	"notes": "Default allocation (BI-11): required – deliver the lost penguin to the beach, two ducks into the lagoon; optional – build the sandcastle (three sand pails) before the wave comes, the hat on the penguin; events – the parrot steals the hat, a big wave washes items around (new). Workload 7 units in 260 s (37.1 s per unit).",
+	"tasks": [
+		{
+			"id": "penguin_to_beach",
+			"required": true,
+			"title_key": "level.l4_lagoon.penguin_to_beach.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "penguin",
+					"zone": "beach"
+				}
+			],
+			"hint_key": "level.l4_lagoon.penguin_to_beach.hint",
+			"fail_key": "level.l4_lagoon.penguin_to_beach.fail"
+		},
+		{
+			"id": "ducks_in_lagoon",
+			"required": true,
+			"title_key": "level.l4_lagoon.ducks_in_lagoon.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "duck",
+					"zone": "lagoon",
+					"count": 2
+				}
+			],
+			"hint_key": "level.l4_lagoon.ducks_in_lagoon.hint",
+			"fail_key": "level.l4_lagoon.ducks_in_lagoon.fail"
+		},
+		{
+			"id": "sandcastle_before_wave",
+			"required": false,
+			"title_key": "level.l4_lagoon.sandcastle_before_wave.title",
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "sand_pail",
+					"target": "sandcastle",
+					"count": 3
+				}
+			],
+			"hint_key": "level.l4_lagoon.sandcastle_before_wave.hint",
+			"fail_key": "level.l4_lagoon.sandcastle_before_wave.fail",
+			"modifiers": [
+				{
+					"type": "before_event",
+					"event": "big_wave"
+				}
+			]
+		},
+		{
+			"id": "hat_on_penguin",
+			"required": false,
+			"title_key": "level.l4_lagoon.hat_on_penguin.title",
+			"conditions": [
+				{
+					"type": "worn",
+					"item": "hat",
+					"wearer": "penguin"
+				}
+			],
+			"hint_key": "level.l4_lagoon.hat_on_penguin.hint",
+			"fail_key": "level.l4_lagoon.hat_on_penguin.fail"
+		}
+	],
+	"events": [
+		{
+			"id": "parrot_raid",
+			"type": "parrot_steal_hat",
+			"window": [
+				20,
+				40
+			],
+			"duration_s": 6,
+			"params": {
+				"flee_zone": "parrot_flee"
+			}
+		},
+		{
+			"id": "big_wave",
+			"type": "wave_wash",
+			"window": [
+				150,
+				170
+			],
+			"duration_s": 8,
+			"params": {
+				"zone": "tide_flat",
+				"strength": 1.0
+			}
+		}
+	]
+}

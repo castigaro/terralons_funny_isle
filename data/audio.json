@@ -248,7 +248,8 @@
 		"pig": 0.75,
 		"monkey": 1.1,
 		"parrot": 1.5,
-		"penguin": 1.0
+		"penguin": 1.0,
+		"frog": 1.3
 	},
 	"signals": {
 		"castaway_step": {

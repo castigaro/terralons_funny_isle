@@ -1,10 +1,10 @@
 extends "res://tests/support/level_case.gd"
-## watchdog: 200
+## watchdog: 520
 ## Every event of the shipped levels is presented: a warning (EventBus event_warning, HUD warning cue for at least
 ## 2 s, feedback at the event anchor), then at the trigger an actor or overlay of EventEffects, its event sound
 ## request and a funny reaction from the feedback director. Runs with the earliest schedule so the events come quickly.
 
-const LEVELS := ["l1_beach_camp", "l2_farm_meadow"]
+const LEVELS := ["l1_beach_camp", "l2_farm_meadow", "l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
 const WARN_PREFIX := "hud.cue.warn."
 ## Popups and emotes rise above their anchor point.
 const RISE_PX := 160.0
