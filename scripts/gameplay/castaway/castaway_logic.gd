@@ -103,7 +103,7 @@ func step(input: CastawayInput, delta: float, pos: Vector2, world: CastawayWorld
 func _walk(move: Vector2, delta: float) -> void:
 	var target := move * cfg.move_speed
 	if carried != null:
-		target *= cfg.carry_speed_factor
+		target *= cfg.carry_speed_factor / _carry_weight()
 	var rate := cfg.move_accel if move != Vector2.ZERO else cfg.move_decel
 	if velocity.length() > cfg.move_speed:
 		velocity = velocity.limit_length(cfg.move_speed)
@@ -144,7 +144,7 @@ func resolve(pos: Vector2, world: CastawayWorld) -> Dictionary:
 		var aim := _aim_target(pos, world)
 		var res_throw := _resolution(VERB_THROW, aim, _kind_of(carried))
 		res_throw["throw_destination"] = aim.global_position if aim != null \
-				else pos + facing_vector() * cfg.throw_range
+				else pos + facing_vector() * throw_reach()
 		return res_throw
 	var candidate := _grab_candidate(pos, world)
 	if candidate != null:
@@ -189,11 +189,12 @@ func _aim_target(pos: Vector2, world: CastawayWorld) -> Object:
 	var limit := deg_to_rad(cfg.throw_aim_tolerance_degrees)
 	var facing := facing_vector()
 	var best: Object = null
-	for target in world.throw_targets(pos, cfg.throw_range):
+	var reach := throw_reach()
+	for target in world.throw_targets(pos, reach):
 		if not UseTarget.is_valid(target) or not target.call("accepts", carried):
 			continue
 		var offset: Vector2 = target.global_position - pos
-		if offset == Vector2.ZERO or offset.length() > cfg.throw_range:
+		if offset == Vector2.ZERO or offset.length() > reach:
 			continue
 		if absf(facing.angle_to(offset)) <= limit and _closer(target, best, pos):
 			best = target
@@ -209,6 +210,18 @@ func _closer(candidate: Object, best: Object, pos: Vector2) -> bool:
 	if not is_equal_approx(dc, db):
 		return dc < db
 	return candidate.get_instance_id() < best.get_instance_id()
+
+
+## Throw range for the carried object: heavier loads fly shorter (throw_range / carry weight).
+func throw_reach() -> float:
+	return cfg.throw_range / _carry_weight()
+
+
+## Carry weight of the carried object (get_carry_weight(), clamped to the castaway limits), 1.0 without one.
+func _carry_weight() -> float:
+	if carried == null or not is_instance_valid(carried) or not carried.has_method("get_carry_weight"):
+		return 1.0
+	return clampf(float(carried.call("get_carry_weight")), cfg.carry_weight_min, cfg.carry_weight_max)
 
 
 func _kind_of(obj: Object) -> String:

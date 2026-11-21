@@ -45,6 +45,10 @@ CONDITIONS = {
 MODIFIERS = dict(CONDITIONS)
 MODIFIERS["before_event"] = ({"event": "event"}, {})
 TIME_TYPES = ("before_time", "before_event")
+# Condition fields that name an entity kind (checked against data/animals.json and data/items.json, except player).
+ENTITY_FIELDS = {"in_zone": ("entity",), "held": ("entity",), "delivered_to": ("entity",), "worn": ("item", "wearer")}
+ANIMALS_FILE = "data/animals.json"
+ITEMS_FILE = "data/items.json"
 
 EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground")
 PARAM_TYPES = ("string", "int", "float", "bool")
@@ -87,6 +91,16 @@ def load_rules(root: Path):
     errors = ["%s: %s: missing or not an integer" % (RULES_FILE, key) for key in RULE_KEYS
               if not is_int(data.get(key))]
     return data, errors
+
+
+def load_entity_kinds(root: Path) -> set:
+    """Return the animal and item kinds of root/data (empty when the files are missing or broken)."""
+    kinds = set()
+    for rel, key in ((ANIMALS_FILE, "animals"), (ITEMS_FILE, "items")):
+        data, err = load_json(Path(root) / rel)
+        if not err and isinstance(data, dict) and isinstance(data.get(key), dict):
+            kinds.update(data[key])
+    return kinds
 
 
 def validate_event_types(data, fname: str = "events.json") -> list:
@@ -161,7 +175,7 @@ def _check_text_key(value, path: str, catalog: dict, err) -> None:
         err(path, "DE text missing or empty for %s" % value)
 
 
-def _check_condition(cond, path: str, grammar: dict, timer, event_ids, err) -> None:
+def _check_condition(cond, path: str, grammar: dict, timer, event_ids, err, kinds=()) -> None:
     if not isinstance(cond, dict):
         err(path, "must be an object")
         return
@@ -195,6 +209,12 @@ def _check_condition(cond, path: str, grammar: dict, timer, event_ids, err) -> N
         elif kind == "event":
             if value not in event_ids:
                 err(fpath, "before_event must name an event of this level, got %r" % (value,))
+    if not kinds:
+        return
+    for key in ENTITY_FIELDS.get(ctype, ()):
+        name = cond.get(key)
+        if is_name(name) and name != PLAYER and name not in kinds:
+            err("%s.%s" % (path, key), "unknown entity kind %s (not in data/animals.json or data/items.json)" % name)
 
 
 def _counting(conds) -> list:
@@ -202,8 +222,11 @@ def _counting(conds) -> list:
             and c.get("type") in CONDITIONS]
 
 
-def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict) -> list:
-    """Return the errors of one parsed level (pure): '<fname>: <field path>: <message>'."""
+def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict, entity_kinds=()) -> list:
+    """Return the errors of one parsed level (pure): '<fname>: <field path>: <message>'.
+
+    entity_kinds: the known animal and item kinds; when empty, entity names are not checked.
+    """
     errors = []
 
     def err(path, message):
@@ -297,7 +320,7 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
                 err(tpath + ".conditions", "must be a non-empty list")
                 conds = []
             for j, cond in enumerate(conds):
-                _check_condition(cond, "%s.conditions[%d]" % (tpath, j), CONDITIONS, timer, event_ids, err)
+                _check_condition(cond, "%s.conditions[%d]" % (tpath, j), CONDITIONS, timer, event_ids, err, entity_kinds)
             if conds and all(isinstance(c, dict) and c.get("type") == "before_time" for c in conds):
                 err(tpath + ".conditions", "before_time cannot be the only condition")
         else:
@@ -308,7 +331,7 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
             mods = []
         for j, mod in enumerate(mods):
             mpath = "%s.modifiers[%d]" % (tpath, j)
-            _check_condition(mod, mpath, MODIFIERS, timer, event_ids, err)
+            _check_condition(mod, mpath, MODIFIERS, timer, event_ids, err, entity_kinds)
             if isinstance(mod, dict) and mod.get("type") == "before_event" and required is True:
                 err(mpath + ".type", "before_event is only allowed on optional tasks")
         if len(_counting(list(conds) + list(mods))) > 1:
@@ -396,6 +419,7 @@ def main(argv=None) -> int:
         if not isinstance(event_types, dict):
             event_types = {}
     catalog, _cat_errors = load_catalog(root)
+    entity_kinds = load_entity_kinds(root)
     for extra in opts.i18n_dir:
         more, _more_errors = load_catalog_dir(Path(extra))
         catalog.update(more)
@@ -411,7 +435,7 @@ def main(argv=None) -> int:
             if err:
                 errors.append("%s: %s" % (path.name, err))
                 continue
-            errors.extend(validate_level(data, path.name, rules, event_types, catalog))
+            errors.extend(validate_level(data, path.name, rules, event_types, catalog, entity_kinds))
     for line in errors:
         print(line)
     print("validate_levels: %d level file(s), %d error(s)" % (len(files), len(errors)))

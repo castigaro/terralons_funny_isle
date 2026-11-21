@@ -108,6 +108,28 @@ class ValidateCodeFailTest(unittest.TestCase):
         self.assert_fails({"project.godot": project}, "input action inventory")
 
 
+    def test_harm_gd_identifier(self):
+        self.assert_fails({"scripts/a.gd": gd("var animal_damage := 0")}, "harm identifier animal_damage")
+
+    def test_harm_tscn_node(self):
+        self.assert_fails({"scenes/a.tscn": '[gd_scene format=3]\n\n[node name="DeadChicken" type="Node2D"]\n'},
+                          "harm node name DeadChicken")
+
+    def test_harm_balance_key(self):
+        self.assert_fails({"data/balance/entities.json": '{"kill_radius": 1}'}, "harm balance key kill_radius")
+
+    def test_harm_animals_data_key(self):
+        self.assert_fails({"data/animals.json": '{"animals": {"pig": {"hurt_time": 1}}}'},
+                          "harm data key animals.pig.hurt_time")
+
+    def test_harm_i18n_key(self):
+        self.assert_fails({"i18n/entities.csv": "key,en,de\nentities.hurt_cue,a,b\n"},
+                          "harm i18n key entities.hurt_cue")
+
+    def test_harm_prefix(self):
+        self.assert_fails({"tests/a.gd": gd("var injured_state := 0")}, "harm identifier injured_state")
+
+
 class ValidateCodePassTest(unittest.TestCase):
     def assert_passes(self, files: dict):
         code, out = run(make_tree(files))
@@ -141,13 +163,17 @@ class ValidateCodePassTest(unittest.TestCase):
             "project.godot": '[input]\n\nmove_up={\n"deadzone": 0.2,\n"events": []\n}\n',
         })
 
+    def test_harm_allowed_cases(self):
+        self.assert_passes({"scripts/a.gd": gd('var t := create_tween()\nfunc f() -> void:\n\tt.kill()\n'
+                                               'var is_deadline := 0\nvar s := "damage"\n# no damage here')})
+
     def test_real_repo_passes(self):
         code, out = run(common.REPO)
         self.assertEqual(code, 0, out)
 
 
 class ValidateCodeArtRulesTest(unittest.TestCase):
-    """Rules (h) fog/darkness/procedural maps and (i) placeholder graphics."""
+    """Rules (i) fog/darkness/procedural maps and (j) placeholder graphics."""
 
     def assert_fails(self, files: dict, message: str):
         code, out = run(make_tree(files))

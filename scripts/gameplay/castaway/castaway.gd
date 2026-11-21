@@ -7,6 +7,9 @@ extends CharacterBody2D
 ## Emitted when a hit was accepted (hook for the BONK popup).
 signal bonked(cause: String)
 
+## Group used by animals and the entity registry to find the castaway.
+const GROUP := "castaway"
+
 var last_safe_position := Vector2.ZERO
 var cfg: CastawayConfig
 var _logic: CastawayLogic
@@ -27,6 +30,7 @@ var _shadow_base := Vector2.ONE
 
 
 func _ready() -> void:
+	add_to_group(GROUP)
 	collision_layer = PhysicsLayers.CASTAWAY
 	collision_mask = PhysicsLayers.CASTAWAY_MASK
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
