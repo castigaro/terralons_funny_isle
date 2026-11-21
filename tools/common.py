@@ -138,7 +138,10 @@ def code_files(root: Path, suffix: str) -> list:
 
 
 def gd_strip(text: str):
-    """Split GDScript source: returns (code without comments, code without comments and strings, [(literal, offset)])."""
+    """Split GDScript source: returns (code without comments, code without comments and strings, [(literal, offset)]).
+
+    In the bare code every literal becomes '""' followed by its own newlines, so line numbers stay correct.
+    """
     no_comments = []
     bare = []
     strings = []
@@ -163,7 +166,7 @@ def gd_strip(text: str):
                 j += 1
             end = min(j + len(quote), n)
             no_comments.append(text[i:end])
-            bare.append('""')
+            bare.append('""' + "\n" * text.count("\n", i, end))
             strings.append((text[i + len(quote):j], i))
             i = end
             continue
@@ -171,3 +174,44 @@ def gd_strip(text: str):
         bare.append(c)
         i += 1
     return "".join(no_comments), "".join(bare), strings
+
+
+def gd_comments(text: str) -> list:
+    """Return [(line_no, comment_text)] for every GDScript comment outside string literals ('#' removed)."""
+    found = []
+    i = 0
+    n = len(text)
+    while i < n:
+        c = text[i]
+        if c == "#":
+            j = text.find("\n", i)
+            j = n if j < 0 else j
+            found.append((text.count("\n", 0, i) + 1, text[i + 1:j]))
+            i = j
+            continue
+        if c in "\"'":
+            quote = c * 3 if text.startswith(c * 3, i) else c
+            raw = i > 0 and text[i - 1] == "r" and (i < 2 or not (text[i - 2].isalnum() or text[i - 2] == "_"))
+            j = i + len(quote)
+            while j < n:
+                if not raw and text[j] == "\\":
+                    j += 2
+                    continue
+                if text.startswith(quote, j) or (len(quote) == 1 and text[j] == "\n"):
+                    break
+                j += 1
+            i = min(j + len(quote), n)
+            continue
+        i += 1
+    return found
+
+
+_IDENT_TOKEN_RE = re.compile(r"[A-Z]+(?=[A-Z][a-z])|[A-Z]?[a-z]+|[A-Z]+|\d+")
+
+
+def split_identifier(name: str) -> list:
+    """Split an identifier on '_' and camelCase or acronym boundaries into lower-case tokens."""
+    tokens = []
+    for part in name.split("_"):
+        tokens.extend(t.lower() for t in _IDENT_TOKEN_RE.findall(part))
+    return tokens
