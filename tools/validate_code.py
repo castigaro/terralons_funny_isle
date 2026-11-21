@@ -17,6 +17,10 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
 (g) No turn-based, grid or inventory mechanics: no action_point(s), end_turn, turn_count, turn_based, snap_to_grid,
     tile_step or grid_move sequence and no inventory/recipe/crafting part in .gd identifiers and .tscn node names
     below scripts/ and scenes/ or in the [input] action names of project.godot (turn_speed stays allowed).
+(h) No harm to animals or the castaway: no damage/death/dead/die/died/dies/kill/killed/blood/bloody/hurt/wound/
+    wounded token, no exact hp token and no token starting with injur in .gd identifiers and .tscn node names below
+    scripts/, scenes/, ui/ and tests/, in balance file names and keys, in the keys of data/animals.json and
+    data/items.json or in i18n keys. The engine call .kill( (Tween.kill) stays allowed.
 Comments and string literals never count as code.
 """
 import argparse
@@ -72,6 +76,11 @@ TURN_SEQUENCES = ("action_point", "action_points", "end_turn", "turn_count", "tu
                   "tile_step", "grid_move")
 INVENTORY_PARTS = {"inventory", "inventories", "recipe", "recipes", "crafting"}
 TURN_GD_DIRS = ("scripts", "scenes")
+HARM = {"damage", "damaged", "death", "dead", "die", "died", "dies", "kill", "killed", "blood", "bloody", "hurt",
+        "wound", "wounded", "hp"}
+HARM_PREFIXES = ("injur",)
+HARM_GD_DIRS = ("scripts", "scenes", "ui", "tests")
+HARM_DATA_FILES = ("data/animals.json", "data/items.json")
 INPUT_SECTION_RE = re.compile(r"^\[input\]\n(.*?)(?=^\[|\Z)", re.M | re.S)
 INPUT_ACTION_RE = re.compile(r"^(\w+)=\{", re.M)
 
@@ -393,11 +402,77 @@ def check_turn_grid(root: Path) -> list:
     return errors
 
 
+# --- (h) no harm ------------------------------------------------------------------------------------
+
+def harm_tokens(name: str) -> list:
+    """Return the harm tokens contained in an identifier, node name or key."""
+    parts = split_identifier(name)
+    return sorted(set(p for p in parts if p in HARM or p.startswith(HARM_PREFIXES)))
+
+
+def _engine_kill(bare: str, start: int, end: int) -> bool:
+    """True for the engine call .kill( such as Tween.kill()."""
+    return bare[start:end] == "kill" and start > 0 and bare[start - 1] == "." and bare[end:end + 1] == "("
+
+
+def check_harm(root: Path) -> list:
+    errors = []
+    for path in _files(root, HARM_GD_DIRS, ".gd"):
+        rel = _rel(root, path)
+        if rel in SELF_EXCLUDED:
+            continue
+        _nc, bare, _strings = gd_strip(_read(path))
+        reported = set()
+        for match in IDENT_RE.finditer(bare):
+            name = match.group(0)
+            if name in reported or _engine_kill(bare, match.start(), match.end()):
+                continue
+            hits = harm_tokens(name)
+            if hits:
+                reported.add(name)
+                errors.append("%s:%d: harm identifier %s (%s) – animals and the castaway are never harmed"
+                              % (rel, _line(bare, match.start()), name, "/".join(hits)))
+    for path in _files(root, HARM_GD_DIRS, ".tscn"):
+        for line_no, line in enumerate(_read(path).splitlines(), start=1):
+            match = TSCN_NODE_RE.match(line)
+            if match and harm_tokens(match.group(1)):
+                errors.append("%s:%d: harm node name %s" % (_rel(root, path), line_no, match.group(1)))
+    json_files = []
+    balance = Path(root) / "data" / "balance"
+    if balance.is_dir():
+        for path in sorted(balance.glob("*.json")):
+            if harm_tokens(path.stem):
+                errors.append("%s: harm balance file %s" % (_rel(root, path), path.stem))
+            json_files.append((path, "balance key"))
+    for rel in HARM_DATA_FILES:
+        if (Path(root) / rel).is_file():
+            json_files.append((Path(root) / rel, "data key"))
+    for path, label in json_files:
+        try:
+            data = json.loads(_read(path))
+        except ValueError:
+            continue
+        for full, key in _json_keys(data):
+            if harm_tokens(key):
+                errors.append("%s: harm %s %s" % (_rel(root, path), label, full))
+    i18n = Path(root) / "i18n"
+    if i18n.is_dir():
+        for path in sorted(i18n.glob("*.csv")):
+            for line_no, line in enumerate(_read(path).splitlines(), start=1):
+                key = line.split(",", 1)[0].strip()
+                if line_no == 1 or not key:
+                    continue
+                if any(harm_tokens(part) for part in key.split(".")):
+                    errors.append("%s:%d: harm i18n key %s" % (_rel(root, path), line_no, key))
+    return errors
+
+
 def validate(root: Path = REPO) -> list:
     """Return every code-rule error below root (empty = valid)."""
     root = Path(root)
     return (check_comments(root) + check_magic_numbers(root) + check_networking(root) + check_third_party(root)
-            + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root))
+            + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root)
+            + check_harm(root))
 
 
 def main(argv=None) -> int:

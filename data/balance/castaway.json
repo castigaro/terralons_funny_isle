@@ -41,5 +41,7 @@
 	"dizzy_wobble_degrees": 12,
 	"dizzy_wobble_frequency": 10,
 	"dust_amount": 10,
-	"step_interval": 0.28
+	"step_interval": 0.28,
+	"carry_weight_min": 0.5,
+	"carry_weight_max": 2.0
 }

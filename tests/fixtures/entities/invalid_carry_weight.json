@@ -1,0 +1,62 @@
+{
+	"animals": {
+		"format_version": 1,
+		"animals": {
+			"chicken": {
+				"sprite": "res://assets/graphics/animals/PNG/Round (outline)/chicken.png",
+				"sprite_scale": 0.55,
+				"speed": 150,
+				"wander_radius": 170,
+				"flee_radius": 190,
+				"flee_speed_factor": 2.0,
+				"panic_duration": 1.8,
+				"lure_item": "",
+				"lure_radius": 340,
+				"follow_distance": 90,
+				"herdable": true,
+				"swims": false,
+				"carry_weight": 3.0,
+				"pitch": 1.25,
+				"name_key": "entities.name_chicken"
+			},
+			"monkey": {
+				"sprite": "res://assets/graphics/animals/PNG/Round (outline)/monkey.png",
+				"sprite_scale": 0.5,
+				"speed": 165,
+				"wander_radius": 170,
+				"flee_radius": 200,
+				"flee_speed_factor": 2.0,
+				"panic_duration": 1.5,
+				"lure_item": "coconut",
+				"lure_radius": 340,
+				"follow_distance": 90,
+				"herdable": false,
+				"swims": false,
+				"carry_weight": 1.0,
+				"pitch": 1.1,
+				"name_key": "entities.name_monkey"
+			}
+		}
+	},
+	"items": {
+		"format_version": 1,
+		"items": {
+			"coconut": {
+				"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_161.png",
+				"sprite_scale": 2.5,
+				"carry_weight": 1.0,
+				"wearable": false,
+				"swims": false,
+				"name_key": "entities.name_coconut"
+			},
+			"hat": {
+				"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_152.png",
+				"sprite_scale": 0.6,
+				"carry_weight": 1.0,
+				"wearable": true,
+				"swims": false,
+				"name_key": "entities.name_hat"
+			}
+		}
+	}
+}

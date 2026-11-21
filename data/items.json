@@ -1,0 +1,37 @@
+{
+	"format_version": 1,
+	"items": {
+		"coconut": {
+			"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_161.png",
+			"sprite_scale": 2.5,
+			"carry_weight": 1.0,
+			"wearable": false,
+			"swims": false,
+			"name_key": "entities.name_coconut"
+		},
+		"hat": {
+			"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_152.png",
+			"sprite_scale": 0.6,
+			"carry_weight": 1.0,
+			"wearable": true,
+			"swims": false,
+			"name_key": "entities.name_hat"
+		},
+		"bucket": {
+			"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_114.png",
+			"sprite_scale": 0.45,
+			"carry_weight": 1.1,
+			"wearable": false,
+			"swims": false,
+			"name_key": "entities.name_bucket"
+		},
+		"sand_pail": {
+			"sprite": "res://assets/graphics/items/PNG/Colored/genericItem_color_022.png",
+			"sprite_scale": 0.45,
+			"carry_weight": 1.0,
+			"wearable": false,
+			"swims": false,
+			"name_key": "entities.name_sand_pail"
+		}
+	}
+}

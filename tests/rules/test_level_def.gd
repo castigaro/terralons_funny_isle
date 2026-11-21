@@ -9,7 +9,7 @@ const FIXTURES := "res://tests/fixtures/levels"
 func _ctx() -> Dictionary:
 	var messages: Dictionary = I18nScript.parse_dir("res://i18n")["messages"]
 	messages.merge(I18nScript.parse_dir(FIXTURES.path_join("i18n"))["messages"])
-	return LevelDef.make_context(H.rules(), H.event_types(), messages)
+	return LevelDef.make_context(H.rules(), H.event_types(), messages, EntityDefs.kinds())
 
 
 func test_event_catalogue_loads() -> void:
@@ -73,3 +73,30 @@ func test_reserved_and_type_errors() -> void:
 	data["tasks"][0]["required"] = 1
 	check(H.make_def(data) == null, "int required flag rejected")
 	check(H.make_def(H.level_data()) != null, "inline level valid")
+
+
+func test_entity_kinds_checked_except_player_and_targets() -> void:
+	var ctx := _ctx()
+	var bad := LevelDef.load_file(FIXTURES.path_join("invalid_unknown_entity.json"), ctx)
+	check_false(bad["ok"], "unknown entity rejected")
+	check(str(bad["errors"]).contains("tasks[0].conditions[0].entity: unknown entity kind dragon"), str(bad["errors"]))
+	var data := H.level_data()
+	data["tasks"][0]["conditions"] = [{"type": "in_zone", "entity": "player", "zone": "coop"}]
+	data["tasks"][2]["conditions"][0]["target"] = "farmer"
+	var res := LevelDef.parse(data, _inline_ctx(data, EntityDefs.kinds()), "")
+	check(res["ok"], "player and delivered_to target pass: %s" % str(res["errors"]))
+	data = H.level_data()
+	data["tasks"][1]["conditions"] = [{"type": "worn", "item": "hat", "wearer": "unicorn"}]
+	res = LevelDef.parse(data, _inline_ctx(data, EntityDefs.kinds()), "")
+	check_false(res["ok"], "unknown wearer rejected")
+	res = LevelDef.parse(data, _inline_ctx(data, {}), "")
+	check(res["ok"], "no kinds, no check: %s" % str(res["errors"]))
+
+
+func _inline_ctx(data: Dictionary, kinds: Dictionary) -> Dictionary:
+	var messages := {}
+	messages[data["title_key"]] = {"en": "x", "de": "x"}
+	for task in data["tasks"]:
+		for key in ["hint_key", "fail_key"]:
+			messages[task[key]] = {"en": "x", "de": "x"}
+	return LevelDef.make_context(H.rules(), H.event_types(), messages, kinds)
