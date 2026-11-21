@@ -19,6 +19,8 @@ DataDir="*res://scripts/autoload/data_dir.gd"
 Balance="*res://scripts/autoload/balance.gd"
 I18n="*res://scripts/autoload/i18n.gd"
 Audio="*res://scripts/autoload/audio.gd"
+Settings="*res://scripts/autoload/settings.gd"
+Progress="*res://scripts/autoload/progress.gd"
 
 [display]
 

@@ -1,0 +1,39 @@
+key,en,de
+menu.play,Play,Spielen
+menu.settings,Settings,Einstellungen
+menu.credits,Credits,Mitwirkende
+menu.quit,Quit,Beenden
+menu.back,Back,Zurück
+menu.lang.en,English,English
+menu.lang.de,Deutsch,Deutsch
+menu.level_select.title,Choose a level,Wähle ein Level
+menu.level_number,Level {n},Level {n}
+menu.best_time,Best {time},Bestzeit {time}
+menu.new_level,Not won yet,Noch offen
+menu.locked,Locked,Gesperrt
+menu.coming_soon,Coming soon,Demnächst
+menu.settings.title,Settings,Einstellungen
+menu.settings.language,Language,Sprache
+menu.settings.music,Music,Musik
+menu.settings.effects,Effects,Effekte
+menu.settings.reduce_shake,Reduce screen shake and flashes,Wackeln und Blitze verringern
+menu.percent,{value} %,{value} %
+menu.intro.required,Required,Pflicht
+menu.intro.optional,Optional,Optional
+menu.intro.three_star,3 stars: all tasks with {time} left,3 Sterne: alle Aufgaben mit {time} Restzeit
+menu.intro.go_hint,Press any key - Go!,Drück eine Taste - Los!
+menu.pause.title,Paused,Pause
+menu.resume,Resume,Weiter
+menu.restart,Restart (R),Neustart (R)
+menu.level_select,Level select,Levelauswahl
+menu.retry,Retry (R),Nochmal (R)
+menu.next,Next level,Nächstes Level
+menu.result.won,Level complete!,Level geschafft!
+menu.result.lost,Time's up!,Die Zeit ist um!
+menu.result.time_left,Time left {time},Restzeit {time}
+menu.result.new_best,New best!,Neue Bestleistung!
+menu.result.missing,Missing: {tasks},Es fehlt: {tasks}
+menu.credits.title,Credits,Mitwirkende
+menu.credits.intro,Thanks to the artists whose free assets bring the isle to life:,"Danke an die Künstler, deren freie Assets die Insel lebendig machen:"
+menu.credits.licence,Licence: {licence},Lizenz: {licence}
+menu.credits.return,Press any key to return,Drück eine Taste für zurück

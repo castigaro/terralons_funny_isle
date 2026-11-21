@@ -4,8 +4,9 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
 
 (a) Comments are English and use the en dash: no em dash, no German umlaut or sharp s and not two or more
     distinct German function words in one comment (.gd comments, .py comments and docstrings).
-(b) No magic tuning numbers in gameplay and audio scripts (scripts/gameplay, scripts/levels, scripts/feedback,
-    scripts/rules, scripts/audio and scripts/autoload/audio.gd): every
+(b) No magic tuning numbers in gameplay, audio and menu scripts (scripts/gameplay, scripts/levels, scripts/feedback,
+    scripts/rules, scripts/audio, scripts/flow, scripts/ui/menus, scripts/autoload/audio.gd, settings.gd and
+    progress.gd): every
     numeric literal other than 0, 0.5, 1 and 2 must come from the Balance autoload; a line may opt out with
     the comment "# balance-exempt: <reason>".
 (c) No networking: no Godot network classes in .gd code and no network modules imported by .py files.
@@ -57,8 +58,9 @@ GERMAN_WORDS = {"und", "der", "die", "das", "nicht", "ist", "mit", "für", "ein"
                 "sind", "oder"}
 WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 
-MAGIC_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback", "scripts/rules", "scripts/audio")
-MAGIC_FILES = ("scripts/autoload/audio.gd",)
+MAGIC_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback", "scripts/rules", "scripts/audio", "scripts/flow",
+              "scripts/ui/menus")
+MAGIC_FILES = ("scripts/autoload/audio.gd", "scripts/autoload/settings.gd", "scripts/autoload/progress.gd")
 MAGIC_ALLOWED_FILES = set()
 MAGIC_ALLOWED_VALUES = {0.0, 0.5, 1.0, 2.0}
 NUMBER_RE = re.compile(r"(?<![\w.])(0x[0-9A-Fa-f_]+|0b[01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][-+]?\d+)?|\.\d+)")

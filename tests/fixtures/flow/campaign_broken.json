@@ -1,0 +1,1 @@
+{"schema_version": 1, "levels": [{"id": "Bad Id", "scene": 3}, "x", {"id": "ok_one", "scene": "res://a.tscn", "json": "res://a.json"}, {"id": "ok_one", "scene": "res://a.tscn", "json": "res://a.json"}]}
