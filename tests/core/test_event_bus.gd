@@ -4,6 +4,8 @@ extends TestCase
 const FROZEN := [
 	"level_started", "level_timer_tick", "task_completed", "all_required_done", "level_won", "level_lost",
 	"event_triggered", "object_grabbed", "object_thrown", "object_bonked", "settings_changed",
+	"castaway_dashed", "castaway_step", "object_used", "object_landed", "castaway_dizzy_started",
+	"castaway_dizzy_ended", "interact_verb_changed",
 ]
 
 var _got: Array = []

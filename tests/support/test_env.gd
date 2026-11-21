@@ -1,11 +1,17 @@
 extends RefCounted
 ## Resets the global environment between tests (loaded by tests/runner.gd); duck-typed so it names no autoload.
 
+const RELEASED_ACTIONS := ["move_up", "move_down", "move_left", "move_right", "dash", "interact"]
+
 
 static func reset() -> void:
 	var tree := Engine.get_main_loop() as SceneTree
 	if tree == null:
 		return
+	tree.paused = false
+	for action in RELEASED_ACTIONS:
+		if InputMap.has_action(action):
+			Input.action_release(action)
 	var balance := tree.root.get_node_or_null("Balance")
 	if balance != null and balance.has_method("clear_overrides"):
 		balance.call("clear_overrides")

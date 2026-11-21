@@ -1,5 +1,4 @@
 """Architecture rules of the foundation: no plugin registry, no v1 turn actions, i18n import rule, title stub."""
-import configparser
 import re
 import sys
 import unittest
@@ -20,6 +19,12 @@ def i18n_keys() -> set:
     return keys
 
 
+def input_actions(text: str) -> set:
+    """Return the action names of the [input] section of a project.godot text (multiline values allowed)."""
+    section = re.search(r"^\[input\]\n(.*?)(?=^\[|\Z)", text, re.M | re.S)
+    return set(re.findall(r"^(\w+)=\{", section.group(1), re.M)) if section else set()
+
+
 class ArchitectureTest(unittest.TestCase):
     def test_no_features_folder(self):
         self.assertFalse((REPO / "features").exists())
@@ -31,12 +36,23 @@ class ArchitectureTest(unittest.TestCase):
             self.assertIsNone(re.search(r"\bfeature_registry\b|\bregister_feature\b", bare), path)
 
     def test_no_v1_turn_actions(self):
-        text = (REPO / "project.godot").read_text(encoding="utf-8")
-        cfg = configparser.ConfigParser(strict=False, interpolation=None)
-        cfg.read_string("[root]\n" + text)
-        actions = set(cfg["input"].keys()) if cfg.has_section("input") else set()
+        actions = input_actions((REPO / "project.godot").read_text(encoding="utf-8"))
+        self.assertIn("move_up", actions)
         for name in ("end_turn", "inventory", "undo", "fast_forward"):
             self.assertNotIn(name, actions)
+
+    def test_input_section_multiline_regression(self):
+        sample = (
+            '[application]\n\nconfig/name="x"\n\n[input]\n\nmove_up={\n"deadzone": 0.2,\n'
+            '"events": [Object(InputEventKey,"resource_local_to_scene":false,"physical_keycode":87)]\n}\n'
+            'dash={\n"deadzone": 0.2,\n"events": [Object(InputEventKey,"physical_keycode":4194325,'
+            '"location":1), Object(InputEventKey,"physical_keycode":4194325,"location":2)]\n}\n\n'
+            "[rendering]\n\nfoo=1\n"
+        )
+        self.assertEqual(input_actions(sample), {"move_up", "dash"})
+        self.assertEqual(input_actions("[application]\nx=1\n"), set())
+        real = input_actions((REPO / "project.godot").read_text(encoding="utf-8"))
+        self.assertTrue({"move_up", "dash", "interact", "finish"} <= real, real)
 
     def test_csv_have_keep_import(self):
         csvs = sorted((REPO / "i18n").glob("*.csv"))

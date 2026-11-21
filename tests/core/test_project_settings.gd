@@ -34,3 +34,48 @@ func test_autoloads_are_exactly_the_core_set() -> void:
 	for forbidden in FORBIDDEN_AUTOLOADS:
 		check_false(names.has(forbidden), "forbidden autoload %s" % forbidden)
 		check(root().get_node_or_null(forbidden) == null, "node %s exists" % forbidden)
+
+
+const EXPECTED_KEYS := {
+	"move_up": [KEY_W, KEY_UP],
+	"move_down": [KEY_S, KEY_DOWN],
+	"move_left": [KEY_A, KEY_LEFT],
+	"move_right": [KEY_D, KEY_RIGHT],
+	"dash": [KEY_SHIFT, KEY_SHIFT],
+	"interact": [KEY_SPACE, KEY_E],
+	"pause": [KEY_ESCAPE],
+	"restart": [KEY_R],
+	"hint": [KEY_H],
+	"finish": [KEY_ENTER, KEY_KP_ENTER, KEY_F],
+}
+const EXPECTED_LAYERS := ["world_solid", "water", "bounds", "castaway", "animals", "items", "zones"]
+
+
+func test_input_map_actions_and_physical_keys() -> void:
+	for action in EXPECTED_KEYS:
+		check(InputMap.has_action(action), "missing action %s" % action)
+		if not InputMap.has_action(action):
+			continue
+		var codes := []
+		for event in InputMap.action_get_events(action):
+			check(event is InputEventKey, "%s: non-key event" % action)
+			if event is InputEventKey:
+				check_eq(event.keycode, KEY_NONE, "%s uses physical keycodes only" % action)
+				codes.append(event.physical_keycode)
+		check_eq(codes, EXPECTED_KEYS[action], "%s keys" % action)
+
+
+func test_dash_has_both_shift_keys() -> void:
+	var locations := []
+	for event in InputMap.action_get_events("dash"):
+		locations.append((event as InputEventKey).location)
+	locations.sort()
+	check_eq(locations, [KEY_LOCATION_LEFT, KEY_LOCATION_RIGHT], "shift locations")
+
+
+func test_physics_layer_names() -> void:
+	for i in EXPECTED_LAYERS.size():
+		var value := String(ProjectSettings.get_setting("layer_names/2d_physics/layer_%d" % (i + 1), ""))
+		check_eq(value, EXPECTED_LAYERS[i], "layer %d" % (i + 1))
+	check_eq(PhysicsLayers.WORLD_SOLID, 1 << 0, "solid bit")
+	check_eq(PhysicsLayers.ZONES, 1 << 6, "zones bit")
