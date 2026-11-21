@@ -1,0 +1,86 @@
+{
+	"format_version": 1,
+	"id": "valid_steal_events",
+	"title_key": "fixture.sample_title",
+	"theme": "palm_beach",
+	"music": "level_1",
+	"seed": 5150,
+	"timer_seconds": 180,
+	"tasks": [
+		{
+			"id": "fx_reach_a",
+			"required": true,
+			"title_key": "fixture.reach_a_title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "player",
+					"zone": "zone_a"
+				}
+			],
+			"hint_key": "fixture.reach_a_hint",
+			"fail_key": "fixture.reach_a_fail"
+		},
+		{
+			"id": "fx_reach_b",
+			"required": false,
+			"title_key": "fixture.reach_b_title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "player",
+					"zone": "zone_b"
+				}
+			],
+			"hint_key": "fixture.reach_b_hint",
+			"fail_key": "fixture.reach_b_fail"
+		},
+		{
+			"id": "fx_grab_coconut",
+			"required": false,
+			"title_key": "fixture.grab_coconut_title",
+			"conditions": [
+				{
+					"type": "held",
+					"entity": "coconut"
+				}
+			],
+			"hint_key": "fixture.grab_coconut_hint",
+			"fail_key": "fixture.grab_coconut_fail"
+		},
+		{
+			"id": "fx_chicken_a",
+			"required": false,
+			"title_key": "fixture.chicken_a_title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "zone_a"
+				}
+			],
+			"hint_key": "fixture.chicken_a_hint",
+			"fail_key": "fixture.chicken_a_fail"
+		}
+	],
+	"events": [
+		{
+			"id": "fx_ev_coconuts",
+			"type": "coconut_throw",
+			"window": [
+				20,
+				40
+			],
+			"duration_s": 5
+		},
+		{
+			"id": "fx_ev_parrot",
+			"type": "parrot_steal_hat",
+			"window": [
+				60,
+				90
+			],
+			"duration_s": 6
+		}
+	]
+}

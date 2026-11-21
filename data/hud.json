@@ -1,0 +1,36 @@
+{
+	"format_version": 1,
+	"failure_types": {
+		"animal_escaped": {
+			"key": "hud.cue.animal_escaped",
+			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png",
+			"triggers": [{"signal": "entity_lost", "kind_class": "animal"}]
+		},
+		"item_lost_sea": {
+			"key": "hud.cue.item_lost_sea",
+			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_faceSad.png",
+			"triggers": [{"signal": "entity_lost", "kind_class": "item", "reasons": ["water", "bounds"]}]
+		},
+		"time_up": {
+			"key": "hud.cue.time_up",
+			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_swirl.png",
+			"triggers": [{"signal": "level_lost"}]
+		},
+		"dizzy_hit": {
+			"key": "hud.cue.dizzy_hit",
+			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_stars.png",
+			"triggers": [{"signal": "castaway_dizzy_started"}]
+		},
+		"event_stole": {
+			"key": "hud.cue.event_stole",
+			"icon": "res://assets/graphics/emotes/PNG/Vector/Style 1/emote_anger.png",
+			"triggers": [{"signal": "event_triggered", "effects": ["take_held", "take_worn"]}]
+		}
+	},
+	"priority": ["time_up"],
+	"verbs": {
+		"grab": "hud.verb.grab",
+		"throw": "hud.verb.throw",
+		"use": "hud.verb.use"
+	}
+}

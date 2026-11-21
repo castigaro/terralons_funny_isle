@@ -51,6 +51,20 @@ func test_derived_targets() -> void:
 	check_eq(counts.three_star_share, 0.5, "share override")
 
 
+func test_prompts_and_titles_are_normalized() -> void:
+	var def: LevelDef = LevelDef.load_file(FIXTURES.path_join("valid_prompts.json"), _ctx())["def"]
+	check(def != null, "valid_prompts loads")
+	check(def.prompts.size() >= 3, "prompts kept: %d" % def.prompts.size())
+	for prompt in def.prompts:
+		for field in ["id", "anchor", "action", "text_key"]:
+			check(prompt.has(field) and String(prompt[field]) != "", "prompt %s has %s" % [prompt.get("id"), field])
+		check_has(LevelDef.PROMPT_ACTIONS, prompt["action"], "known action")
+	var sample: LevelDef = LevelDef.load_file(FIXTURES.path_join("valid_sample_level.json"), _ctx())["def"]
+	check_eq(sample.tasks[0].get("title_key", ""), "fixture.reach_a_title", "title_key kept")
+	var basic: LevelDef = LevelDef.load_file(FIXTURES.path_join("valid_basic.json"), _ctx())["def"]
+	check(basic.prompts is Array, "prompts list without prompts in the file")
+
+
 func test_missing_folder_lists_nothing() -> void:
 	check_eq(LevelDef.list_level_files("res://does_not_exist_dir"), [], "missing folder")
 

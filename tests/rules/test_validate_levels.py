@@ -45,6 +45,12 @@ EXPECTED = {
     "invalid_unknown_event_ref": "before_event must name an event",
     "invalid_unknown_entity": "tasks[0].conditions[0].entity: unknown entity kind dragon",
     "invalid_unknown_music": "music: unknown music id disco_tune",
+    "invalid_prompt_unknown_action": "prompts[1].action: unknown action jump",
+    "invalid_prompt_bad_anchor": "prompts[2].anchor: must be player, zone:<name> or entity:<uid>",
+    "invalid_prompt_duplicate_id": "prompts[3].id: duplicate prompt id pr_move",
+    "invalid_prompt_missing_de": "prompts[0].text_key: DE text",
+    "invalid_prompt_unknown_field": "prompts[0].colour: unknown field",
+    "invalid_title_missing_de": "tasks[0].title_key: DE text",
 }
 
 
@@ -193,6 +199,45 @@ class ValidateLevelsTest(unittest.TestCase):
         self.assertTrue(any("wearer: unknown entity kind unicorn" in e for e in errs), errs)
         self.assertFalse(any("unknown entity kind" in e for e in validate_levels.validate_level(
             data, "valid_basic.json", rules, types, catalog)), "no kinds, no check")
+
+    def test_real_levels_need_task_titles(self):
+        root = temp_root()
+        levels = root / "data" / "levels"
+        levels.mkdir()
+        data = load_fixture("valid_basic")
+        data["id"] = "titled_level"
+        (levels / "titled_level.json").write_text(json.dumps(data), encoding="utf-8")
+        code, out = run("--root", root, "--i18n-dir", FIXTURE_I18N)
+        self.assertEqual(code, 0, out)
+        data["id"] = "untitled_level"
+        del data["tasks"][2]["title_key"]
+        (levels / "untitled_level.json").write_text(json.dumps(data), encoding="utf-8")
+        code, out = run("--root", root, "--i18n-dir", FIXTURE_I18N)
+        self.assertEqual(code, 1, out)
+        self.assertIn("untitled_level.json: tasks[2].title_key: missing", out)
+        code, out = run("--root", root, "--path", levels / "untitled_level.json", "--i18n-dir", FIXTURE_I18N)
+        self.assertEqual(code, 1, out)
+        fixture = FIXTURES / "valid_small_level.json"
+        tasks = json.loads(fixture.read_text(encoding="utf-8"))["tasks"]
+        self.assertFalse(any("title_key" in task for task in tasks), "fixture without task titles")
+        code, out = run("--path", fixture, "--i18n-dir", FIXTURE_I18N)
+        self.assertEqual(code, 0, out)
+
+    def test_prompts_are_normalized_and_checked(self):
+        rules, _errors = validate_levels.load_rules(REPO)
+        types = json.loads((REPO / "data" / "events.json").read_text(encoding="utf-8"))["types"]
+        catalog = fixture_catalog()
+        data = load_fixture("valid_prompts")
+        self.assertEqual(validate_levels.validate_level(data, "valid_prompts.json", rules, types, catalog), [])
+        data["prompts"] = {"id": "x"}
+        errs = validate_levels.validate_level(data, "valid_prompts.json", rules, types, catalog)
+        self.assertTrue(any("prompts: must be a list" in e for e in errs), errs)
+        data = load_fixture("valid_prompts")
+        del data["prompts"][0]["text_key"]
+        data["prompts"][1]["anchor"] = "zone:Coop"
+        errs = validate_levels.validate_level(data, "valid_prompts.json", rules, types, catalog)
+        self.assertTrue(any("prompts[0].text_key: missing" in e for e in errs), errs)
+        self.assertTrue(any("prompts[1].anchor" in e for e in errs), errs)
 
     def test_prefix_convention_matches_gdscript_parity_test(self):
         for path in FIXTURES.glob("*.json"):
