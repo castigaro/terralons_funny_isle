@@ -37,6 +37,7 @@ Generic items, coloured (`assets/graphics/items/PNG/Colored/`). The pack has no 
 | Key | `assets/graphics/items/PNG/Colored/genericItem_color_155.png` | cage key |
 | Bag | `assets/graphics/items/PNG/Colored/genericItem_color_143.png` | carry bag |
 | Compass | `assets/graphics/items/PNG/Colored/genericItem_color_162.png` | treasure prop |
+| Feed bowl (trough, L2) | `assets/graphics/items/PNG/Colored/genericItem_color_128.png` | blue bowl, art of the trough use target |
 
 Never use the knife (`genericItem_color_134`), the axe (`_020`), saws or other sharp tools as carryable items.
 
@@ -54,7 +55,7 @@ Island tiles 128×128 px from the pirate pack (`assets/graphics/pirate-pack/PNG/
 - Stone ground (volcano cliffs): `tile_10`–`tile_12`, `tile_26`–`tile_28`, `tile_42`–`tile_44`, `tile_58`, `tile_59`, `tile_74`, `tile_75`
 - Rocks: `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_49.png`, `tile_50`, `tile_51`, mossy `tile_65`–`tile_67`
 - Sand details and small plants: `tile_68`, `tile_69`, `tile_70`–`tile_72`, `tile_87`, `tile_88`
-- Props: wrecked boat `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_81.png`, wooden bridge `tile_60` and `tile_76`
+- Props: wrecked boat `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_81.png`, wooden bridge `tile_60` and `tile_76` (BI-10: pen gates use `tile_76`, the pond jetty `tile_60`; the packs have no fence, so pens are framed by bushes)
 - Ships, ship parts (cannons, skull sails) and the explosion effects are excluded.
 
 Foliage (`assets/graphics/foliage/PNG/Retina/`), sway by a shader:

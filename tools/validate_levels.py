@@ -30,7 +30,7 @@ RULE_KEYS = ("timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max",
 
 LEVEL_REQUIRED = ("format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
                   "events")
-LEVEL_OPTIONAL = ("three_star_share", "prompts")
+LEVEL_OPTIONAL = ("three_star_share", "prompts", "notes")
 TASK_REQUIRED = ("id", "required", "conditions", "hint_key", "fail_key")
 TASK_OPTIONAL = ("modifiers", "title_key")
 # Contextual key prompts (BI-6); the level scene checks that zone and entity anchors exist.
@@ -315,6 +315,8 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
             timer = None
         elif not (tmin <= timer <= tmax):
             err("timer_seconds", "%s outside %s..%s" % (timer, tmin, tmax))
+    if "notes" in data and not isinstance(data["notes"], str):
+        err("notes", "must be a string")
     if "three_star_share" in data:
         share = data["three_star_share"]
         if not is_number(share) or not (0 < share < 1):

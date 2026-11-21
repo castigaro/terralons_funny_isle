@@ -10,7 +10,7 @@ const ID_PATTERN := "^[a-z][a-z0-9_]*$"
 const PLAYER := "player"
 const LEVEL_REQUIRED := ["format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
 		"events"]
-const LEVEL_OPTIONAL := ["three_star_share", "prompts"]
+const LEVEL_OPTIONAL := ["three_star_share", "prompts", "notes"]
 const TASK_REQUIRED := ["id", "required", "conditions", "hint_key", "fail_key"]
 const TASK_OPTIONAL := ["modifiers", "title_key"]
 ## Contextual key prompts (BI-6): {id, anchor, action, text_key}; anchors are checked again by LevelBase.
@@ -154,6 +154,8 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 			timer = null
 		elif timer < rules["timer_min_seconds"] or timer > rules["timer_max_seconds"]:
 			err.call("timer_seconds", "%d outside %d..%d" % [timer, rules["timer_min_seconds"], rules["timer_max_seconds"]])
+	if data.has("notes") and not data["notes"] is String:
+		err.call("notes", "must be a string")
 	if data.has("three_star_share"):
 		var share: Variant = data["three_star_share"]
 		if not _is_number(share) or share <= 0 or share >= 1:

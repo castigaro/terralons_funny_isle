@@ -1,5 +1,6 @@
 extends Control
-## Title scene stub (replaced by BI-7); supports the headless smoke mode (-- --smoke).
+## Title scene stub (replaced by BI-7); supports the headless smoke mode (-- --smoke), -- --level=<id> to boot a
+## level directly and starts the first level on any key or click.
 
 const AUTOLOADS := ["EventBus", "DataDir", "Balance", "I18n", "Audio"]
 
@@ -10,11 +11,30 @@ func _ready() -> void:
 	if "--smoke" in OS.get_cmdline_user_args():
 		_run_smoke()
 		return
+	var target := start_target(CliArgs.current())
+	if target != "":
+		get_tree().change_scene_to_file.call_deferred(target)
+		return
 	Audio.play_music("title")
 	var half := maxf(Balance.get_float("core", "title_hint_pulse_seconds"), 0.1) / 2.0
 	var tween := create_tween().set_loops()
 	tween.tween_property(_hint, "modulate:a", 0.35, half)
 	tween.tween_property(_hint, "modulate:a", 1.0, half)
+
+
+## Scene to boot from the user arguments: the level of --level=<id>, "" for the title (also for unknown ids).
+static func start_target(args: Dictionary) -> String:
+	if not args.has("level"):
+		return ""
+	return LevelCatalogue.scene_for(str(args["level"]))
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	var pressed := (event is InputEventKey or event is InputEventMouseButton or event is InputEventJoypadButton) \
+			and event.is_pressed() and not event.is_echo()
+	if pressed and LevelCatalogue.first_id() != "":
+		get_viewport().set_input_as_handled()
+		get_tree().change_scene_to_file(LevelCatalogue.scene_path(LevelCatalogue.first_id()))
 
 
 func _run_smoke() -> void:

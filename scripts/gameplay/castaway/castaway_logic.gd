@@ -80,7 +80,8 @@ func step(input: CastawayInput, delta: float, pos: Vector2, world: CastawayWorld
 			knock_left = _dec(knock_left, delta)
 			out.mode = CastawayStep.MODE_BURST
 		_:
-			_walk(move, delta)
+			var surface := world.surface_at(pos) if world != null else Grabbable.SURFACE_SAND
+			_walk(move, delta, surface)
 			out.mode = CastawayStep.MODE_WALK
 	if out.mode == CastawayStep.MODE_WALK and locomotion != Locomotion.KNOCKBACK:
 		locomotion = Locomotion.RUN if velocity != Vector2.ZERO else Locomotion.IDLE
@@ -100,11 +101,13 @@ func step(input: CastawayInput, delta: float, pos: Vector2, world: CastawayWorld
 	return out
 
 
-func _walk(move: Vector2, delta: float) -> void:
+func _walk(move: Vector2, delta: float, surface: String = Grabbable.SURFACE_SAND) -> void:
 	var target := move * cfg.move_speed
 	if carried != null:
 		target *= cfg.carry_speed_factor / _carry_weight()
 	var rate := cfg.move_accel if move != Vector2.ZERO else cfg.move_decel
+	if surface == Grabbable.SURFACE_MUD:
+		rate *= cfg.slippery_accel_factor if move != Vector2.ZERO else cfg.slippery_friction_factor
 	if velocity.length() > cfg.move_speed:
 		velocity = velocity.limit_length(cfg.move_speed)
 	velocity = velocity.move_toward(target, rate * delta)
@@ -244,6 +247,15 @@ func bonk(from_direction: Vector2) -> Dictionary:
 	_verb = VERB_NONE
 	_verb_kind = ""
 	return {"accepted": true, "dropped": dropped}
+
+
+## Empties the carry slot without a bonk (an event snatched the object); returns the object or null.
+func release_carried() -> Object:
+	var dropped := carried
+	carried = null
+	_verb = VERB_NONE
+	_verb_kind = ""
+	return dropped
 
 
 ## Ends a dash or knockback burst (the shell hit an obstacle) and stops.

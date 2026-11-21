@@ -9,6 +9,7 @@ var waters: Array = []
 ## The playable area; leaving it counts as blocked.
 var bounds := Rect2(-100000, -100000, 200000, 200000)
 var grass: Array = []
+var mud: Array = []
 
 
 func grabbables(pos: Vector2, radius: float) -> Array:
@@ -24,6 +25,9 @@ func throw_targets(pos: Vector2, radius: float) -> Array:
 
 
 func surface_at(pos: Vector2) -> String:
+	for rect in mud:
+		if rect.has_point(pos):
+			return Grabbable.SURFACE_MUD
 	for rect in waters:
 		if rect.has_point(pos):
 			return Grabbable.SURFACE_WATER

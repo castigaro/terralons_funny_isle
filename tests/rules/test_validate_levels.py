@@ -51,6 +51,7 @@ EXPECTED = {
     "invalid_prompt_missing_de": "prompts[0].text_key: DE text",
     "invalid_prompt_unknown_field": "prompts[0].colour: unknown field",
     "invalid_title_missing_de": "tasks[0].title_key: DE text",
+    "invalid_notes_type": "notes: must be a string",
 }
 
 

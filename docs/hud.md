@@ -39,6 +39,8 @@ H (action `hint`) or the hint button shows the hint of the first open required t
 | `dizzy_hit` | `castaway_dizzy_started` |
 | `event_stole` | `event_triggered` of a scheduled event whose type has `take_held` (castaway holds something) or `take_worn` (castaway wears something) |
 
+An `event_warning` shows the cue `hud.cue.warn.<event_type>` (exclamation icon) for `cue_seconds` (2.5 s) through the same throttle; types without a key show nothing. The warning sound stays at the trigger (BI-9).
+
 An open task whose conditions name the involved kind replaces the generic text with its `fail_key`. One cue shows at a time for `cue_seconds`; the same key within `cue_min_interval` only extends it. The funny reaction itself comes from the FeedbackDirector (BI-8).
 
 ## Contextual prompts

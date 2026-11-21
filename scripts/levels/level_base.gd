@@ -55,6 +55,8 @@ var _registry: EntityRegistry
 var _protection: EntityProtection
 var _messages := {}
 var _prompt_problems: Array = []
+## Event surface overrides: key -> {zone: Zone, surface: String}, checked before the tiles.
+var _surface_overrides := {}
 
 
 func _ready() -> void:
@@ -289,6 +291,23 @@ func camera() -> LevelCamera:
 	return _camera
 
 
+## The EventEffects child that applies the event effects to the world (null in levels without one).
+func event_effects() -> EventEffects:
+	return get_node_or_null("EventEffects") as EventEffects
+
+
+## The FeedbackDirector child (null in levels without one).
+func feedback_director() -> FeedbackDirector:
+	return get_node_or_null("FeedbackDirector") as FeedbackDirector
+
+
+## Forwards a delivery by a use target to the session (delivered_to conditions); ignored while failed.
+func report_delivery(entity: String, target: String) -> void:
+	if _failed or _session == null:
+		return
+	_session.report_delivery(entity, target)
+
+
 func entity_registry() -> EntityRegistry:
 	return _registry
 
@@ -306,6 +325,7 @@ func restart_level() -> void:
 		return
 	_session.restart()
 	_session.start()
+	clear_surface_overrides()
 	if _castaway.has_method("reset_to"):
 		_castaway.call("reset_to", spawn_position(), spawn_facing())
 	_registry.reset_all()
@@ -482,6 +502,13 @@ func _size_backdrop() -> void:
 
 ## Surface under a global point: stone, grass or sand from the top-most tile with surface data, else water.
 func get_surface_at(pos: Vector2) -> String:
+	var keys := _surface_overrides.keys()
+	keys.sort()
+	for key in keys:
+		var entry: Dictionary = _surface_overrides[key]
+		var z := entry["zone"] as Zone
+		if z != null and is_instance_valid(z) and z.contains_point(pos):
+			return String(entry["surface"])
 	for layer_name in SURFACE_LAYERS:
 		var layer := get_node_or_null(layer_name) as TileMapLayer
 		if layer == null:
@@ -492,6 +519,27 @@ func get_surface_at(pos: Vector2) -> String:
 			if surface != "":
 				return surface
 	return SURFACE_WATER
+
+
+## Makes every point inside zone report surface until the override with this key is cleared (events).
+func set_surface_override(key: String, area: Zone, surface: String) -> void:
+	if area == null:
+		return
+	_surface_overrides[key] = {"zone": area, "surface": surface}
+
+
+func clear_surface_override(key: String) -> void:
+	_surface_overrides.erase(key)
+
+
+func clear_surface_overrides() -> void:
+	_surface_overrides.clear()
+
+
+func surface_override_keys() -> Array:
+	var keys := _surface_overrides.keys()
+	keys.sort()
+	return keys
 
 
 func cell_of(pos: Vector2) -> Vector2i:

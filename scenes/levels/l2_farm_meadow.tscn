@@ -1,0 +1,371 @@
+[gd_scene load_steps=32 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/levels/level_base.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://scenes/castaway/castaway.tscn" id="2_castaway"]
+[ext_resource type="Script" path="res://scripts/gameplay/entities/zone.gd" id="3_zone"]
+[ext_resource type="PackedScene" path="res://scenes/entities/animal.tscn" id="4_animal"]
+[ext_resource type="PackedScene" path="res://scenes/entities/item.tscn" id="5_item"]
+[ext_resource type="PackedScene" path="res://scenes/levels/props/sway_prop.tscn" id="6_prop"]
+[ext_resource type="PackedScene" path="res://scenes/levels/props/boulder.tscn" id="7_boulder"]
+[ext_resource type="PackedScene" path="res://scenes/levels/props/palm.tscn" id="8_palm"]
+[ext_resource type="Script" path="res://scripts/feedback/feedback_director.gd" id="9_director"]
+[ext_resource type="Script" path="res://scripts/levels/event_effects.gd" id="10_effects"]
+[ext_resource type="Script" path="res://scripts/levels/event_anchor.gd" id="11_anchor"]
+[ext_resource type="Script" path="res://scripts/levels/delivery_target.gd" id="12_delivery"]
+[ext_resource type="Script" path="res://scripts/levels/wear_target.gd" id="13_wear"]
+[ext_resource type="Script" path="res://scripts/levels/pen_target.gd" id="14_pen"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_008.png" id="t1"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_010.png" id="t2"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_050.png" id="t3"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_051.png" id="t4"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_052.png" id="t5"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_053.png" id="t6"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_019.png" id="t7"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_021.png" id="t8"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_001.png" id="t9"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_003.png" id="t10"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_60.png" id="t11"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_76.png" id="t12"]
+[ext_resource type="Texture2D" path="res://assets/graphics/items/PNG/Colored/genericItem_color_128.png" id="t13"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pond"]
+size = Vector2(512, 512)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pig_pen"]
+size = Vector2(384, 384)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trough"]
+size = Vector2(256, 256)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mud_lane"]
+size = Vector2(512, 384)
+
+[node name="FarmMeadow" instance=ExtResource("1_base")]
+level_json_path = "res://data/levels/l2_farm_meadow.json"
+
+[node name="Sand" parent="."]
+tile_map_data = PackedByteArray(0, 0, 2, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 2, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 2, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 2, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 2, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 2, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 2, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 3, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 3, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 3, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 3, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 3, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 4, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 4, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 5, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 5, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 6, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 6, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 7, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 7, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 8, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 8, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 9, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 9, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 10, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 10, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 11, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 11, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 12, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 12, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 13, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 13, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 13, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 13, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 13, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 13, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 13, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 13, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 14, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 14, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 14, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 14, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 14, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 14, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 14, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 14, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 15, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 15, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 15, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 15, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 15, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 15, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 15, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 15, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 16, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 16, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 16, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 16, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 16, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 16, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 16, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 16, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 17, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 17, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 17, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 17, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 17, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 17, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 17, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 17, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 17, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 18, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 18, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 18, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 18, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 19, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 19, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 20, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 20, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 21, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 21, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 22, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 22, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 23, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 23, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 24, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 24, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 25, 0, 14, 0, 0, 0, 4, 0, 4, 0, 0, 0, 25, 0, 15, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 26, 0, 14, 0, 0, 0, 3, 0, 4, 0, 0, 0, 26, 0, 15, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 27, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 27, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 27, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 27, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 27, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 27, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 2, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 3, 0, 0, 0, 4, 0, 4, 0, 0, 0, 28, 0, 4, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 5, 0, 0, 0, 4, 0, 4, 0, 0, 0, 28, 0, 6, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 7, 0, 0, 0, 4, 0, 4, 0, 0, 0, 28, 0, 8, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 9, 0, 0, 0, 4, 0, 4, 0, 0, 0, 28, 0, 10, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 11, 0, 0, 0, 4, 0, 4, 0, 0, 0, 28, 0, 12, 0, 0, 0, 3, 0, 4, 0, 0, 0, 28, 0, 13, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 2, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 3, 0, 0, 0, 3, 0, 4, 0, 0, 0, 29, 0, 4, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 5, 0, 0, 0, 3, 0, 4, 0, 0, 0, 29, 0, 6, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 7, 0, 0, 0, 3, 0, 4, 0, 0, 0, 29, 0, 8, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 9, 0, 0, 0, 3, 0, 4, 0, 0, 0, 29, 0, 10, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 11, 0, 0, 0, 3, 0, 4, 0, 0, 0, 29, 0, 12, 0, 0, 0, 4, 0, 4, 0, 0, 0, 29, 0, 13, 0, 0, 0, 3, 0, 4, 0, 0, 0)
+
+[node name="Grass" parent="."]
+tile_map_data = PackedByteArray(0, 0, 3, 0, 5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 6, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 7, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 8, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 9, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 10, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 11, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 12, 0, 1, 0, 2, 0, 0, 0, 0, 0, 3, 0, 13, 0, 1, 0, 2, 0, 1, 0, 0, 0, 4, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 6, 0, 0, 0, 6, 0, 2, 0, 0, 0, 4, 0, 7, 0, 0, 0, 7, 0, 2, 0, 0, 0, 4, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 4, 0, 9, 0, 0, 0, 7, 0, 1, 0, 0, 0, 4, 0, 10, 0, 0, 0, 6, 0, 2, 0, 0, 0, 4, 0, 11, 0, 0, 0, 7, 0, 2, 0, 0, 0, 4, 0, 12, 0, 0, 0, 6, 0, 1, 0, 0, 0, 4, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 5, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 5, 0, 6, 0, 0, 0, 7, 0, 1, 0, 0, 0, 5, 0, 7, 0, 0, 0, 6, 0, 2, 0, 0, 0, 5, 0, 8, 0, 0, 0, 7, 0, 2, 0, 0, 0, 5, 0, 9, 0, 0, 0, 6, 0, 1, 0, 0, 0, 5, 0, 10, 0, 0, 0, 7, 0, 1, 0, 0, 0, 5, 0, 11, 0, 0, 0, 6, 0, 2, 0, 0, 0, 5, 0, 12, 0, 0, 0, 7, 0, 2, 0, 0, 0, 5, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 6, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 6, 0, 6, 0, 0, 0, 6, 0, 1, 0, 0, 0, 6, 0, 7, 0, 0, 0, 7, 0, 1, 0, 0, 0, 6, 0, 8, 0, 0, 0, 6, 0, 2, 0, 0, 0, 6, 0, 9, 0, 0, 0, 7, 0, 2, 0, 0, 0, 6, 0, 10, 0, 0, 0, 6, 0, 1, 0, 0, 0, 6, 0, 11, 0, 0, 0, 7, 0, 1, 0, 0, 0, 6, 0, 12, 0, 0, 0, 6, 0, 2, 0, 0, 0, 6, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 7, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 7, 0, 6, 0, 0, 0, 7, 0, 2, 0, 0, 0, 7, 0, 7, 0, 0, 0, 6, 0, 1, 0, 0, 0, 7, 0, 8, 0, 0, 0, 7, 0, 1, 0, 0, 0, 7, 0, 9, 0, 0, 0, 6, 0, 2, 0, 0, 0, 7, 0, 10, 0, 0, 0, 7, 0, 2, 0, 0, 0, 7, 0, 11, 0, 0, 0, 6, 0, 1, 0, 0, 0, 7, 0, 12, 0, 0, 0, 7, 0, 1, 0, 0, 0, 7, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 8, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 8, 0, 6, 0, 0, 0, 6, 0, 2, 0, 0, 0, 8, 0, 7, 0, 0, 0, 7, 0, 2, 0, 0, 0, 8, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 8, 0, 9, 0, 0, 0, 7, 0, 1, 0, 0, 0, 8, 0, 10, 0, 0, 0, 6, 0, 2, 0, 0, 0, 8, 0, 11, 0, 0, 0, 7, 0, 2, 0, 0, 0, 8, 0, 12, 0, 0, 0, 6, 0, 1, 0, 0, 0, 8, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 9, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 9, 0, 6, 0, 0, 0, 7, 0, 1, 0, 0, 0, 9, 0, 7, 0, 0, 0, 6, 0, 2, 0, 0, 0, 9, 0, 8, 0, 0, 0, 7, 0, 2, 0, 0, 0, 9, 0, 9, 0, 0, 0, 6, 0, 1, 0, 0, 0, 9, 0, 10, 0, 0, 0, 7, 0, 1, 0, 0, 0, 9, 0, 11, 0, 0, 0, 6, 0, 2, 0, 0, 0, 9, 0, 12, 0, 0, 0, 7, 0, 2, 0, 0, 0, 9, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 10, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 10, 0, 6, 0, 0, 0, 6, 0, 1, 0, 0, 0, 10, 0, 7, 0, 0, 0, 7, 0, 1, 0, 0, 0, 10, 0, 8, 0, 0, 0, 6, 0, 2, 0, 0, 0, 10, 0, 9, 0, 0, 0, 7, 0, 2, 0, 0, 0, 10, 0, 10, 0, 0, 0, 6, 0, 1, 0, 0, 0, 10, 0, 11, 0, 0, 0, 7, 0, 1, 0, 0, 0, 10, 0, 12, 0, 0, 0, 6, 0, 2, 0, 0, 0, 10, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 11, 0, 5, 0, 1, 0, 1, 0, 1, 0, 0, 0, 11, 0, 6, 0, 1, 0, 3, 0, 0, 0, 0, 0, 11, 0, 7, 0, 1, 0, 3, 0, 0, 0, 0, 0, 11, 0, 8, 0, 1, 0, 3, 0, 0, 0, 0, 0, 11, 0, 9, 0, 1, 0, 3, 0, 0, 0, 0, 0, 11, 0, 10, 0, 1, 0, 3, 0, 0, 0, 0, 0, 11, 0, 11, 0, 1, 0, 1, 0, 2, 0, 0, 0, 11, 0, 12, 0, 0, 0, 7, 0, 1, 0, 0, 0, 11, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 12, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 12, 0, 12, 0, 0, 0, 6, 0, 1, 0, 0, 0, 12, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 13, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 13, 0, 12, 0, 0, 0, 7, 0, 2, 0, 0, 0, 13, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 14, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 14, 0, 12, 0, 0, 0, 6, 0, 2, 0, 0, 0, 14, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 15, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 15, 0, 12, 0, 0, 0, 7, 0, 1, 0, 0, 0, 15, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 16, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 16, 0, 12, 0, 0, 0, 6, 0, 1, 0, 0, 0, 16, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 17, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 17, 0, 12, 0, 0, 0, 7, 0, 2, 0, 0, 0, 17, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 18, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 18, 0, 12, 0, 0, 0, 6, 0, 2, 0, 0, 0, 18, 0, 13, 0, 1, 0, 1, 0, 0, 0, 0, 0, 19, 0, 11, 0, 1, 0, 0, 0, 0, 0, 0, 0, 19, 0, 12, 0, 1, 0, 3, 0, 2, 0, 0, 0, 19, 0, 13, 0, 1, 0, 3, 0, 1, 0, 0, 0, 20, 0, 5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 20, 0, 6, 0, 1, 0, 2, 0, 0, 0, 0, 0, 20, 0, 7, 0, 1, 0, 2, 0, 0, 0, 0, 0, 20, 0, 8, 0, 1, 0, 2, 0, 0, 0, 0, 0, 20, 0, 9, 0, 1, 0, 2, 0, 0, 0, 0, 0, 20, 0, 10, 0, 1, 0, 2, 0, 0, 0, 0, 0, 20, 0, 11, 0, 1, 0, 0, 0, 2, 0, 0, 0, 20, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 21, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 21, 0, 6, 0, 0, 0, 7, 0, 1, 0, 0, 0, 21, 0, 7, 0, 0, 0, 6, 0, 2, 0, 0, 0, 21, 0, 8, 0, 0, 0, 7, 0, 2, 0, 0, 0, 21, 0, 9, 0, 0, 0, 6, 0, 1, 0, 0, 0, 21, 0, 10, 0, 0, 0, 7, 0, 1, 0, 0, 0, 21, 0, 11, 0, 0, 0, 6, 0, 2, 0, 0, 0, 21, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 22, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 22, 0, 6, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 7, 0, 0, 0, 7, 0, 1, 0, 0, 0, 22, 0, 8, 0, 0, 0, 6, 0, 2, 0, 0, 0, 22, 0, 9, 0, 0, 0, 7, 0, 2, 0, 0, 0, 22, 0, 10, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 11, 0, 0, 0, 7, 0, 1, 0, 0, 0, 22, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 23, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 23, 0, 6, 0, 0, 0, 7, 0, 2, 0, 0, 0, 23, 0, 7, 0, 0, 0, 6, 0, 1, 0, 0, 0, 23, 0, 8, 0, 0, 0, 7, 0, 1, 0, 0, 0, 23, 0, 9, 0, 0, 0, 6, 0, 2, 0, 0, 0, 23, 0, 10, 0, 0, 0, 7, 0, 2, 0, 0, 0, 23, 0, 11, 0, 0, 0, 6, 0, 1, 0, 0, 0, 23, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 24, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 24, 0, 6, 0, 0, 0, 6, 0, 2, 0, 0, 0, 24, 0, 7, 0, 0, 0, 7, 0, 2, 0, 0, 0, 24, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 24, 0, 9, 0, 0, 0, 7, 0, 1, 0, 0, 0, 24, 0, 10, 0, 0, 0, 6, 0, 2, 0, 0, 0, 24, 0, 11, 0, 0, 0, 7, 0, 2, 0, 0, 0, 24, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 25, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 25, 0, 6, 0, 0, 0, 7, 0, 1, 0, 0, 0, 25, 0, 7, 0, 0, 0, 6, 0, 2, 0, 0, 0, 25, 0, 8, 0, 0, 0, 7, 0, 2, 0, 0, 0, 25, 0, 9, 0, 0, 0, 6, 0, 1, 0, 0, 0, 25, 0, 10, 0, 0, 0, 7, 0, 1, 0, 0, 0, 25, 0, 11, 0, 0, 0, 6, 0, 2, 0, 0, 0, 25, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 26, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 26, 0, 6, 0, 0, 0, 6, 0, 1, 0, 0, 0, 26, 0, 7, 0, 0, 0, 7, 0, 1, 0, 0, 0, 26, 0, 8, 0, 0, 0, 6, 0, 2, 0, 0, 0, 26, 0, 9, 0, 0, 0, 7, 0, 2, 0, 0, 0, 26, 0, 10, 0, 0, 0, 6, 0, 1, 0, 0, 0, 26, 0, 11, 0, 0, 0, 7, 0, 1, 0, 0, 0, 26, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 27, 0, 5, 0, 1, 0, 0, 0, 0, 0, 0, 0, 27, 0, 6, 0, 0, 0, 7, 0, 2, 0, 0, 0, 27, 0, 7, 0, 0, 0, 6, 0, 1, 0, 0, 0, 27, 0, 8, 0, 0, 0, 7, 0, 1, 0, 0, 0, 27, 0, 9, 0, 0, 0, 6, 0, 2, 0, 0, 0, 27, 0, 10, 0, 0, 0, 7, 0, 2, 0, 0, 0, 27, 0, 11, 0, 0, 0, 6, 0, 1, 0, 0, 0, 27, 0, 12, 0, 1, 0, 1, 0, 0, 0, 0, 0, 28, 0, 5, 0, 1, 0, 1, 0, 1, 0, 0, 0, 28, 0, 6, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 7, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 8, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 9, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 10, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 11, 0, 1, 0, 3, 0, 0, 0, 0, 0, 28, 0, 12, 0, 1, 0, 3, 0, 1, 0, 0, 0)
+
+[node name="Shore" parent="."]
+tile_map_data = PackedByteArray(0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 16, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 3, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 3, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 0, 3, 0, 1, 0, 0, 0, 3, 0, 0, 0, 4, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 5, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 6, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 6, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 7, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 7, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 8, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 9, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 9, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 10, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 10, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 11, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 11, 0, 15, 0, 1, 0, 3, 0, 3, 0, 0, 0, 11, 0, 16, 0, 0, 0, 2, 0, 2, 0, 0, 0, 12, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 12, 0, 15, 0, 0, 0, 1, 0, 2, 0, 0, 0, 13, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 13, 0, 5, 0, 1, 0, 3, 0, 3, 0, 0, 0, 13, 0, 6, 0, 0, 0, 2, 0, 1, 0, 0, 0, 13, 0, 7, 0, 0, 0, 2, 0, 1, 0, 0, 0, 13, 0, 8, 0, 0, 0, 2, 0, 1, 0, 0, 0, 13, 0, 9, 0, 1, 0, 1, 0, 3, 0, 0, 0, 13, 0, 15, 0, 0, 0, 1, 0, 2, 0, 0, 0, 14, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 14, 0, 5, 0, 0, 0, 1, 0, 2, 0, 0, 0, 14, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 14, 0, 15, 0, 0, 0, 1, 0, 2, 0, 0, 0, 15, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 15, 0, 5, 0, 0, 0, 1, 0, 2, 0, 0, 0, 15, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 15, 0, 15, 0, 0, 0, 1, 0, 2, 0, 0, 0, 16, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 16, 0, 5, 0, 0, 0, 1, 0, 2, 0, 0, 0, 16, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 16, 0, 15, 0, 1, 0, 2, 0, 3, 0, 0, 0, 16, 0, 16, 0, 0, 0, 0, 0, 2, 0, 0, 0, 17, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 17, 0, 5, 0, 0, 0, 1, 0, 2, 0, 0, 0, 17, 0, 9, 0, 0, 0, 1, 0, 0, 0, 0, 0, 17, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 18, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 18, 0, 5, 0, 1, 0, 2, 0, 3, 0, 0, 0, 18, 0, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 18, 0, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 18, 0, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 18, 0, 9, 0, 1, 0, 0, 0, 3, 0, 0, 0, 18, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 19, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 19, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 20, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 20, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 21, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 21, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 22, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 22, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 23, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 23, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 24, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 24, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 25, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 25, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 26, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 26, 0, 16, 0, 0, 0, 1, 0, 2, 0, 0, 0, 27, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 27, 0, 14, 0, 1, 0, 3, 0, 3, 0, 0, 0, 27, 0, 15, 0, 0, 0, 2, 0, 1, 0, 0, 0, 27, 0, 16, 0, 0, 0, 2, 0, 2, 0, 0, 0, 28, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 28, 0, 14, 0, 0, 0, 1, 0, 2, 0, 0, 0, 29, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 29, 0, 14, 0, 0, 0, 1, 0, 2, 0, 0, 0, 30, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 30, 0, 2, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 3, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 4, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 5, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 6, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 7, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 8, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 9, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 10, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 11, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 12, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 13, 0, 0, 0, 2, 0, 1, 0, 0, 0, 30, 0, 14, 0, 0, 0, 2, 0, 2, 0, 0, 0)
+
+[node name="Details" parent="."]
+tile_map_data = PackedByteArray(0, 0, 8, 0, 3, 0, 0, 0, 2, 0, 4, 0, 0, 0, 22, 0, 14, 0, 0, 0, 0, 0, 3, 0, 0, 0)
+
+[node name="FeedbackDirector" type="Node" parent="." index="5"]
+script = ExtResource("9_director")
+
+[node name="Castaway" parent="Actors" groups=["actor"] instance=ExtResource("2_castaway")]
+position = Vector2(448, 1216)
+
+[node name="Duck1" parent="Actors" instance=ExtResource("4_animal")]
+kind = "duck"
+home_marker = NodePath("../../HomePoints/duck_1")
+uid = "duck_1"
+position = Vector2(960, 1344)
+
+[node name="Duck2" parent="Actors" instance=ExtResource("4_animal")]
+kind = "duck"
+home_marker = NodePath("../../HomePoints/duck_2")
+uid = "duck_2"
+position = Vector2(1216, 1728)
+
+[node name="Duck3" parent="Actors" instance=ExtResource("4_animal")]
+kind = "duck"
+home_marker = NodePath("../../HomePoints/duck_3")
+uid = "duck_3"
+position = Vector2(704, 1728)
+
+[node name="Pig1" parent="Actors" instance=ExtResource("4_animal")]
+kind = "pig"
+home_marker = NodePath("../../HomePoints/pig_1")
+uid = "pig_1"
+position = Vector2(3264, 1728)
+
+[node name="Bucket1" parent="Actors" instance=ExtResource("5_item")]
+kind = "bucket"
+home_marker = NodePath("../../HomePoints/bucket_1")
+uid = "bucket_1"
+position = Vector2(2368, 1856)
+
+[node name="Chicken1" parent="Actors" instance=ExtResource("4_animal")]
+kind = "chicken"
+home_marker = NodePath("../../HomePoints/chicken_1")
+uid = "chicken_1"
+position = Vector2(2368, 448)
+
+[node name="Chicken2" parent="Actors" instance=ExtResource("4_animal")]
+kind = "chicken"
+home_marker = NodePath("../../HomePoints/chicken_2")
+uid = "chicken_2"
+position = Vector2(1728, 1856)
+
+[node name="Chicken3" parent="Actors" instance=ExtResource("4_animal")]
+kind = "chicken"
+home_marker = NodePath("../../HomePoints/chicken_3")
+uid = "chicken_3"
+position = Vector2(3520, 1344)
+
+[node name="Prop1" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(320, 612)
+texture = ExtResource("t1")
+sprite_scale = 0.7
+footprint_radius = 30
+shadow_width_share = 0.7
+
+[node name="Prop2" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(1600, 484)
+texture = ExtResource("t2")
+sprite_scale = 0.7
+footprint_radius = 30
+shadow_width_share = 0.7
+
+[node name="Prop3" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3776, 612)
+texture = ExtResource("t1")
+sprite_scale = 0.7
+footprint_radius = 30
+shadow_width_share = 0.7
+
+[node name="Prop4" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(2752, 2020)
+texture = ExtResource("t2")
+sprite_scale = 0.7
+footprint_radius = 30
+shadow_width_share = 0.7
+
+[node name="Prop5" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(192, 2020)
+texture = ExtResource("t1")
+sprite_scale = 0.6
+footprint_radius = 30
+shadow_width_share = 0.7
+
+[node name="Prop6" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3044, 740)
+texture = ExtResource("t3")
+sprite_scale = 0.55
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop7" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3486, 740)
+texture = ExtResource("t4")
+sprite_scale = 0.55
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop8" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3044, 1134)
+texture = ExtResource("t5")
+sprite_scale = 0.5
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop9" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3486, 1134)
+texture = ExtResource("t6")
+sprite_scale = 0.5
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop10" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(1064, 376)
+texture = ExtResource("t7")
+sprite_scale = 0.8
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop11" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(1370, 376)
+texture = ExtResource("t8")
+sprite_scale = 0.8
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop12" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(832, 832)
+texture = ExtResource("t9")
+sprite_scale = 0.6
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop13" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(1344, 1472)
+texture = ExtResource("t10")
+sprite_scale = 0.6
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop14" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(3392, 1472)
+texture = ExtResource("t9")
+sprite_scale = 0.6
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Prop15" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
+position = Vector2(2240, 1856)
+texture = ExtResource("t3")
+sprite_scale = 0.6
+footprint_radius = 0
+shadow_width_share = 1
+
+[node name="Boulder16" parent="Actors" instance=ExtResource("7_boulder")]
+position = Vector2(1694, 1252)
+
+[node name="Boulder17" parent="Actors" instance=ExtResource("7_boulder")]
+position = Vector2(3776, 1600)
+
+[node name="PondJetty" type="Node2D" parent="Actors"]
+position = Vector2(2048, 1236)
+script = ExtResource("14_pen")
+target_kind = "pond"
+accepted_kinds = PackedStringArray("duck")
+
+[node name="Art" type="Sprite2D" parent="Actors/PondJetty"]
+z_index = -1
+scale = Vector2(1, 1)
+texture = ExtResource("t11")
+
+[node name="Slot1" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(-192, -276)
+
+[node name="Slot2" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(-64, -276)
+
+[node name="Slot3" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(64, -276)
+
+[node name="Slot4" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(192, -276)
+
+[node name="Slot5" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(-64, -404)
+
+[node name="Slot6" type="Marker2D" parent="Actors/PondJetty"]
+position = Vector2(64, -404)
+
+[node name="PenGate" type="Node2D" parent="Actors"]
+position = Vector2(3264, 1256)
+script = ExtResource("14_pen")
+target_kind = "pen"
+accepted_kinds = PackedStringArray("pig")
+
+[node name="Art" type="Sprite2D" parent="Actors/PenGate"]
+z_index = -1
+scale = Vector2(1, 1)
+texture = ExtResource("t12")
+
+[node name="Slot1" type="Marker2D" parent="Actors/PenGate"]
+position = Vector2(0, -296)
+
+[node name="Slot2" type="Marker2D" parent="Actors/PenGate"]
+position = Vector2(-128, -296)
+
+[node name="Slot3" type="Marker2D" parent="Actors/PenGate"]
+position = Vector2(128, -296)
+
+[node name="Trough" type="Node2D" parent="Actors"]
+position = Vector2(1216, 448)
+script = ExtResource("12_delivery")
+target_kind = "trough"
+accepted_kinds = PackedStringArray("bucket")
+
+[node name="Art" type="Sprite2D" parent="Actors/Trough"]
+z_index = 0
+scale = Vector2(1, 1)
+texture = ExtResource("t13")
+
+[node name="Spawn" parent="Markers"]
+position = Vector2(448, 1216)
+
+[node name="duck_1" type="Marker2D" parent="HomePoints"]
+position = Vector2(960, 1344)
+
+[node name="duck_2" type="Marker2D" parent="HomePoints"]
+position = Vector2(1216, 1728)
+
+[node name="duck_3" type="Marker2D" parent="HomePoints"]
+position = Vector2(704, 1728)
+
+[node name="pig_1" type="Marker2D" parent="HomePoints"]
+position = Vector2(3264, 1728)
+
+[node name="bucket_1" type="Marker2D" parent="HomePoints"]
+position = Vector2(2368, 1856)
+
+[node name="chicken_1" type="Marker2D" parent="HomePoints"]
+position = Vector2(2368, 448)
+
+[node name="chicken_2" type="Marker2D" parent="HomePoints"]
+position = Vector2(1728, 1856)
+
+[node name="chicken_3" type="Marker2D" parent="HomePoints"]
+position = Vector2(3520, 1344)
+
+[node name="pond" type="Area2D" parent="Zones"]
+position = Vector2(1984, 1216)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_zone")
+zone_id = "pond"
+contains = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zones/pond"]
+position = Vector2(64, -192)
+shape = SubResource("RectangleShape2D_pond")
+
+[node name="pig_pen" type="Area2D" parent="Zones"]
+position = Vector2(3264, 960)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_zone")
+zone_id = "pig_pen"
+contains = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zones/pig_pen"]
+shape = SubResource("RectangleShape2D_pig_pen")
+
+[node name="trough" type="Area2D" parent="Zones"]
+position = Vector2(1216, 448)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_zone")
+zone_id = "trough"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zones/trough"]
+shape = SubResource("RectangleShape2D_trough")
+
+[node name="mud_lane" type="Area2D" parent="Zones"]
+position = Vector2(2496, 1472)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+script = ExtResource("3_zone")
+zone_id = "mud_lane"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zones/mud_lane"]
+position = Vector2(64, 64)
+shape = SubResource("RectangleShape2D_mud_lane")
+
+[node name="EventAnchors" type="Node2D" parent="."]
+
+[node name="pig_mud" type="Marker2D" parent="EventAnchors"]
+position = Vector2(2496, 1600)
+script = ExtResource("11_anchor")
+event_id = "pig_mud"
+
+[node name="rain_shower" type="Marker2D" parent="EventAnchors"]
+position = Vector2(1984, 1472)
+script = ExtResource("11_anchor")
+event_id = "rain_shower"
+
+[node name="EventEffects" type="Node2D" parent="."]
+script = ExtResource("10_effects")

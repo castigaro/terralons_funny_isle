@@ -14,7 +14,7 @@ const KEYS := [
 	"star_scale", "star_count", "star_orbit_radius", "star_orbit_speed", "star_height",
 	"bob_amplitude", "bob_frequency", "lean_degrees", "dash_stretch", "landing_squash", "landing_squash_seconds",
 	"throw_punch_offset", "dizzy_wobble_degrees", "dizzy_wobble_frequency", "dust_amount", "step_interval",
-	"carry_weight_min", "carry_weight_max",
+	"carry_weight_min", "carry_weight_max", "slippery_accel_factor", "slippery_friction_factor",
 ]
 
 var move_speed := 0.0
@@ -64,6 +64,9 @@ var step_interval := 0.0
 ## Limits for the carry weight of animals and items (1.0 is a normal load).
 var carry_weight_min := 0.0
 var carry_weight_max := 0.0
+## Traction on slippery ground (mud): share of move_accel while steering and of move_decel while sliding out.
+var slippery_accel_factor := 1.0
+var slippery_friction_factor := 1.0
 ## Keys that were missing in the source dictionary.
 var missing: Array = []
 

@@ -14,6 +14,8 @@ const SURFACE_PROVIDER_GROUP := "surface_provider"
 const SURFACE_SAND := "sand"
 const SURFACE_GRASS := "grass"
 const SURFACE_WATER := "water"
+## Slippery ground laid by events (LevelBase surface overrides); lowers the castaway's traction.
+const SURFACE_MUD := "mud"
 const REQUIRED_METHODS := ["can_grab", "on_grabbed", "on_released"]
 
 

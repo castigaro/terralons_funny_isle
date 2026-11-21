@@ -1,0 +1,87 @@
+{
+	"format_version": 1,
+	"id": "l2_farm_meadow",
+	"title_key": "level.l2_farm_meadow.title",
+	"theme": "farm_meadow",
+	"music": "level_2",
+	"seed": 2202,
+	"timer_seconds": 210,
+	"notes": "Default allocation (BI-10, no sprite swap): required – herd three ducks into the pond, catch the runaway pig; optional (implementer's farm task) – bring the feed bucket to the trough before the rain; events – the pig leaves slippery mud (new mechanic), rain makes the chickens panic. Workload 5 units in 210 s (42 s per unit, tighter than level 1).",
+	"tasks": [
+		{
+			"id": "ducks_in_pond",
+			"required": true,
+			"title_key": "level.l2_farm_meadow.ducks_in_pond.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "duck",
+					"zone": "pond",
+					"count": 3
+				}
+			],
+			"hint_key": "level.l2_farm_meadow.ducks_in_pond.hint",
+			"fail_key": "level.l2_farm_meadow.ducks_in_pond.fail"
+		},
+		{
+			"id": "catch_pig",
+			"required": true,
+			"title_key": "level.l2_farm_meadow.catch_pig.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "pig",
+					"zone": "pig_pen"
+				}
+			],
+			"hint_key": "level.l2_farm_meadow.catch_pig.hint",
+			"fail_key": "level.l2_farm_meadow.catch_pig.fail"
+		},
+		{
+			"id": "feed_before_rain",
+			"required": false,
+			"title_key": "level.l2_farm_meadow.feed_before_rain.title",
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "bucket",
+					"target": "trough"
+				}
+			],
+			"hint_key": "level.l2_farm_meadow.feed_before_rain.hint",
+			"fail_key": "level.l2_farm_meadow.feed_before_rain.fail",
+			"modifiers": [
+				{
+					"type": "before_event",
+					"event": "rain_shower"
+				}
+			]
+		}
+	],
+	"events": [
+		{
+			"id": "pig_mud",
+			"type": "mud_trail",
+			"window": [
+				20,
+				40
+			],
+			"duration_s": 12,
+			"params": {
+				"zone": "mud_lane"
+			}
+		},
+		{
+			"id": "rain_shower",
+			"type": "rain_panic",
+			"window": [
+				70,
+				100
+			],
+			"duration_s": 8,
+			"params": {
+				"kind": "chicken"
+			}
+		}
+	]
+}

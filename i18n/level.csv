@@ -2,3 +2,27 @@ key,en,de
 level.error.load_failed,This level could not be loaded.,Dieses Level konnte nicht geladen werden.
 level.error.back,Back,Zurück
 level.restarted,Restarted!,Neustart!
+level.l1_beach_camp.title,Beach Camp,Strandlager
+level.l1_beach_camp.chickens_in_cage.title,Chickens in the cage,Hühner in den Käfig
+level.l1_beach_camp.chickens_in_cage.hint,Grab a chicken and use it at the cage.,Schnapp dir ein Huhn und bring es zum Käfig.
+level.l1_beach_camp.chickens_in_cage.fail,The chickens are still on the loose!,Die Hühner laufen noch frei herum!
+level.l1_beach_camp.coconuts_to_monkey.title,Coconuts for the monkey,Kokosnüsse für den Affen
+level.l1_beach_camp.coconuts_to_monkey.hint,Carry coconuts from the palm pile to the monkey.,Trag Kokosnüsse vom Palmenhaufen zum Affen.
+level.l1_beach_camp.coconuts_to_monkey.fail,The monkey is still hungry!,Der Affe hat noch Hunger!
+level.l1_beach_camp.hat_on_goat.title,Hat on the goat,Hut auf die Ziege
+level.l1_beach_camp.hat_on_goat.hint,The goat follows the hat - carry it over and use it.,Die Ziege folgt dem Hut - bring ihn hin und setz ihn auf.
+level.l1_beach_camp.hat_on_goat.fail,The goat has no hat!,Die Ziege hat keinen Hut!
+level.l2_farm_meadow.title,Farm Meadow,Bauernwiese
+level.l2_farm_meadow.ducks_in_pond.title,Ducks in the pond,Enten in den Teich
+level.l2_farm_meadow.ducks_in_pond.hint,Carry each duck to the pond and use it at the jetty.,Trag jede Ente zum Teich und lass sie am Steg los.
+level.l2_farm_meadow.ducks_in_pond.fail,Some ducks never reached the pond!,Ein paar Enten sind nicht im Teich!
+level.l2_farm_meadow.catch_pig.title,Catch the pig,Fang das Schwein
+level.l2_farm_meadow.catch_pig.hint,The pig loves the bucket - lure it close and grab it.,Das Schwein liebt den Eimer - lock es an und schnapp es.
+level.l2_farm_meadow.catch_pig.fail,The pig is still running wild!,Das Schwein rennt noch frei herum!
+level.l2_farm_meadow.feed_before_rain.title,Feed before the rain,Füttern vor dem Regen
+level.l2_farm_meadow.feed_before_rain.hint,Bring the bucket to the trough before it rains.,Bring den Eimer zum Trog bevor es regnet.
+level.l2_farm_meadow.feed_before_rain.fail,The rain came first!,Der Regen war schneller!
+level.prompt.move,Move,Laufen
+level.prompt.grab,Grab,Greifen
+level.prompt.throw,Throw,Werfen
+level.prompt.use,Use,Benutzen

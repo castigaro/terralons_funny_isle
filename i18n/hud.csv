@@ -17,3 +17,9 @@ hud.key.shift,Shift,Umschalt
 hud.star_goal,3-star time,3-Sterne-Zeit
 hud.required,Must,Pflicht
 hud.optional,Bonus,Bonus
+hud.cue.warn.parrot_steal_hat,Parrot incoming!,Papagei im Anflug!
+hud.cue.warn.goat_stampede,Goats incoming!,Ziegen im Anmarsch!
+hud.cue.warn.coconut_throw,Coconuts incoming!,Kokosnüsse im Anflug!
+hud.cue.warn.rain_panic,Rain is coming!,Gleich regnet es!
+hud.cue.warn.wave_wash,Big wave ahead!,Große Welle!
+hud.cue.warn.mud_trail,Mud ahead!,Achtung Matsch!
