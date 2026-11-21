@@ -7,14 +7,14 @@ level.l1_beach_camp.chickens_in_cage.title,Chickens in the cage,Hühner in den K
 level.l1_beach_camp.chickens_in_cage.hint,Bring a chicken to the cage gate.,Bring ein Huhn zum Käfigtor.
 level.l1_beach_camp.chickens_in_cage.fail,The chickens are still on the loose!,Die Hühner laufen noch frei herum!
 level.l1_beach_camp.coconuts_to_monkey.title,Coconuts for the monkey,Kokosnüsse für den Affen
-level.l1_beach_camp.coconuts_to_monkey.hint,Two coconuts for the monkey.,Zwei Kokosnüsse für den Affen.
+level.l1_beach_camp.coconuts_to_monkey.hint,Bring 2 coconuts from the palm pile to the monkey.,2 Kokosnüsse vom Haufen zum Affen.
 level.l1_beach_camp.coconuts_to_monkey.fail,The monkey is still hungry!,Der Affe hat noch Hunger!
 level.l1_beach_camp.hat_on_goat.title,Hat on the goat,Hut auf die Ziege
 level.l1_beach_camp.hat_on_goat.hint,The goat follows the hat – carry it over and use it.,Die Ziege mag den Hut – setz ihn auf.
 level.l1_beach_camp.hat_on_goat.fail,The goat has no hat!,Die Ziege hat keinen Hut!
 level.l2_farm_meadow.title,Farm Meadow,Bauernwiese
 level.l2_farm_meadow.ducks_in_pond.title,Ducks in the pond,Enten in den Teich
-level.l2_farm_meadow.ducks_in_pond.hint,Carry each duck to the pond and use it at the jetty.,"Enten in den Teich, schnell!"
+level.l2_farm_meadow.ducks_in_pond.hint,Carry each duck to the pond jetty and use it.,Trag jede Ente zum Steg.
 level.l2_farm_meadow.ducks_in_pond.fail,Some ducks never reached the pond!,Ein paar Enten sind nicht im Teich!
 level.l2_farm_meadow.catch_pig.title,Catch the pig,Fang das Schwein
 level.l2_farm_meadow.catch_pig.hint,The pig loves the bucket – lure it close and grab it.,Das Schwein liebt den Eimer – lock es an.

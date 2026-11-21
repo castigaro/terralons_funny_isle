@@ -10,13 +10,18 @@ const WARN_PREFIX := "hud.cue.warn."
 const RISE_PX := 160.0
 
 
+func _scene(id: String) -> String:
+	var campaign: Campaign = Campaign.load_file("res://data/campaign.json")["campaign"]
+	return String(campaign.entry(id)["scene"])
+
+
 func _near_anchor(pos: Vector2, anchor: Vector2) -> bool:
 	return absf(pos.x - anchor.x) < 1.0 and pos.y <= anchor.y + 1.0 and pos.y >= anchor.y - RISE_PX
 
 
 func test_events_warn_animate_and_react() -> void:
 	for id in LEVELS:
-		await open_level(LevelCatalogue.scene_path(id), {"session_options": {"schedule_mode": "earliest"}})
+		await open_level(_scene(id), {"session_options": {"schedule_mode": "earliest"}})
 		var session := level.level_session()
 		var schedule := session.schedule()
 		var hud := level.hud()

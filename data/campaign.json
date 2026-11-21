@@ -1,10 +1,10 @@
 {
 	"schema_version": 1,
 	"levels": [
-		{"id": "beach_camp"},
-		{"id": "farm_meadow"},
-		{"id": "jungle"},
-		{"id": "lagoon"},
-		{"id": "volcano_cliffs"}
+		{"id": "l1_beach_camp"},
+		{"id": "l2_farm_meadow"},
+		{"id": "l3_jungle"},
+		{"id": "l4_lagoon"},
+		{"id": "l5_volcano_cliffs"}
 	]
 }

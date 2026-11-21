@@ -23,7 +23,7 @@ Music: "title" on the title, level select and settings (outside a level), the le
 
 ## Campaign
 
-`data/campaign.json` lists the level ids in unlock order: `beach_camp`, `farm_meadow`, `jungle`, `lagoon`, `volcano_cliffs` (D-8). By convention level `<id>` is `scenes/levels/<id>.tscn` with `data/levels/<id>.json`; an entry may name other `scene` and `json` paths (test campaigns). The tile title is the `title_key` of the level JSON ("Level N" until the JSON exists); a level whose scene does not exist yet shows "Coming soon" and cannot be started. Music per D-2 is set in each level JSON: level_1, level_2, level_3, level_2, level_3.
+`data/campaign.json` lists the level ids in unlock order: `l1_beach_camp`, `l2_farm_meadow`, `l3_jungle`, `l4_lagoon`, `l5_volcano_cliffs` (D-8). An id is the file stem of its level JSON with the `lN_` prefix, N being its 1-based position (checked by `tests/levels/test_level_data.py`). By convention level `<id>` is `scenes/levels/<id>.tscn` with `data/levels/<id>.json`; an entry may name other `scene` and `json` paths (test campaigns). The tile title is the `title_key` of the level JSON ("Level N" until the JSON exists); a level whose scene does not exist yet shows "Coming soon" and cannot be started. Music per D-2 is set in each level JSON: level_1, level_2, level_3, level_2, level_3.
 
 `-- --campaign=<res path>` swaps the campaign file and `-- --level=<id>` boots straight into the intro card of an unlocked level (development and bot runs).
 
@@ -39,8 +39,8 @@ English on first start, volumes are linear 0..1 (0 mutes the bus; default `audio
 
 `progress.json` (autoload `Progress`):
 
-    {"schema_version": 1, "unlocked": ["beach_camp", "farm_meadow"],
-     "levels": {"beach_camp": {"won": true, "best_stars": 2, "best_time_s": 83.4}}}
+    {"schema_version": 1, "unlocked": ["l1_beach_camp", "l2_farm_meadow"],
+     "levels": {"l1_beach_camp": {"won": true, "best_stars": 2, "best_time_s": 83.4}}}
 
 Unlocks are derived from wins (the first level is always open, level N+1 opens when level N is won, a won level stays replayable); the stored `unlocked` list is informative only. Level i is unlocked only when level i-1 is won; wins are read in campaign order and stop at the first level that is not won, so a hand-edited file can never put stars on a locked level. Best stars (max) and best time (min completion time = timer length minus time left) are independent records. The result screen shows "New best!" only when an earlier record was beaten: a first win shows its stars and time without the mark.
 

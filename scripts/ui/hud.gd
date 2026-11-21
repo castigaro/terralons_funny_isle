@@ -558,6 +558,8 @@ func _on_level_restarted(_level_id: String) -> void:
 func _on_level_ended() -> void:
 	hide_hint()
 	_banner.visible = false
+	# The flow pauses the tree on the result screen, so the last progress is drawn here and not in _process.
+	refresh()
 
 
 func _on_settings_changed(_key: String) -> void:

@@ -3,26 +3,38 @@ extends "res://tests/support/level_case.gd"
 ## anchors, the feedback director and the event effects, and every use target is reachable on foot.
 
 const LEVELS := ["l1_beach_camp", "l2_farm_meadow"]
+const CAMPAIGN := "res://data/campaign.json"
 
 
-func test_catalogue_lists_the_shipped_levels() -> void:
-	check_eq(LevelCatalogue.ids(), LEVELS, "level ids")
-	check_eq(LevelCatalogue.first_id(), "l1_beach_camp", "first level")
+func _campaign() -> Campaign:
+	return Campaign.load_file(CAMPAIGN)["campaign"]
+
+
+func _scene(id: String) -> String:
+	return String(_campaign().entry(id)["scene"])
+
+
+func test_campaign_lists_the_shipped_levels() -> void:
+	var c := _campaign()
+	check_eq(c.ids().slice(0, LEVELS.size()), LEVELS, "level ids")
+	check_eq(c.first_id(), "l1_beach_camp", "first level")
 	for id in LEVELS:
-		check(ResourceLoader.exists(LevelCatalogue.scene_path(id)), "%s scene exists" % id)
-		check(FileAccess.file_exists(LevelCatalogue.json_path(id)), "%s json exists" % id)
+		var e := c.entry(id)
+		check_true(e["available"], "%s available" % id)
+		check(ResourceLoader.exists(String(e["scene"])), "%s scene exists" % id)
+		check(FileAccess.file_exists(String(e["json"])), "%s json exists" % id)
 
 
 func test_every_shipped_level_is_complete_and_reachable() -> void:
 	var themes := {}
 	var music := {}
 	for id in LEVELS:
-		await open_level(LevelCatalogue.scene_path(id))
+		await open_level(_scene(id))
 		check_false(level.is_failed(), "%s loads: %s" % [id, str(level.load_errors())])
 		if level.is_failed():
 			continue
 		check_eq(level.prompt_problems(), [], "%s prompts placed" % id)
-		check_eq(level.level_json_path, LevelCatalogue.json_path(id), "%s json path" % id)
+		check_eq(level.level_json_path, String(_campaign().entry(id)["json"]), "%s json path" % id)
 		var def := level.level_def()
 		themes[def.theme] = true
 		music[def.music] = true
@@ -56,7 +68,7 @@ func test_every_shipped_level_is_complete_and_reachable() -> void:
 func test_pen_slots_lie_inside_their_zone() -> void:
 	var pens := {"l1_beach_camp": {"CageGate": "cage"}, "l2_farm_meadow": {"PondJetty": "pond", "PenGate": "pig_pen"}}
 	for id in pens:
-		await open_level(LevelCatalogue.scene_path(id))
+		await open_level(_scene(id))
 		for gate_name in pens[id]:
 			var gate := level.get_node("Actors/%s" % gate_name) as PenTarget
 			var area := level.zone(String(pens[id][gate_name]))

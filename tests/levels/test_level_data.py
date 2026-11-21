@@ -12,6 +12,7 @@ import common  # noqa: E402
 REPO = common.REPO
 LEVELS = REPO / "data" / "levels"
 IDENT_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+CAMPAIGN_ID_RE = re.compile(r"^l([1-9])_[a-z0-9_]+$")
 
 
 def load(name):
@@ -120,6 +121,45 @@ class LevelDataTest(unittest.TestCase):
                 words.update(IDENT_RE.findall(literal))
             for found in sorted(ids & words):
                 self.fail("%s names the level or task id %s" % (path.relative_to(REPO).as_posix(), found))
+
+
+
+class CampaignDataTest(unittest.TestCase):
+    """data/campaign.json and data/levels agree: lN_ ids in position order, a scene for every built level."""
+
+    def setUp(self):
+        data = json.loads((REPO / "data" / "campaign.json").read_text(encoding="utf-8"))
+        self.ids = [entry["id"] for entry in data["levels"]]
+
+    def test_every_level_json_is_in_the_campaign(self):
+        for path in sorted(LEVELS.glob("*.json")):
+            with self.subTest(level=path.stem):
+                self.assertIn(path.stem, self.ids)
+
+    def test_ids_carry_their_position(self):
+        self.assertEqual(len(self.ids), 5)
+        for position, level_id in enumerate(self.ids, start=1):
+            with self.subTest(id=level_id):
+                match = CAMPAIGN_ID_RE.match(level_id)
+                self.assertIsNotNone(match)
+                self.assertEqual(int(match.group(1)), position)
+
+    def test_built_levels_have_a_scene(self):
+        for level_id in self.ids:
+            if (LEVELS / ("%s.json" % level_id)).exists():
+                with self.subTest(id=level_id):
+                    self.assertTrue((REPO / "scenes" / "levels" / ("%s.tscn" % level_id)).exists())
+
+    def test_no_level_catalogue_left(self):
+        needle = re.compile(r"LevelCatalogue|level_catalogue")
+        for top in ("scripts", "tests", "tools", "docs"):
+            for path in sorted((REPO / top).rglob("*")):
+                if path.suffix not in (".gd", ".py", ".md", ".tscn", ".json") or "process" in path.relative_to(REPO).parts:
+                    continue
+                if path.resolve() == Path(__file__).resolve():
+                    continue
+                with self.subTest(path=path.relative_to(REPO).as_posix()):
+                    self.assertIsNone(needle.search(path.read_text(encoding="utf-8")))
 
 
 if __name__ == "__main__":
