@@ -59,6 +59,12 @@ class ValidateCodeFailTest(unittest.TestCase):
     def test_magic_number_const(self):
         self.assert_fails({"scripts/levels/y.gd": gd("const SPEED := 420")}, "magic number 420")
 
+    def test_magic_number_audio(self):
+        self.assert_fails({"scripts/audio/x.gd": gd("const DUCK_DB := -12.0")}, "magic number 12.0")
+
+    def test_magic_number_audio_autoload(self):
+        self.assert_fails({"scripts/autoload/audio.gd": gd("var gap := 0.15")}, "magic number 0.15")
+
     def test_http_request(self):
         self.assert_fails({"scripts/a.gd": gd("var r := HTTPRequest.new()")}, "networking class HTTPRequest")
 
