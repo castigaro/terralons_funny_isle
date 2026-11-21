@@ -44,7 +44,7 @@ Duck-typed, because animals and items use different base classes:
 
 The castaway joins group `castaway` (used by the entity registry). Animal and item signals are listed in `docs/entities.md`.
 
-`castaway_dashed(position, direction)`, `castaway_step(position, surface)` every `step_interval` while running, `object_grabbed(kind)`, `object_used(kind, target_kind)`, `object_thrown(kind)`, `object_landed(kind, position, surface)`, `object_bonked("castaway", cause)`, `castaway_dizzy_started(cause)`, `castaway_dizzy_ended()`, `interact_verb_changed(verb, target_kind)`.
+`castaway_dashed(position, direction)`, `castaway_step(position, surface)` every `step_interval` while running, `object_grabbed(kind)`, `object_used(kind, target_kind)`, `object_thrown(kind)`, `object_landed(kind, position, surface)`, `object_bonked("castaway", cause)`, `castaway_dizzy_started(cause)`, `castaway_dizzy_ended()`, `interact_verb_changed(verb, target_kind)`. Right before `object_grabbed` it emits `fx_anchor_node(kind, thing)`, before `object_used` `fx_anchor_node(target_kind, target)` and before `object_thrown` and `object_bonked` `fx_anchor_node("castaway", self)` (feedback position, `docs/feedback.md`). `fx_squash` and `fx_recoil` on the castaway add a feedback squash and recoil on top of its own dash stretch and throw punch.
 
 ## Physics layers
 

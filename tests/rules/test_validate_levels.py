@@ -44,6 +44,7 @@ EXPECTED = {
     "invalid_before_time_beyond": "seconds: before_time seconds",
     "invalid_unknown_event_ref": "before_event must name an event",
     "invalid_unknown_entity": "tasks[0].conditions[0].entity: unknown entity kind dragon",
+    "invalid_unknown_music": "music: unknown music id disco_tune",
 }
 
 
@@ -127,6 +128,17 @@ class ValidateLevelsTest(unittest.TestCase):
         code, out = run("--root", root, "--i18n-dir", FIXTURE_I18N)
         self.assertEqual(code, 1, out)
         self.assertIn("edge_level.json: timer_seconds: 180 outside 200..300", out)
+
+    def test_event_warning_lead_is_checked(self):
+        rules, errors = validate_levels.load_rules(REPO)
+        self.assertEqual(errors, [])
+        self.assertEqual(rules["event_warning_lead_seconds"], 2.0)
+        root = temp_root()
+        path = root / "data" / "balance" / "rules.json"
+        rules["event_warning_lead_seconds"] = -1
+        path.write_text(json.dumps(rules), encoding="utf-8")
+        _rules, errors = validate_levels.load_rules(root)
+        self.assertTrue(any("event_warning_lead_seconds" in e for e in errors), errors)
 
     def test_reserved_ids_and_types(self):
         rules, errors = validate_levels.load_rules(REPO)

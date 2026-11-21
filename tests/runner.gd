@@ -8,6 +8,7 @@ extends SceneTree
 ## it may not name autoloads or classes that name autoloads.
 
 const ENV_SCRIPT := "res://tests/support/test_env.gd"
+const AUDIO_SETTLE_MSEC := 150
 
 var _current_file := ""
 var _results: Array = []
@@ -79,8 +80,17 @@ func _run_file(file: String, watchdog: float) -> Array:
 				printerr("FAIL %s::%s – %s" % [file, name, f])
 	if env_script != null:
 		env_script.call("reset")
+	_current_file = ""
+	await _settle_audio()
 	await process_frame
 	return [passed, failed]
+
+
+## Waits in real time so the audio mixer releases the playbacks stopped by the reset before the process quits.
+func _settle_audio() -> void:
+	var until := Time.get_ticks_msec() + AUDIO_SETTLE_MSEC
+	while Time.get_ticks_msec() < until:
+		await process_frame
 
 
 func _on_watchdog(file: String) -> void:

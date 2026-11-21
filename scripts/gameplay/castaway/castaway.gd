@@ -110,6 +110,7 @@ func bonk(cause: String, from_direction: Vector2) -> bool:
 	stars.visible = true
 	_emit_verb()
 	bonked.emit(cause)
+	EventBus.fx_anchor_node.emit(GROUP, self)
 	EventBus.object_bonked.emit("castaway", cause)
 	EventBus.castaway_dizzy_started.emit(cause)
 	return true
@@ -164,17 +165,21 @@ func _carry_out(step: CastawayStep) -> void:
 		CastawayLogic.VERB_GRAB:
 			var thing: Node2D = step.intent_target
 			thing.call("on_grabbed", self)
+			EventBus.fx_anchor_node.emit(_kind_of(thing), thing)
 			EventBus.object_grabbed.emit(_kind_of(thing))
 		CastawayLogic.VERB_USE:
 			var used: Node2D = step.intent_object
 			var target: Object = step.intent_target
 			used.call("on_released")
 			target.call("use", used)
+			if target is Node2D:
+				EventBus.fx_anchor_node.emit(String(target.get("target_kind")), target)
 			EventBus.object_used.emit(_kind_of(used), String(target.get("target_kind")))
 		CastawayLogic.VERB_THROW:
 			var thrown: Node2D = step.intent_object
 			ThrowFlight.launch(thrown, thrown.global_position, step.throw_destination, cfg, global_position)
 			visual.play_throw()
+			EventBus.fx_anchor_node.emit(GROUP, self)
 			EventBus.object_thrown.emit(_kind_of(thrown))
 
 
@@ -244,6 +249,16 @@ func _build_stars() -> void:
 		var star := template.duplicate() as Sprite2D
 		star.name = "Star%d" % (i + 1)
 		stars.add_child(star)
+
+
+## Feedback hook (duck-typed FeedbackDirector contract): a short squash and stretch of the castaway sprite.
+func fx_squash(sx: float, sy: float, seconds: float) -> void:
+	visual.fx_squash(sx, sy, seconds)
+
+
+## Feedback hook: a short visual recoil of the sprite by a world-space offset (gameplay knockback is separate).
+func fx_recoil(offset: Vector2, seconds: float) -> void:
+	visual.fx_recoil(offset, seconds)
 
 
 func _kind_of(obj: Object) -> String:

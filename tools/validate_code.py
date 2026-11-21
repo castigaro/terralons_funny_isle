@@ -4,8 +4,8 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
 
 (a) Comments are English and use the en dash: no em dash, no German umlaut or sharp s and not two or more
     distinct German function words in one comment (.gd comments, .py comments and docstrings).
-(b) No magic tuning numbers in gameplay scripts (scripts/gameplay, scripts/levels, scripts/feedback,
-    scripts/rules): every
+(b) No magic tuning numbers in gameplay and audio scripts (scripts/gameplay, scripts/levels, scripts/feedback,
+    scripts/rules, scripts/audio and scripts/autoload/audio.gd): every
     numeric literal other than 0, 0.5, 1 and 2 must come from the Balance autoload; a line may opt out with
     the comment "# balance-exempt: <reason>".
 (c) No networking: no Godot network classes in .gd code and no network modules imported by .py files.
@@ -30,6 +30,8 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
     allowed) and no ColorRect.new(), Polygon2D.new(), draw_rect(), draw_circle() or draw_polygon() in
     scripts/gameplay, scripts/levels and scripts/feedback. GradientTexture2D and NoiseTexture2D stay allowed.
     A .gd line may opt out of (i) and (j) with the comment "# art-exempt: <reason>".
+(k) Engine.time_scale is global (hit-stop): only scripts/feedback/feedback_director.gd may assign it; files below
+    tests/ are exempt (they restore it between tests).
 Comments and string literals never count as code.
 """
 import argparse
@@ -55,7 +57,8 @@ GERMAN_WORDS = {"und", "der", "die", "das", "nicht", "ist", "mit", "für", "ein"
                 "sind", "oder"}
 WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 
-MAGIC_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback", "scripts/rules")
+MAGIC_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback", "scripts/rules", "scripts/audio")
+MAGIC_FILES = ("scripts/autoload/audio.gd",)
 MAGIC_ALLOWED_FILES = set()
 MAGIC_ALLOWED_VALUES = {0.0, 0.5, 1.0, 2.0}
 NUMBER_RE = re.compile(r"(?<![\w.])(0x[0-9A-Fa-f_]+|0b[01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][-+]?\d+)?|\.\d+)")
@@ -90,6 +93,8 @@ HARM = {"damage", "damaged", "death", "dead", "die", "died", "dies", "kill", "ki
 HARM_PREFIXES = ("injur",)
 HARM_GD_DIRS = ("scripts", "scenes", "ui", "tests")
 HARM_DATA_FILES = ("data/animals.json", "data/items.json")
+TIME_SCALE_RE = re.compile(r"\bEngine\s*\.\s*time_scale\s*(?:[-+*/]?=)(?!=)")
+TIME_SCALE_WRITER = "scripts/feedback/feedback_director.gd"
 INPUT_SECTION_RE = re.compile(r"^\[input\]\n(.*?)(?=^\[|\Z)", re.M | re.S)
 INPUT_ACTION_RE = re.compile(r"^(\w+)=\{", re.M)
 
@@ -205,7 +210,8 @@ def _number_value(literal: str):
 
 def check_magic_numbers(root: Path) -> list:
     errors = []
-    for path in _files(root, MAGIC_DIRS, ".gd"):
+    extra = [Path(root) / rel for rel in MAGIC_FILES if (Path(root) / rel).is_file()]
+    for path in _files(root, MAGIC_DIRS, ".gd") + extra:
         rel = _rel(root, path)
         if rel in MAGIC_ALLOWED_FILES:
             continue
@@ -570,12 +576,27 @@ def check_placeholders(root: Path) -> list:
     return errors
 
 
+# --- (k) single writer of Engine.time_scale ----------------------------------------------------------
+
+def check_time_scale(root: Path) -> list:
+    errors = []
+    for path in code_files(root, ".gd"):
+        rel = _rel(root, path)
+        if rel == TIME_SCALE_WRITER or rel.startswith("tests/"):
+            continue
+        _nc, bare, _strings = gd_strip(_read(path))
+        for match in TIME_SCALE_RE.finditer(bare):
+            errors.append("%s:%d: Engine.time_scale may only be set by %s (hit-stop owner)"
+                          % (rel, _line(bare, match.start()), TIME_SCALE_WRITER))
+    return errors
+
+
 def validate(root: Path = REPO) -> list:
     """Return every code-rule error below root (empty = valid)."""
     root = Path(root)
     return (check_comments(root) + check_magic_numbers(root) + check_networking(root) + check_third_party(root)
             + check_survival(root) + check_rng(root) + check_meta(root) + check_uids(root) + check_turn_grid(root)
-            + check_harm(root) + check_fog_and_procedural(root) + check_placeholders(root))
+            + check_harm(root) + check_fog_and_procedural(root) + check_placeholders(root) + check_time_scale(root))
 
 
 def main(argv=None) -> int:

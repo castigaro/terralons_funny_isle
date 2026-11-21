@@ -12,6 +12,12 @@ var punch := 0.0
 var _time := 0.0
 var _bob_phase := 0.0
 var _tween: Tween
+var _squash := Vector2.ONE
+var _squash_left := 0.0
+var _squash_total := 0.0
+var _recoil := Vector2.ZERO
+var _recoil_left := 0.0
+var _recoil_total := 0.0
 
 @onready var body: Sprite2D = $Body
 @onready var hold_point: Marker2D = $HoldPoint
@@ -44,8 +50,8 @@ func apply_pose(pose: String, velocity: Vector2, facing: float, delta: float) ->
 		lean = deg_to_rad(cfg.dizzy_wobble_degrees) * sin(_time * cfg.dizzy_wobble_frequency)
 	position = Vector2(0.0, -hop)
 	body.rotation = lean
-	body.position = Vector2(punch, 0.0)
-	body.scale = Vector2.ONE * cfg.sprite_scale * stretch
+	body.position = Vector2(punch, 0.0) + _recoil_step(delta).rotated(-rotation)
+	body.scale = Vector2.ONE * cfg.sprite_scale * stretch * _squash_step(delta)
 
 
 func play_dash() -> void:
@@ -68,6 +74,8 @@ func reset_look(facing: float) -> void:
 		_tween = null
 	stretch = Vector2.ONE
 	punch = 0.0
+	_squash_left = 0.0
+	_recoil_left = 0.0
 	_bob_phase = 0.0
 	rotation = facing
 	position = Vector2.ZERO
@@ -75,6 +83,38 @@ func reset_look(facing: float) -> void:
 	body.rotation = 0.0
 	body.position = Vector2.ZERO
 	body.scale = Vector2.ONE * cfg.sprite_scale
+
+
+## Feedback squash and stretch that eases from (sx, sy) back to 1 within seconds (on top of the dash stretch).
+func fx_squash(sx: float, sy: float, seconds: float) -> void:
+	if seconds > 0.0:
+		_squash = Vector2(sx, sy)
+		_squash_total = seconds
+		_squash_left = seconds
+
+
+## Feedback recoil by a world-space offset that eases back within seconds (the node itself rotates with facing).
+func fx_recoil(offset: Vector2, seconds: float) -> void:
+	if seconds > 0.0:
+		_recoil = offset
+		_recoil_total = seconds
+		_recoil_left = seconds
+
+
+func _squash_step(delta: float) -> Vector2:
+	if _squash_left <= 0.0:
+		return Vector2.ONE
+	_squash_left = maxf(0.0, _squash_left - delta)
+	var share := _squash_left / _squash_total
+	return Vector2.ONE.lerp(_squash, share * share)
+
+
+func _recoil_step(delta: float) -> Vector2:
+	if _recoil_left <= 0.0:
+		return Vector2.ZERO
+	_recoil_left = maxf(0.0, _recoil_left - delta)
+	var share := _recoil_left / _recoil_total
+	return _recoil * share * share
 
 
 func _restart_tween() -> void:

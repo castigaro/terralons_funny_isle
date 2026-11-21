@@ -101,7 +101,7 @@ Balance (`data/balance/level.json`, namespace `level`): `camera_follow_speed` 7,
 
 - `physics/common/physics_interpolation = true`, `physics_ticks_per_second = 60`, `physics_jitter_fix = 0`.
 - On (inherit): bodies, carried objects, `ThrowFlight`, the castaway including its visual (posed in `_physics_process`, tweens on the physics clock) and the camera.
-- Off: every `CanvasLayer` (overlay, cue, error panel, later the HUD) and nodes animated only in `_process` (`RespawnPuff`). Animals and items are posed in `_physics_process` (visual, stars, emote, item hop tween on the physics clock), so they inherit; `relocate_to` and `reset_to_home` call `reset_physics_interpolation()`.
+- Off: every `CanvasLayer` (overlay, cue, error panel, later the HUD) and nodes animated only in `_process` (the `FeedbackDirector` effect layers). Animals and items are posed in `_physics_process` (visual, stars, item hop tween on the physics clock), so they inherit; `relocate_to` and `reset_to_home` call `reset_physics_interpolation()`.
 
 ## Painting a layout
 

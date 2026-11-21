@@ -48,10 +48,12 @@ var events: Array[Dictionary] = []
 
 
 ## Returns the context for parse(): balance section "rules", event types, i18n messages {key: {en, de}} and the
-## known entity kinds {kind: true} (animals and items); with no kinds the entity names are not checked.
+## known entity kinds {kind: true} (animals and items); with no kinds the entity names are not checked. music_ids
+## lists the music ids of data/audio.json (AudioMap.music_ids()); empty means the music id is not checked.
 static func make_context(rules: Dictionary, event_types: Dictionary, messages: Dictionary,
-		entity_kinds: Dictionary = {}) -> Dictionary:
-	return {"rules": rules, "event_types": event_types, "messages": messages, "entity_kinds": entity_kinds}
+		entity_kinds: Dictionary = {}, music_ids: Array = []) -> Dictionary:
+	return {"rules": rules, "event_types": event_types, "messages": messages, "entity_kinds": entity_kinds,
+			"music_ids": music_ids}
 
 
 ## Loads data/events.json: returns {types: Dictionary, errors: Array}.
@@ -133,6 +135,9 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 	for key in ["theme", "music"]:
 		if data.has(key) and not _is_name(data[key]):
 			err.call(key, "must match %s" % ID_PATTERN)
+	var music_ids: Array = ctx.get("music_ids", [])
+	if not music_ids.is_empty() and _is_name(data.get("music")) and not music_ids.has(data["music"]):
+		err.call("music", "unknown music id %s (not in the music section of data/audio.json)" % data["music"])
 	if data.has("seed") and not data["seed"] is int:
 		err.call("seed", "must be an integer")
 	var timer: Variant = data.get("timer_seconds")

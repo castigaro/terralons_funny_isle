@@ -1,11 +1,9 @@
 class_name AnimalVisual
 extends Node2D
 ## Animal look: the round animal sprite with waddle tilt, hops, a wiggle while carried, a bob while waiting for the
-## respawn, emotes on reactions and the flip towards the movement. Only the child sprites are animated, so a
-## ThrowFlight may lift and squash this node freely. Speed lines and dizzy stars are siblings driven from here.
-
-const EMOTE_ALERT := preload("res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png")
-const EMOTE_HEART := preload("res://assets/graphics/emotes/PNG/Vector/Style 1/emote_heart.png")
+## respawn and the flip towards the movement. Only the child sprites are animated, so a ThrowFlight may lift and
+## squash this node freely. Speed lines and dizzy stars are siblings driven from here. Emotes, puffs and popups
+## come from the level's FeedbackDirector; its squash and recoil requests are composed into apply().
 const WALKING := [AnimalBrain.State.WANDER, AnimalBrain.State.FLEE, AnimalBrain.State.PANIC,
 		AnimalBrain.State.LURED, AnimalBrain.State.SETTLED]
 
@@ -17,13 +15,18 @@ var _time := 0.0
 var _phase := 0.0
 var _hop_left := 0.0
 var _hop_wait := 0.0
-var _emote_left := 0.0
+var _body_scale := Vector2.ONE
+var _squash := Vector2.ONE
+var _squash_left := 0.0
+var _squash_total := 0.0
+var _recoil := Vector2.ZERO
+var _recoil_left := 0.0
+var _recoil_total := 0.0
 var _last_state: int = -1
 var _speed_lines: CPUParticles2D
 var _stars: DizzyStars
 
 @onready var body: Sprite2D = $Body
-@onready var emote: Sprite2D = $Emote
 
 
 ## Sets the kind's sprite and the sibling effect nodes.
@@ -34,10 +37,9 @@ func setup(config: EntityConfig, kind_def: Dictionary, speed_lines: CPUParticles
 	var sprite_path := String(kind_def.get("sprite", ""))
 	if sprite_path != "" and ResourceLoader.exists(sprite_path):
 		body.texture = load(sprite_path)
-	body.scale = Vector2.ONE * float(kind_def.get("sprite_scale", 1.0))
+	_body_scale = Vector2.ONE * float(kind_def.get("sprite_scale", 1.0))
+	body.scale = _body_scale
 	max_speed = maxf(float(kind_def.get("speed", 1.0)) * float(kind_def.get("flee_speed_factor", 1.0)), 1.0)
-	emote.scale = Vector2.ONE * cfg.emote_scale
-	emote.position = Vector2(0.0, -cfg.emote_height)
 	_speed_lines.amount = maxi(1, int(cfg.speed_line_amount))
 	_stars.setup(cfg)
 	reset_look()
@@ -48,14 +50,15 @@ func reset_look() -> void:
 	_phase = 0.0
 	_hop_left = 0.0
 	_hop_wait = cfg.idle_hop_interval
-	_emote_left = 0.0
+	_squash_left = 0.0
+	_recoil_left = 0.0
 	_last_state = -1
 	waddle = 0.0
 	hop_offset = 0.0
 	body.rotation = 0.0
 	body.position = Vector2.ZERO
 	body.flip_h = false
-	emote.visible = false
+	body.scale = _body_scale
 	_speed_lines.emitting = false
 	_stars.show_stars(false)
 
@@ -79,7 +82,8 @@ func apply(state: int, velocity: Vector2, facing_x: float, delta: float) -> void
 	if state == AnimalBrain.State.RESPAWNING:
 		hop_offset = (sin(_time * cfg.wiggle_frequency / 2.0) + 1.0) * cfg.hop_height / 2.0
 	body.rotation = waddle
-	body.position = Vector2(0.0, -hop_offset)
+	body.position = Vector2(0.0, -hop_offset) + _fx_recoil_step(delta)
+	body.scale = _body_scale * _fx_squash_step(delta)
 	body.flip_h = facing_x < 0.0
 	var fleeing := state == AnimalBrain.State.FLEE or state == AnimalBrain.State.PANIC
 	_speed_lines.emitting = fleeing and velocity != Vector2.ZERO
@@ -87,27 +91,49 @@ func apply(state: int, velocity: Vector2, facing_x: float, delta: float) -> void
 		_speed_lines.direction = -velocity.normalized()
 	_stars.show_stars(state == AnimalBrain.State.BONKED)
 	_stars.tick(delta)
-	if _emote_left > 0.0:
-		_emote_left = maxf(0.0, _emote_left - delta)
-		emote.visible = _emote_left > 0.0
 
 
 func _enter(state: int) -> void:
-	match state:
-		AnimalBrain.State.FLEE, AnimalBrain.State.PANIC:
-			_show_emote(EMOTE_ALERT)
-			_hop_left = cfg.hop_seconds
-		AnimalBrain.State.LURED:
-			_show_emote(EMOTE_HEART)
-		AnimalBrain.State.BONKED:
-			emote.visible = false
-			_emote_left = 0.0
+	if state == AnimalBrain.State.FLEE or state == AnimalBrain.State.PANIC:
+		_hop_left = cfg.hop_seconds
 
 
-func _show_emote(texture: Texture2D) -> void:
-	emote.texture = texture
-	emote.visible = true
-	_emote_left = cfg.emote_seconds
+## Starts a squash and stretch that eases from (sx, sy) back to the normal size within seconds.
+func fx_squash(sx: float, sy: float, seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	_squash = Vector2(sx, sy)
+	_squash_total = seconds
+	_squash_left = seconds
+
+
+## Starts a visual recoil that eases from offset back to the rest position within seconds.
+func fx_recoil(offset: Vector2, seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	_recoil = offset
+	_recoil_total = seconds
+	_recoil_left = seconds
+
+
+func fx_active() -> bool:
+	return _squash_left > 0.0 or _recoil_left > 0.0
+
+
+func _fx_squash_step(delta: float) -> Vector2:
+	if _squash_left <= 0.0:
+		return Vector2.ONE
+	_squash_left = maxf(0.0, _squash_left - delta)
+	var share := _squash_left / _squash_total
+	return Vector2.ONE.lerp(_squash, share * share)
+
+
+func _fx_recoil_step(delta: float) -> Vector2:
+	if _recoil_left <= 0.0:
+		return Vector2.ZERO
+	_recoil_left = maxf(0.0, _recoil_left - delta)
+	var share := _recoil_left / _recoil_total
+	return _recoil * share * share
 
 
 func _update_hop(state: int, speed01: float, delta: float) -> void:
@@ -129,6 +155,3 @@ func _update_hop(state: int, speed01: float, delta: float) -> void:
 		_hop_wait = interval
 		_hop_left = cfg.hop_seconds
 
-
-func is_emote_visible() -> bool:
-	return emote.visible

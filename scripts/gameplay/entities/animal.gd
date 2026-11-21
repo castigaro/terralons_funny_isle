@@ -131,6 +131,7 @@ func _move(intent: Dictionary, delta: float) -> void:
 
 func _emit(intent: Dictionary) -> void:
 	for name: String in intent["emits"]:
+		EventBus.fx_anchor_node.emit(kind, self)
 		match name:
 			AnimalBrain.EMIT_FLED:
 				EventBus.animal_fled.emit(kind)
@@ -148,11 +149,8 @@ func _present(intent: Dictionary, delta: float) -> void:
 
 
 func _respawn(reason: String) -> void:
-	var lost_at := global_position
+	EventBus.fx_anchor.emit(kind, global_position)
 	EventBus.entity_lost.emit(kind, reason)
-	var parent := get_parent() if get_parent() != null else self
-	RespawnPuff.spawn(parent, lost_at, cfg)
-	RespawnPuff.spawn(parent, home, cfg)
 	reset_to_home()
 	EventBus.entity_respawned.emit(kind, home)
 
@@ -189,6 +187,7 @@ func on_grabbed(by: Node2D) -> void:
 	collision_mask = 0
 	brain.grab()
 	_guard.reset()
+	EventBus.fx_anchor_node.emit(kind, self)
 	EventBus.animal_caught.emit(kind)
 
 
@@ -273,6 +272,16 @@ func _cancel_flight() -> void:
 	shadow.scale = _shadow_base * cfg.shadow_scale * body_radius() / float(shadow.texture.get_width()) * 2.0
 	visual.position = Vector2.ZERO
 	visual.scale = Vector2.ONE
+
+
+## Feedback hook (duck-typed FeedbackDirector contract): a short squash and stretch of the body sprite.
+func fx_squash(sx: float, sy: float, seconds: float) -> void:
+	visual.fx_squash(sx, sy, seconds)
+
+
+## Feedback hook: a short visual recoil of the body sprite by offset (gameplay knockback is separate).
+func fx_recoil(offset: Vector2, seconds: float) -> void:
+	visual.fx_recoil(offset, seconds)
 
 
 func get_guard() -> RespawnGuard:

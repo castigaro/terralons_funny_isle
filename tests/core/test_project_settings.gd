@@ -1,7 +1,7 @@
 extends TestCase
 ## Project settings required by the foundation item (viewport, window, physics, autoloads).
 
-const EXPECTED_AUTOLOADS := ["Balance", "DataDir", "EventBus", "I18n"]
+const EXPECTED_AUTOLOADS := ["Audio", "Balance", "DataDir", "EventBus", "I18n"]
 const FORBIDDEN_AUTOLOADS := ["Game", "Features", "Capabilities", "Actions"]
 
 
@@ -123,8 +123,9 @@ func test_entity_interpolation_modes() -> void:
 				check_ne((child as CanvasItem).physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF,
 						"%s/%s follows the physics-animated body" % [path, child.name])
 		node.queue_free()
-	var cfg := EntityConfig.from_balance()
-	var puff := RespawnPuff.spawn(root(), Vector2(100, 100), cfg)
+	var director := FeedbackDirector.new()
+	add_node(director)
 	await frames(1)
-	check_eq(puff.physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF, "respawn puff (_process) not interpolated")
-	puff.queue_free()
+	for layer: Node in [director.ground_layer, director.fx_layer, director.popup_layer]:
+		check(not (layer as CanvasItem).is_physics_interpolated(), "feedback %s (_process) not interpolated" % layer.name)
+	director.queue_free()

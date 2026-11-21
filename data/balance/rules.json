@@ -7,5 +7,6 @@
 	"events_min": 2,
 	"timer_warning_seconds": 10,
 	"three_star_time_share": 0.25,
-	"auto_finish_when_all_done": true
+	"auto_finish_when_all_done": true,
+	"event_warning_lead_seconds": 2.0
 }

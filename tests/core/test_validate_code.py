@@ -41,6 +41,10 @@ class ValidateCodeFailTest(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn(message, out)
 
+    def test_time_scale_outside_director(self):
+        self.assert_fails({"scripts/gameplay/x.gd": gd("func f() -> void:\n\tEngine.time_scale = 1.0")},
+                          "Engine.time_scale may only be set")
+
     def test_em_dash_gd_comment(self):
         self.assert_fails({"scripts/a.gd": gd("# a %s b" % EM_DASH)}, "em dash")
 
@@ -58,6 +62,12 @@ class ValidateCodeFailTest(unittest.TestCase):
 
     def test_magic_number_const(self):
         self.assert_fails({"scripts/levels/y.gd": gd("const SPEED := 420")}, "magic number 420")
+
+    def test_magic_number_audio(self):
+        self.assert_fails({"scripts/audio/x.gd": gd("const DUCK_DB := -12.0")}, "magic number 12.0")
+
+    def test_magic_number_audio_autoload(self):
+        self.assert_fails({"scripts/autoload/audio.gd": gd("var gap := 0.15")}, "magic number 0.15")
 
     def test_http_request(self):
         self.assert_fails({"scripts/a.gd": gd("var r := HTTPRequest.new()")}, "networking class HTTPRequest")
@@ -166,6 +176,13 @@ class ValidateCodePassTest(unittest.TestCase):
     def test_harm_allowed_cases(self):
         self.assert_passes({"scripts/a.gd": gd('var t := create_tween()\nfunc f() -> void:\n\tt.kill()\n'
                                                'var is_deadline := 0\nvar s := "damage"\n# no damage here')})
+
+    def test_time_scale_writer_and_tests_allowed(self):
+        self.assert_passes({
+            "scripts/feedback/feedback_director.gd": gd("func f() -> void:\n\tEngine.time_scale = 0.5"),
+            "tests/x.gd": gd("func f() -> void:\n\tEngine.time_scale = 1.0"),
+            "scripts/b.gd": gd("func f() -> bool:\n\treturn Engine.time_scale == 1.0"),
+        })
 
     def test_real_repo_passes(self):
         code, out = run(common.REPO)

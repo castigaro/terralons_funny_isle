@@ -3,7 +3,7 @@
 	"id": "valid_sample_level",
 	"title_key": "fixture.sample_title",
 	"theme": "palm_beach",
-	"music": "fixture_tune",
+	"music": "level_1",
 	"seed": 5150,
 	"timer_seconds": 180,
 	"tasks": [
