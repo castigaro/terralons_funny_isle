@@ -1,0 +1,14 @@
+{
+	"id": "fx_level_2",
+	"music": "level_2",
+	"events": [
+		{
+			"id": "fx_rain",
+			"type": "rain_panic"
+		},
+		{
+			"id": "fx_wave",
+			"type": "wave_wash"
+		}
+	]
+}

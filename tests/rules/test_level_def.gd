@@ -9,7 +9,8 @@ const FIXTURES := "res://tests/fixtures/levels"
 func _ctx() -> Dictionary:
 	var messages: Dictionary = I18nScript.parse_dir("res://i18n")["messages"]
 	messages.merge(I18nScript.parse_dir(FIXTURES.path_join("i18n"))["messages"])
-	return LevelDef.make_context(H.rules(), H.event_types(), messages, EntityDefs.kinds())
+	return LevelDef.make_context(H.rules(), H.event_types(), messages, EntityDefs.kinds(),
+			AudioMap.load_file().music_ids())
 
 
 func test_event_catalogue_loads() -> void:
@@ -100,3 +101,15 @@ func _inline_ctx(data: Dictionary, kinds: Dictionary) -> Dictionary:
 		for key in ["hint_key", "fail_key"]:
 			messages[task[key]] = {"en": "x", "de": "x"}
 	return LevelDef.make_context(H.rules(), H.event_types(), messages, kinds)
+
+
+func test_music_id_checked_against_audio_map() -> void:
+	var ctx := _ctx()
+	var bad := LevelDef.load_file(FIXTURES.path_join("invalid_unknown_music.json"), ctx)
+	check_false(bad["ok"], "unknown music accepted")
+	check(str(bad["errors"]).contains("music: unknown music id disco_tune"), str(bad["errors"]))
+	var good := LevelDef.load_file(FIXTURES.path_join("valid_basic.json"), ctx)
+	check_true(good["ok"], str(good["errors"]))
+	var data := H.level_data()
+	data["music"] = "disco_tune"
+	check(H.make_def(data) != null, "without music ids the music id is not checked")
