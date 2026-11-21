@@ -10,6 +10,7 @@
 		{
 			"id": "fx_reach_a",
 			"required": true,
+			"title_key": "fixture.reach_a_title",
 			"conditions": [
 				{
 					"type": "in_zone",
@@ -23,6 +24,7 @@
 		{
 			"id": "fx_reach_b",
 			"required": false,
+			"title_key": "fixture.reach_b_title",
 			"conditions": [
 				{
 					"type": "in_zone",
@@ -36,6 +38,7 @@
 		{
 			"id": "fx_grab_coconut",
 			"required": false,
+			"title_key": "fixture.grab_coconut_title",
 			"conditions": [
 				{
 					"type": "held",
@@ -48,6 +51,7 @@
 		{
 			"id": "fx_chicken_a",
 			"required": false,
+			"title_key": "fixture.chicken_a_title",
 			"conditions": [
 				{
 					"type": "in_zone",
@@ -80,6 +84,26 @@
 			"params": {
 				"strength": 1.0
 			}
+		}
+	],
+	"prompts": [
+		{
+			"id": "pr_move",
+			"anchor": "player",
+			"action": "move",
+			"text_key": "fixture.prompt_move"
+		},
+		{
+			"id": "pr_grab_chicken",
+			"anchor": "entity:chicken_1",
+			"action": "grab",
+			"text_key": "fixture.prompt_grab"
+		},
+		{
+			"id": "pr_use_zone",
+			"anchor": "zone:zone_a",
+			"action": "use",
+			"text_key": "fixture.prompt_use"
 		}
 	]
 }

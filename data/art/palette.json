@@ -10,6 +10,7 @@
 		"ui_panel": "#1d2733",
 		"ui_text": "#f7f3e8",
 		"ui_accent": "#ffc93c",
+		"ui_warning": "#ff6b4a",
 		"shadow": "#1e3b3f"
 	},
 	"water_tint": "water",
