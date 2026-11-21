@@ -23,7 +23,7 @@ GDScript tests run with `--fixed-fps 60` (deterministic physics ticks) and exten
 
 Order: EventBus, DataDir, Balance, I18n. There is no plugin or feature registry and no `features/` folder.
 
-- **EventBus** (`scripts/autoload/event_bus.gd`): typed signals only – `level_started`, `level_timer_tick`, `task_completed`, `all_required_done`, `level_won`, `level_lost`, `event_triggered`, `object_grabbed`, `object_thrown`, `object_bonked`, `settings_changed`, `task_progress`, `timer_warning`, `event_ended`, plus the castaway signals listed in `docs/castaway.md` and the animal and item signals in `docs/entities.md`. Contract: signals are only added, never renamed or retyped; no `register()`, no lookup.
+- **EventBus** (`scripts/autoload/event_bus.gd`): typed signals only – `level_started`, `level_timer_tick`, `task_completed`, `all_required_done`, `level_won`, `level_lost`, `event_triggered`, `object_grabbed`, `object_thrown`, `object_bonked`, `settings_changed`, `task_progress`, `timer_warning`, `event_ended`, plus the castaway signals listed in `docs/castaway.md`, the animal and item signals in `docs/entities.md` and the feedback signals `event_warning`, `fx_anchor` and `fx_anchor_node` (`docs/feedback.md`). Contract: signals are only added, never renamed or retyped; no `register()`, no lookup.
 - **DataDir** (`scripts/autoload/data_dir.gd`): folder for settings and progress. `-- --data-dir=<path>` wins over `TFI_DATA_DIR`, default `user://`. API: `path()`, `file(rel)`, `ensure_dir(rel)`; statics `resolve(cli, env)`, `current_dir()`, `globalize(dir)` (usable from `--script` entries via `preload`).
 - **Balance** (`scripts/autoload/balance.gd`): every tuning number lives in `data/balance/<ns>.json` and is read by namespace (file stem): `get_int`, `get_float`, `get_bool`, `get_value`, `get_section`, `has_value`. Tests override single values with `set_override(ns, key, value)`/`set_overrides`; `clear_overrides()` restores the files. Integral JSON floats read as ints.
 - **I18n** (`scripts/autoload/i18n.gd`): loads `i18n/*.csv` (`key,en,de`, UTF-8 without BOM) into the TranslationServer; English is the default. `set_locale("de")` switches live and emits `locale_changed`; `t(key, args)` fills `{placeholders}`. Controls show keys directly (`text = "core.title"`) and auto-translate.
@@ -45,10 +45,12 @@ Helpers: `CliArgs` (`scripts/core/cli_args.gd`) parses user arguments; `SeededRn
   - no global randomness outside `SeededRng`, no `get_meta(key, null)`, every tracked `.gd` has a tracked `.gd.uid`.
   - no turn-based, grid or inventory mechanics: no `action_point(s)`, `end_turn`, `turn_count`, `turn_based`, `snap_to_grid`, `tile_step`, `grid_move` and no inventory/recipe/crafting in identifiers and node names below `scripts/` and `scenes/` or in input actions.
   - no harm: no damage, death, dead, die, kill, blood, hurt, wound, injur… or hp in identifiers, node names, balance keys, animal/item data keys or i18n keys (Tween `.kill()` stays allowed).
+  - `Engine.time_scale` is assigned only by `scripts/feedback/feedback_director.gd` (hit-stop owner; tests are exempt).
 - `tools/validate_assets.py`: every file below `assets/` lies in a pack listed in `assets/SOURCES.md` (pack, author, licence, source per row); every media file referenced by a `.tscn`, `.tres`, `.gd`, `project.godot` or `data/**/*.json` lies in such a pack, every referenced file exists with the exact letter case, and no used asset name matches the deny list `data/assets/deny_list.json` (weapons, violence, scary content). Unused imported files and imported deny-list names are listed as warnings. Format placeholders (`%s`, `{name}`) make a reference a pattern.
 - `tools/validate_basics.py`: required top-level files exist.
 - `tools/validate_entities.py`: `data/animals.json` and `data/items.json` – structure, lure items, sprites (exist, imported, not deny-listed, at least 24 px at 720p), EN/DE names, carry weights and the reaction time limit (see `docs/entities.md`).
 - `tools/validate_levels.py`: `data/events.json` and every `data/levels/*.json` against the level schema, with limits from `data/balance/rules.json` (see `docs/rules.md`).
+- `tools/validate_feedback.py`: `data/feedback.json` and `data/balance/feedback.json` – every EventBus signal mapped or listed in `no_visual`, required visuals, event warnings, strength keys, sound words (EN/DE, at most 8 characters plus "!"), assets (exist, imported, not deny-listed, folder in `docs/asset_map.md`), family-friendly materials and the balance limits (hit-stop ≤ 80 ms, flash alpha ≤ 0.4, at most 3 flashes per second, reduce factor ≤ 25 %; see `docs/feedback.md`).
 
 ## Assets
 
@@ -63,5 +65,7 @@ The CC0 packs live in `assets/` (copied unchanged from the spec folder), with so
 ## Docs
 
 Vision, backlog, requirements, market and personas are in `docs/process/`.
+
+`docs/feedback.md` describes the slapstick feedback director (effects, data schema, anchors, caps, hit-stop and the reduce toggle).
 
 `docs/rules.md` describes the data-driven rules engine in `scripts/rules/`: level schema, conditions, events, snapshot contract, tick order, signals and stars.

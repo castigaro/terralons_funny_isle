@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/gameplay/entities/animal.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://scenes/castaway/soft_shadow.tres" id="2_shadow"]
@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" path="res://assets/graphics/animals/PNG/Round (outline)/chicken.png" id="4_body"]
 [ext_resource type="Script" path="res://scripts/gameplay/entities/dizzy_stars.gd" id="5_stars"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/trace_01.png" id="6_trace"]
-[ext_resource type="Texture2D" path="res://assets/graphics/emotes/PNG/Vector/Style 1/emote_exclamation.png" id="7_emote"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
 radius = 24.0
@@ -57,11 +56,6 @@ script = ExtResource("3_visual")
 [node name="Body" type="Sprite2D" parent="Visual"]
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("4_body")
-
-[node name="Emote" type="Sprite2D" parent="Visual"]
-visible = false
-position = Vector2(0, -64)
-texture = ExtResource("7_emote")
 
 [node name="Stars" type="Node2D" parent="."]
 visible = false

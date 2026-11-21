@@ -48,7 +48,7 @@ func test_waddle_hop_flip_and_effects() -> void:
 	a.panic(1.0)
 	await physics_frames(3)
 	check(a.speed_lines.emitting, "speed lines while panicking")
-	check(a.visual.is_emote_visible(), "alert emote")
+	check(director.active_count("emote") > 0, "alert emote from the feedback director")
 	a.brain.panic_left = 0.0
 	a.bonk(Vector2.RIGHT, "coconut")
 	await physics_frames(2)

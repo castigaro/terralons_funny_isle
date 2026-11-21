@@ -119,7 +119,7 @@ session.tick(delta, snapshot)        # every physics frame
 Ticks are ignored unless the state is `RUNNING` or `REQUIRED_DONE`. That is how the timer stops during pause and menus (R-26).
 
 1. **Timer:** `elapsed += delta`. Emits `level_timer_tick(seconds_left)` when the whole second changes, and `timer_warning(level_id, seconds_left)` once per attempt.
-2. **Events:** every schedule point with time ≤ elapsed fires in time order (`event_triggered`, `event_ended`). At equal times a trigger comes before an end, then data order applies. Triggering depends on accumulated time only, so it is frame-rate independent.
+2. **Events:** every schedule point with time ≤ elapsed fires in time order (`event_warning`, `event_triggered`, `event_ended`). `event_warning(event_id, event_type, seconds_until)` comes `event_warning_lead_seconds` (rules.json) before the start, clamped at 0. At equal times a warning comes before a trigger and a trigger before an end, then data order applies. Triggering depends on accumulated time only, so it is frame-rate independent.
 3. **Tasks:** emits `task_progress(level_id, task_id, current, target)` on change, then `task_completed(level_id, task_id)`. `task_completed` is the "task done" signal.
 4. **Win and loss:**
    - When all required tasks are done, `all_required_done(level_id)` fires and the state becomes `REQUIRED_DONE`. Play continues (D-3).

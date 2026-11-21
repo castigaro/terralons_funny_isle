@@ -12,9 +12,8 @@ const KEYS := [
 	"wander_retarget_seconds", "panic_turn_interval", "lure_arrive_distance", "settle_margin",
 	"corner_escape_degrees", "waddle_degrees", "waddle_frequency", "hop_height", "hop_seconds",
 	"idle_hop_interval", "panic_hop_interval", "wiggle_degrees", "wiggle_frequency", "star_count", "star_scale",
-	"star_orbit_radius", "star_orbit_speed", "star_height", "speed_line_amount", "emote_seconds", "emote_scale",
-	"emote_height", "shadow_scale", "item_bob_amplitude", "item_bob_frequency", "puff_seconds", "puff_scale",
-	"puff_frames",
+	"star_orbit_radius", "star_orbit_speed", "star_height", "speed_line_amount", "shadow_scale",
+	"item_bob_amplitude", "item_bob_frequency",
 ]
 
 var respawn_delay := 0.0
@@ -60,15 +59,9 @@ var star_orbit_radius := 0.0
 var star_orbit_speed := 0.0
 var star_height := 0.0
 var speed_line_amount := 0.0
-var emote_seconds := 0.0
-var emote_scale := 0.0
-var emote_height := 0.0
 var shadow_scale := 0.0
 var item_bob_amplitude := 0.0
 var item_bob_frequency := 0.0
-var puff_seconds := 0.0
-var puff_scale := 0.0
-var puff_frames := 0.0
 ## Keys that were missing in the source dictionary.
 var missing: Array = []
 

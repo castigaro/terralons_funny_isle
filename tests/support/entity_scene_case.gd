@@ -1,12 +1,14 @@
 extends TestCase
 ## Base for animal and item scene tests: builds the entity arena (optionally with only some kinds), scripts the
-## castaway input per tick and records the EventBus signals.
+## castaway input per tick and records the EventBus signals. A FeedbackDirector runs inside the arena like in a
+## level, with hit-stop scaled to 0 so the frame-exact BI-4 timings stay valid.
 
 const ARENA_SCENE := preload("res://tests/scenes/entity_arena.tscn")
 const SignalRecorder := preload("res://tests/support/signal_recorder.gd")
 const DT := 1.0 / 60.0
 
 var arena: Node2D
+var director: FeedbackDirector
 var castaway: Castaway
 var registry: EntityRegistry
 var recorder: RefCounted
@@ -32,6 +34,10 @@ func build(animal_kinds: Variant = null, item_kinds: Variant = null, input: Call
 	arena.animal_kinds = animal_kinds
 	arena.item_kinds = item_kinds
 	arena.castaway_input = input if input.is_valid() else _scripted_input
+	Balance.set_override("feedback", "hitstop_scale", 0.0)
+	director = FeedbackDirector.new()
+	director.name = "FeedbackDirector"
+	arena.add_child(director)
 	add_node(arena)
 	castaway = arena.castaway
 	registry = arena.registry
@@ -108,5 +114,6 @@ func events(name: String) -> Array:
 	return recorder.filtered([name])
 
 
+## Smoke puffs started by the feedback director since the arena was built.
 func puff_count() -> int:
-	return tree().get_nodes_in_group(RespawnPuff.GROUP).size()
+	return director.played("puff")

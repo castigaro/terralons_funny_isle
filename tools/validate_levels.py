@@ -23,6 +23,7 @@ EVENTS_FILE = "data/events.json"
 LEVELS_DIR = "data/levels"
 ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 PLAYER = "player"
+WARNING_LEAD_KEY = "event_warning_lead_seconds"
 RULE_KEYS = ("timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max", "events_min")
 
 LEVEL_REQUIRED = ("format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
@@ -90,6 +91,9 @@ def load_rules(root: Path):
         return {}, ["%s: top level must be an object" % RULES_FILE]
     errors = ["%s: %s: missing or not an integer" % (RULES_FILE, key) for key in RULE_KEYS
               if not is_int(data.get(key))]
+    lead = data.get(WARNING_LEAD_KEY, 0)
+    if isinstance(lead, bool) or not isinstance(lead, (int, float)) or lead < 0:
+        errors.append("%s: %s: must be a number >= 0" % (RULES_FILE, WARNING_LEAD_KEY))
     return data, errors
 
 

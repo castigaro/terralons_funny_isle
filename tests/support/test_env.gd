@@ -1,5 +1,6 @@
 extends RefCounted
 ## Resets the global environment between tests (loaded by tests/runner.gd); duck-typed so it names no autoload.
+## Also restores Engine.time_scale in case a hit-stop test failed half-way.
 
 const RELEASED_ACTIONS := ["move_up", "move_down", "move_left", "move_right", "dash", "interact"]
 
@@ -9,6 +10,7 @@ static func reset() -> void:
 	if tree == null:
 		return
 	tree.paused = false
+	Engine.time_scale = 1.0
 	for action in RELEASED_ACTIONS:
 		if InputMap.has_action(action):
 			Input.action_release(action)
