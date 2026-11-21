@@ -1,0 +1,11 @@
+{
+	"schema_version": 1,
+	"timer_min_seconds": 180,
+	"timer_max_seconds": 300,
+	"tasks_min": 3,
+	"tasks_max": 5,
+	"events_min": 2,
+	"timer_warning_seconds": 10,
+	"three_star_time_share": 0.25,
+	"auto_finish_when_all_done": true
+}

@@ -23,7 +23,7 @@ GDScript tests extend `TestCase` (`check`, `check_eq`, `check_has`, `fail`, `add
 
 Order: EventBus, DataDir, Balance, I18n. There is no plugin or feature registry and no `features/` folder.
 
-- **EventBus** (`scripts/autoload/event_bus.gd`): typed signals only – `level_started`, `level_timer_tick`, `task_completed`, `all_required_done`, `level_won`, `level_lost`, `event_triggered`, `object_grabbed`, `object_thrown`, `object_bonked`, `settings_changed`. Contract: signals are only added, never renamed or retyped; no `register()`, no lookup.
+- **EventBus** (`scripts/autoload/event_bus.gd`): typed signals only – `level_started`, `level_timer_tick`, `task_completed`, `all_required_done`, `level_won`, `level_lost`, `event_triggered`, `object_grabbed`, `object_thrown`, `object_bonked`, `settings_changed`, `task_progress`, `timer_warning`, `event_ended`. Contract: signals are only added, never renamed or retyped; no `register()`, no lookup.
 - **DataDir** (`scripts/autoload/data_dir.gd`): folder for settings and progress. `-- --data-dir=<path>` wins over `TFI_DATA_DIR`, default `user://`. API: `path()`, `file(rel)`, `ensure_dir(rel)`; statics `resolve(cli, env)`, `current_dir()`, `globalize(dir)` (usable from `--script` entries via `preload`).
 - **Balance** (`scripts/autoload/balance.gd`): every tuning number lives in `data/balance/<ns>.json` and is read by namespace (file stem): `get_int`, `get_float`, `get_bool`, `get_value`, `get_section`, `has_value`. Tests override single values with `set_override(ns, key, value)`/`set_overrides`; `clear_overrides()` restores the files. Integral JSON floats read as ints.
 - **I18n** (`scripts/autoload/i18n.gd`): loads `i18n/*.csv` (`key,en,de`, UTF-8 without BOM) into the TranslationServer; English is the default. `set_locale("de")` switches live and emits `locale_changed`; `t(key, args)` fills `{placeholders}`. Controls show keys directly (`text = "core.title"`) and auto-translate.
@@ -35,12 +35,13 @@ Helpers: `CliArgs` (`scripts/core/cli_args.gd`) parses user arguments; `SeededRn
 - `tools/validate_i18n.py`: CSV format (BOM, header, 3 columns, key prefix = file stem, duplicates, empty EN/DE, equal placeholders) and code usage: unknown keys in `tr()`/`I18n.t()`, unknown key-like literals, hard-coded literals assigned to `.text`/`.tooltip_text`/`.placeholder_text`/`.title`, and `.tscn` text properties that are not keys.
 - `tools/validate_code.py`:
   - comments in English, en dash instead of em dash (.gd and .py);
-  - no magic numbers in `scripts/gameplay/`, `scripts/levels/` and `scripts/feedback/` – only 0, 0.5, 1 and 2 are allowed, everything else comes from Balance; a line may opt out with `# balance-exempt: <reason>`;
+  - no magic numbers in `scripts/gameplay/`, `scripts/levels/`, `scripts/feedback/` and `scripts/rules/` – only 0, 0.5, 1 and 2 are allowed, everything else comes from Balance; a line may opt out with `# balance-exempt: <reason>`;
   - no networking classes or modules, Python standard library only;
   - no survival stats: no hunger, energy, health, food, rest, faint or stamina in identifiers, node names, balance keys or i18n keys (the game has none of these mechanics);
   - no global randomness outside `SeededRng`, no `get_meta(key, null)`, every tracked `.gd` has a tracked `.gd.uid`.
 - `tools/validate_assets.py`: every file below `assets/` lies in a pack listed in `assets/SOURCES.md` (pack, author, licence, source per row); every media file referenced by a `.tscn`, `.tres`, `.gd`, `project.godot` or `data/**/*.json` lies in such a pack, every referenced file exists with the exact letter case, and no used asset name matches the deny list `data/assets/deny_list.json` (weapons, violence, scary content). Unused imported files and imported deny-list names are listed as warnings. Format placeholders (`%s`, `{name}`) make a reference a pattern.
 - `tools/validate_basics.py`: required top-level files exist.
+- `tools/validate_levels.py`: `data/events.json` and every `data/levels/*.json` against the level schema, with limits from `data/balance/rules.json` (see `docs/rules.md`).
 
 ## Assets
 
@@ -55,3 +56,5 @@ The CC0 packs live in `assets/` (copied unchanged from the spec folder), with so
 ## Docs
 
 Vision, backlog, requirements, market and personas are in `docs/process/`.
+
+`docs/rules.md` describes the data-driven rules engine in `scripts/rules/`: level schema, conditions, events, snapshot contract, tick order, signals and stars.

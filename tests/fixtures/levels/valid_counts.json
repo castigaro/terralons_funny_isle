@@ -1,0 +1,78 @@
+{
+	"format_version": 1,
+	"id": "valid_counts",
+	"title_key": "fixture.level_title",
+	"theme": "jungle_hut",
+	"music": "fixture_tune",
+	"seed": 77,
+	"timer_seconds": 180,
+	"three_star_share": 0.5,
+	"tasks": [
+		{
+			"id": "fx_sandcastle_bits",
+			"required": true,
+			"conditions": [
+				{
+					"type": "count_reached",
+					"counter": "sand_bucket",
+					"count": 4
+				}
+			],
+			"hint_key": "fixture.sandcastle_bits_hint",
+			"fail_key": "fixture.sandcastle_bits_fail"
+		},
+		{
+			"id": "fx_visit_dock",
+			"required": true,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "player",
+					"zone": "dock"
+				}
+			],
+			"hint_key": "fixture.visit_dock_hint",
+			"fail_key": "fixture.visit_dock_fail"
+		},
+		{
+			"id": "fx_penguin_home",
+			"required": false,
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "penguin",
+					"target": "beach"
+				},
+				{
+					"type": "worn",
+					"item": "hat"
+				}
+			],
+			"hint_key": "fixture.penguin_home_hint",
+			"fail_key": "fixture.penguin_home_fail"
+		}
+	],
+	"events": [
+		{
+			"id": "fx_ev_mud",
+			"type": "mud_trail",
+			"window": [
+				20,
+				20
+			],
+			"duration_s": 10
+		},
+		{
+			"id": "fx_ev_rain",
+			"type": "rain_panic",
+			"window": [
+				40,
+				70
+			],
+			"duration_s": 12,
+			"params": {
+				"kind": "chicken"
+			}
+		}
+	]
+}
