@@ -227,6 +227,18 @@
 				"assets/audio/sfx-interface/Audio/tick_004.ogg"
 			],
 			"volume_db": 0.0
+		},
+		"ui_click": {
+			"files": [
+				"assets/audio/sfx-ui/click1.wav"
+			],
+			"volume_db": -4.0
+		},
+		"ui_hover": {
+			"files": [
+				"assets/audio/sfx-ui/rollover1.wav"
+			],
+			"volume_db": -10.0
 		}
 	},
 	"pitch": {

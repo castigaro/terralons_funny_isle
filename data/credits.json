@@ -1,0 +1,95 @@
+{
+	"format_version": 1,
+	"groups": [
+		{
+			"author": "Kenney",
+			"packs": [
+				{
+					"pack": "pirate-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "Pirate Pack - derived grass edges",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "topdown-shooter",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "animal-pack-redux",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "foliage-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "foliage-sprites",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "generic-items",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "particle-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "smoke-particles",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "splat-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "emotes-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "ui-pack",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "kenney-fonts",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "rpg-sounds",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "ui-sounds",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "digital-sounds",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "interface-sounds",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "jingles",
+					"licence": "CC0 1.0"
+				},
+				{
+					"pack": "voiceover",
+					"licence": "CC0 1.0"
+				}
+			]
+		},
+		{
+			"author": "Juhani Junkala",
+			"packs": [
+				{
+					"pack": "chiptunes-action",
+					"licence": "CC0 1.0"
+				}
+			]
+		}
+	]
+}

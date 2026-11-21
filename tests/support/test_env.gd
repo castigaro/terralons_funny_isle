@@ -24,3 +24,7 @@ static func reset() -> void:
 	var i18n := tree.root.get_node_or_null("I18n")
 	if i18n != null and i18n.has_method("get_locale") and i18n.call("get_locale") != "en":
 		i18n.call("set_locale", "en")
+	for autoload_name in ["Settings", "Progress"]:
+		var node := tree.root.get_node_or_null(autoload_name)
+		if node != null and node.has_method("reset_for_tests"):
+			node.call("reset_for_tests")

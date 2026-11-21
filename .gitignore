@@ -7,4 +7,5 @@ __pycache__/
 *.pyc
 build/
 !tests/fixtures/levels/i18n/*.csv.import
+!tests/fixtures/flow/i18n/*.csv.import
 !assets/audio/music/*.wav.import

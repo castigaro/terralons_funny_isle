@@ -73,6 +73,7 @@ Foliage (`assets/graphics/foliage/PNG/Retina/`), sway by a shader:
 - Task done and failed: `assets/ui/ui-pack/PNG/Blue/Default/icon_checkmark.png`, `assets/ui/ui-pack/PNG/Blue/Default/icon_cross.png`
 - Stars (result screen, thresholds): `assets/ui/ui-pack/PNG/Yellow/Default/star.png`, `assets/ui/ui-pack/PNG/Yellow/Default/star_outline.png`
 - Icons: play `assets/ui/ui-pack/PNG/Extra/Default/icon_play_light.png`, retry `assets/ui/ui-pack/PNG/Extra/Default/icon_repeat_light.png`, back `assets/ui/ui-pack/PNG/Blue/Default/arrow_basic_w.png`
+- Menu icons (BI-7, `scripts/ui/menus/`): icons on the blue buttons come from the Yellow set for contrast: back and next `assets/ui/ui-pack/PNG/Yellow/Default/arrow_basic_w.png`, `assets/ui/ui-pack/PNG/Yellow/Default/arrow_basic_e.png`; the pack has no gear, pause, lock, quit or language icon, so the substitutes are: settings = text only (the slider handle and the 16 px slider section both read as a dot on the button in the windowed check, and settings is not one of the glyph actions of AC1), quit and locked level = `assets/ui/ui-pack/PNG/Yellow/Default/icon_cross.png`, credits = Yellow `star`, language = the language name as text (no icon). Volume slider track `assets/ui/ui-pack/PNG/Blue/Default/slide_horizontal_grey.png` with the `slide_horizontal_color` fill; the hovered or focused slider shows the Yellow grabber `assets/ui/ui-pack/PNG/Yellow/Default/slide_hangle.png` next to its focus ring. Level tiles use `button_square_depth_gradient`, the title shows the round animals `chicken`, `pig`, `goat`, `duck`, `monkey` and `penguin`.
 - Emote bubbles (Style 1, `assets/graphics/emotes/PNG/Vector/Style 1/`): `assets/graphics/emotes/PNG/Vector/Style 1/emote_stars.png` (dizzy), `emote_exclamation`, `emote_question`, `emote_anger`, `emote_heart`, `emote_laugh`, `emote_swirl`, `emote_faceHappy`, `emote_faceSad`
 - The colours Grey, Green and Red and all `Double` variants are excluded.
 
@@ -117,7 +118,7 @@ Chiptunes (`assets/audio/music/`, WAV, loop on import), allocation per D-2:
 - Task done: `assets/audio/sfx-interface/Audio/confirmation_001.ogg`, `confirmation_002`–`confirmation_004`
 - Failure cue: `assets/audio/sfx-interface/Audio/error_001.ogg`, `error_002`–`error_008`
 - Cage, latch, door: `assets/audio/sfx-rpg/OGG/metalLatch.ogg`, `assets/audio/sfx-rpg/OGG/doorClose_1.ogg`, `creak1`–`creak3`
-- Menus: `assets/audio/sfx-ui/click1.wav`, `assets/audio/sfx-ui/rollover1.wav`, `assets/audio/sfx-ui/switch1.wav`
+- Menus (`ui_click`, `ui_hover` in `data/audio.json`): `assets/audio/sfx-ui/click1.wav`, `assets/audio/sfx-ui/rollover1.wav`; reserve `assets/audio/sfx-ui/switch1.wav`
 - Timer warning tick: `assets/audio/sfx-interface/Audio/tick_001.ogg`, `tick_002`, `tick_004`
 - Never use `drawKnife*` or `knifeSlice*` (deny list).
 

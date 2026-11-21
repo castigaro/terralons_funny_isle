@@ -1,0 +1,10 @@
+{
+	"schema_version": 1,
+	"levels": [
+		{"id": "valid_sample_level", "scene": "res://tests/scenes/sample_level.tscn", "json": "res://tests/fixtures/flow/levels/long_title.json"},
+		{"id": "valid_small_level", "scene": "res://tests/scenes/small_level.tscn", "json": "res://tests/fixtures/flow/levels/long_title.json"},
+		{"id": "third_level", "scene": "res://tests/scenes/small_level.tscn", "json": "res://tests/fixtures/flow/levels/long_title.json"},
+		{"id": "fourth_level", "scene": "res://tests/scenes/missing_level.tscn", "json": "res://tests/fixtures/flow/levels/long_title.json"},
+		{"id": "fifth_level", "scene": "res://tests/scenes/missing_level.tscn", "json": "res://tests/fixtures/flow/levels/long_title.json"}
+	]
+}
