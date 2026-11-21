@@ -41,3 +41,13 @@ func test_animals_and_items_are_at_least_24_px_at_720p() -> void:
 			check(minf(size.x, size.y) >= 24.0, "%s %s px at 1280x720" % [node.name, size])
 			count += 1
 	check_eq(count, 2, "sample animal and item measured")
+
+
+func test_frog_is_at_least_24_px_at_720p() -> void:
+	await open_level("res://scenes/levels/l3_jungle.tscn")
+	var frogs := tree().get_nodes_in_group("animal").filter(
+			func(n: Node) -> bool: return level.is_ancestor_of(n) and String(n.get("kind")) == "frog")
+	check_eq(frogs.size(), 3, "three frogs")
+	for frog in frogs:
+		var size := _screen_size(frog.get_node("Visual/Body") as Sprite2D, Vector2(1280, 720))
+		check(minf(size.x, size.y) >= 24.0, "%s %s px at 1280x720" % [frog.name, size])

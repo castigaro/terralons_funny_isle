@@ -28,7 +28,7 @@ EXPECTED = {
     "invalid_kind_collision": "kind chicken is both an animal and an item",
     "invalid_carry_weight": "animals.chicken.carry_weight: outside the castaway",
 }
-REQUIRED_ANIMALS = {"chicken", "duck", "goat", "pig", "monkey", "parrot", "penguin"}
+REQUIRED_ANIMALS = {"chicken", "duck", "goat", "pig", "monkey", "parrot", "penguin", "frog"}
 REQUIRED_ITEMS = {"coconut", "hat", "bucket", "sand_pail"}
 
 

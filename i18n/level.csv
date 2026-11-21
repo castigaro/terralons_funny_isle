@@ -26,3 +26,39 @@ level.prompt.move,Move,Laufen
 level.prompt.grab,Grab,Greifen
 level.prompt.throw,Throw,Werfen
 level.prompt.use,Use,Benutzen
+level.l3_jungle.title,Jungle,Dschungel
+level.l3_jungle.frogs_to_pond.title,Frogs back to the pond,Frösche zurück in den Teich
+level.l3_jungle.frogs_to_pond.hint,Return 3 frogs to the pond – carry them to the jetty.,3 Frösche zurück zum Teich – trag sie zum Steg.
+level.l3_jungle.frogs_to_pond.fail,The frogs are still hopping around!,Die Frösche hüpfen noch herum!
+level.l3_jungle.parrot_to_perch.title,Parrot to its perch,Papagei auf die Stange
+level.l3_jungle.parrot_to_perch.hint,Catch the parrot and use it at the perch.,Fang den Papagei und setz ihn auf die Stange.
+level.l3_jungle.parrot_to_perch.fail,The parrot is still flapping around!,Der Papagei flattert noch herum!
+level.l3_jungle.goat_before_stampede.title,Pen the goat in time,Ziege rechtzeitig einsperren
+level.l3_jungle.goat_before_stampede.hint,Pen the goat before the stampede comes.,"Bring die Ziege in den Pferch, bevor die Herde kommt."
+level.l3_jungle.goat_before_stampede.fail,The stampede came first – the goat ran off!,Die Herde war schneller – die Ziege ist weg!
+level.l4_lagoon.title,Lagoon,Lagune
+level.l4_lagoon.penguin_to_beach.title,Lost penguin to the beach,Verirrter Pinguin zum Strand
+level.l4_lagoon.penguin_to_beach.hint,Carry the penguin to the beach flag and use it.,Trag den Pinguin zur Strandfahne.
+level.l4_lagoon.penguin_to_beach.fail,The penguin is still lost!,Der Pinguin hat sich noch verirrt!
+level.l4_lagoon.ducks_in_lagoon.title,Ducks into the lagoon,Enten in die Lagune
+level.l4_lagoon.ducks_in_lagoon.hint,Bring 2 ducks to the lagoon jetty.,Bring 2 Enten zum Lagunensteg.
+level.l4_lagoon.ducks_in_lagoon.fail,The ducks never reached the lagoon!,Die Enten sind nicht in der Lagune!
+level.l4_lagoon.sandcastle_before_wave.title,Sandcastle before the wave,Sandburg vor der Welle
+level.l4_lagoon.sandcastle_before_wave.hint,Sand pail: use it at the castle – 3 pails before the wave.,Sandeimer: an der Burg benutzen – 3 vor der Welle.
+level.l4_lagoon.sandcastle_before_wave.fail,The wave flattened the sandcastle – try again.,Die Welle hat die Sandburg platt gemacht – nochmal!
+level.l4_lagoon.hat_on_penguin.title,Hat on the penguin,Hut auf den Pinguin
+level.l4_lagoon.hat_on_penguin.hint,Put the hat on the penguin – watch out for the parrot.,Setz dem Pinguin den Hut auf – Vorsicht vor dem Papagei.
+level.l4_lagoon.hat_on_penguin.fail,The penguin has no hat!,Der Pinguin hat keinen Hut!
+level.l5_volcano_cliffs.title,Volcano Cliffs,Vulkanklippen
+level.l5_volcano_cliffs.shelter_flock.title,Shelter the flock,Herde in den Unterstand
+level.l5_volcano_cliffs.shelter_flock.hint,2 chickens and the goat into the shelter.,2 Hühner und die Ziege in den Unterstand.
+level.l5_volcano_cliffs.shelter_flock.fail,The flock is still out on the cliffs!,Die Herde ist noch auf den Klippen!
+level.l5_volcano_cliffs.pig_to_mud_pool.title,Pig into the mud pool,Schwein ins Schlammbad
+level.l5_volcano_cliffs.pig_to_mud_pool.hint,The pig loves the bucket – lure it and carry it to the mud pool.,Das Schwein liebt den Eimer – lock es zum Schlammbad.
+level.l5_volcano_cliffs.pig_to_mud_pool.fail,The pig never got its mud bath!,Das Schwein hat kein Schlammbad bekommen!
+level.l5_volcano_cliffs.hat_on_pig.title,Hat on the pig,Hut auf das Schwein
+level.l5_volcano_cliffs.hat_on_pig.hint,Put the hat on the pig before the parrot grabs it.,"Setz dem Schwein den Hut auf, bevor der Papagei ihn klaut."
+level.l5_volcano_cliffs.hat_on_pig.fail,The pig has no hat!,Das Schwein hat keinen Hut!
+level.l5_volcano_cliffs.feed_penguin.title,Feed the penguin,Füttere den Pinguin
+level.l5_volcano_cliffs.feed_penguin.hint,Bring the bucket to the penguin twice.,Bring den Eimer zweimal zum Pinguin.
+level.l5_volcano_cliffs.feed_penguin.fail,The penguin is still hungry!,Der Pinguin hat noch Hunger!

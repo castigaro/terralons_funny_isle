@@ -20,5 +20,22 @@
 	"coconut_arc_height": 90,
 	"coconut_throw_gap_seconds": 0.25,
 	"coconut_scale": 2.0,
-	"coconut_spread_px": 48
+	"coconut_spread_px": 48,
+	"stampede_lead_seconds": 1.5,
+	"stampede_run_seconds": 3.0,
+	"stampede_goat_count": 3,
+	"stampede_goat_gap_seconds": 0.3,
+	"stampede_spread_px": 64,
+	"stampede_tint_alpha": 0.3,
+	"stampede_stripe_px": 64,
+	"stampede_dust_amount": 40,
+	"stampede_dust_reduced_amount": 10,
+	"stampede_dust_scale": 0.25,
+	"wave_sweep_seconds": 2.4,
+	"wave_retreat_seconds": 1.2,
+	"wave_tint_alpha": 0.45,
+	"wave_foam_width_px": 10,
+	"wave_foam_amount": 60,
+	"wave_foam_reduced_amount": 15,
+	"wave_foam_scale": 0.12
 }

@@ -1,0 +1,89 @@
+{
+	"format_version": 1,
+	"id": "l3_jungle",
+	"title_key": "level.l3_jungle.title",
+	"theme": "jungle",
+	"music": "level_3",
+	"seed": 3303,
+	"timer_seconds": 200,
+	"notes": "Default allocation (BI-11): new animals frog and parrot; required – return three frogs to the pond, the parrot to its perch; optional – the goat into its pen before the stampede; events – the monkey throws coconuts, a goat stampede crosses the lane (new). Workload 5 units in 200 s (40 s per unit).",
+	"tasks": [
+		{
+			"id": "frogs_to_pond",
+			"required": true,
+			"title_key": "level.l3_jungle.frogs_to_pond.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "frog",
+					"zone": "pond",
+					"count": 3
+				}
+			],
+			"hint_key": "level.l3_jungle.frogs_to_pond.hint",
+			"fail_key": "level.l3_jungle.frogs_to_pond.fail"
+		},
+		{
+			"id": "parrot_to_perch",
+			"required": true,
+			"title_key": "level.l3_jungle.parrot_to_perch.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "parrot",
+					"zone": "perch"
+				}
+			],
+			"hint_key": "level.l3_jungle.parrot_to_perch.hint",
+			"fail_key": "level.l3_jungle.parrot_to_perch.fail"
+		},
+		{
+			"id": "goat_before_stampede",
+			"required": false,
+			"title_key": "level.l3_jungle.goat_before_stampede.title",
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "goat",
+					"zone": "goat_pen"
+				}
+			],
+			"hint_key": "level.l3_jungle.goat_before_stampede.hint",
+			"fail_key": "level.l3_jungle.goat_before_stampede.fail",
+			"modifiers": [
+				{
+					"type": "before_event",
+					"event": "goat_rush"
+				}
+			]
+		}
+	],
+	"events": [
+		{
+			"id": "coconut_volley",
+			"type": "coconut_throw",
+			"window": [
+				25,
+				45
+			],
+			"duration_s": 3,
+			"params": {
+				"thrower_zone": "monkey_perch",
+				"throws": 3
+			}
+		},
+		{
+			"id": "goat_rush",
+			"type": "goat_stampede",
+			"window": [
+				90,
+				110
+			],
+			"duration_s": 8,
+			"params": {
+				"lane": "goat_lane",
+				"goats": 3
+			}
+		}
+	]
+}

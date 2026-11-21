@@ -5,7 +5,7 @@ const I18nScript := preload("res://scripts/autoload/i18n.gd")
 const FIXTURES := "res://tests/fixtures/entities"
 ## Fixtures only the Python validator rejects (deny list and on-screen size need the PNG files and the deny list).
 const PYTHON_ONLY := ["invalid_denied_sprite.json", "invalid_small_sprite.json"]
-const REQUIRED_ANIMALS := ["chicken", "duck", "goat", "pig", "monkey", "parrot", "penguin"]
+const REQUIRED_ANIMALS := ["chicken", "duck", "goat", "pig", "monkey", "parrot", "penguin", "frog"]
 const REQUIRED_ITEMS := ["coconut", "hat", "bucket", "sand_pail"]
 
 

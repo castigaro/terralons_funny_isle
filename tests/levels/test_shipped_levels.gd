@@ -1,8 +1,11 @@
 extends "res://tests/support/level_case.gd"
-## Shipped levels (data/levels + scenes/levels): load cleanly, carry their own theme and music, have the event
-## anchors, the feedback director and the event effects, and every use target is reachable on foot.
+## Shipped levels (data/levels + scenes/levels): load cleanly, carry their own theme and the music of D-2, have the
+## event anchors, the feedback director and the event effects, and every use target is reachable on foot.
 
-const LEVELS := ["l1_beach_camp", "l2_farm_meadow"]
+const LEVELS := ["l1_beach_camp", "l2_farm_meadow", "l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
+## D-2: levels 1–3 use "Level 1–3", level 4 reuses "Level 2", level 5 reuses "Level 3".
+const MUSIC := {"l1_beach_camp": "level_1", "l2_farm_meadow": "level_2", "l3_jungle": "level_3",
+		"l4_lagoon": "level_2", "l5_volcano_cliffs": "level_3"}
 const CAMPAIGN := "res://data/campaign.json"
 
 
@@ -27,7 +30,6 @@ func test_campaign_lists_the_shipped_levels() -> void:
 
 func test_every_shipped_level_is_complete_and_reachable() -> void:
 	var themes := {}
-	var music := {}
 	for id in LEVELS:
 		await open_level(_scene(id))
 		check_false(level.is_failed(), "%s loads: %s" % [id, str(level.load_errors())])
@@ -37,7 +39,7 @@ func test_every_shipped_level_is_complete_and_reachable() -> void:
 		check_eq(level.level_json_path, String(_campaign().entry(id)["json"]), "%s json path" % id)
 		var def := level.level_def()
 		themes[def.theme] = true
-		music[def.music] = true
+		check_eq(def.music, MUSIC[id], "%s music per D-2" % id)
 		check(level.feedback_director() != null, "%s has a FeedbackDirector" % id)
 		check(level.event_effects() != null, "%s has EventEffects" % id)
 		for ev in def.events:
@@ -62,11 +64,13 @@ func test_every_shipped_level_is_complete_and_reachable() -> void:
 		level.queue_free()
 		await frames(1)
 	check_eq(themes.size(), LEVELS.size(), "every level has its own theme")
-	check_eq(music.size(), LEVELS.size(), "every level has its own music")
 
 
 func test_pen_slots_lie_inside_their_zone() -> void:
-	var pens := {"l1_beach_camp": {"CageGate": "cage"}, "l2_farm_meadow": {"PondJetty": "pond", "PenGate": "pig_pen"}}
+	var pens := {"l1_beach_camp": {"CageGate": "cage"}, "l2_farm_meadow": {"PondJetty": "pond", "PenGate": "pig_pen"},
+			"l3_jungle": {"PondJetty": "pond", "PerchGate": "perch", "PenGate": "goat_pen"},
+			"l4_lagoon": {"BeachFlag": "beach", "LagoonJetty": "lagoon"},
+			"l5_volcano_cliffs": {"ShelterGate": "shelter", "MudGate": "mud_pool"}}
 	for id in pens:
 		await open_level(_scene(id))
 		for gate_name in pens[id]:

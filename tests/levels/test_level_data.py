@@ -1,4 +1,5 @@
-"""Levels 1 and 2 follow the default allocation, the timer and workload rules and have no tutorial or level ids in code."""
+"""Levels 1–5 follow the default allocation, the timer, workload and escalation rules and have no tutorial or level ids
+in code."""
 import csv
 import json
 import re
@@ -21,6 +22,51 @@ def load(name):
 
 def rules():
     return json.loads((REPO / "data" / "balance" / "rules.json").read_text(encoding="utf-8"))
+
+
+LEVEL_IDS = ["l1_beach_camp", "l2_farm_meadow", "l3_jungle", "l4_lagoon", "l5_volcano_cliffs"]
+
+
+def _has(task, cond_type, **fields):
+    return any(c["type"] == cond_type and all(c.get(k) == v for k, v in fields.items()) for c in task["conditions"])
+
+
+def _event_type(level, event_id):
+    for event in level["events"]:
+        if event["id"] == event_id:
+            return event["type"]
+    return None
+
+
+def _wave_sandcastle(task, level):
+    return _has(task, "delivered_to", entity="sand_pail") and any(
+        m["type"] == "before_event" and _event_type(level, m["event"]) == "wave_wash" for m in task.get("modifiers", []))
+
+
+# The seven example tasks of R-17 as predicates over a task and its level.
+EXAMPLES = {
+    "chickens in the cage": lambda t, lv: _has(t, "in_zone", entity="chicken"),
+    "ducks into the pond": lambda t, lv: _has(t, "in_zone", entity="duck"),
+    "hat on the goat": lambda t, lv: _has(t, "worn", item="hat", wearer="goat"),
+    "coconuts to the monkey": lambda t, lv: _has(t, "delivered_to", entity="coconut", target="monkey"),
+    "catch the runaway pig": lambda t, lv: _has(t, "in_zone", entity="pig"),
+    "lost penguin to the beach": lambda t, lv: _has(t, "in_zone", entity="penguin"),
+    "sandcastle before the wave": _wave_sandcastle,
+}
+
+
+def signature(task):
+    """Normalised task signature: sorted (type, subject, place, count) tuples of conditions and modifiers."""
+    parts = []
+    for c in task["conditions"] + task.get("modifiers", []):
+        subject = c.get("entity", c.get("item", c.get("counter", "")))
+        place = c.get("zone", c.get("target", c.get("wearer", c.get("event", ""))))
+        parts.append((c["type"], subject, place, int(c.get("count", 1))))
+    return tuple(sorted(parts))
+
+
+def balance(name):
+    return json.loads((REPO / "data" / "balance" / ("%s.json" % name)).read_text(encoding="utf-8"))
 
 
 def workload(level):
@@ -82,6 +128,117 @@ class LevelDataTest(unittest.TestCase):
         per_unit_2 = self.l2["timer_seconds"] / workload(self.l2)
         self.assertLess(per_unit_2, per_unit_1, "level 2 is tighter relative to its workload")
 
+    def test_jungle_allocation(self):
+        l3 = load("l3_jungle")
+        tasks = self.conds(l3)
+        self.assertEqual(tasks["frogs_to_pond"][:2],
+                         (True, [{"type": "in_zone", "entity": "frog", "zone": "pond", "count": 3}]))
+        self.assertEqual(tasks["parrot_to_perch"][:2], (True, [{"type": "in_zone", "entity": "parrot", "zone": "perch"}]))
+        required, conds, mods = tasks["goat_before_stampede"]
+        self.assertFalse(required)
+        self.assertEqual(conds, [{"type": "in_zone", "entity": "goat", "zone": "goat_pen"}])
+        self.assertEqual(mods, [{"type": "before_event", "event": "goat_rush"}])
+        events = {e["type"]: e for e in l3["events"]}
+        self.assertEqual(sorted(events), ["coconut_throw", "goat_stampede"])
+        self.assertIn("lane", events["goat_stampede"]["params"])
+        self.assertEqual((l3["theme"], l3["music"]), ("jungle", "level_3"))
+
+    def test_lagoon_allocation(self):
+        l4 = load("l4_lagoon")
+        tasks = self.conds(l4)
+        self.assertEqual(tasks["penguin_to_beach"][:2], (True, [{"type": "in_zone", "entity": "penguin", "zone": "beach"}]))
+        required, conds, mods = tasks["sandcastle_before_wave"]
+        self.assertFalse(required)
+        self.assertEqual(conds, [{"type": "delivered_to", "entity": "sand_pail", "target": "sandcastle", "count": 3}])
+        self.assertEqual(len(mods), 1)
+        self.assertEqual(mods[0]["type"], "before_event")
+        self.assertEqual(_event_type(l4, mods[0]["event"]), "wave_wash")
+        events = {e["type"]: e for e in l4["events"]}
+        self.assertEqual(sorted(events), ["parrot_steal_hat", "wave_wash"])
+        self.assertIn("zone", events["wave_wash"]["params"])
+        self.assertEqual((l4["theme"], l4["music"]), ("lagoon", "level_2"))
+
+    def test_volcano_allocation(self):
+        l5 = load("l5_volcano_cliffs")
+        self.assertTrue(4 <= len(l5["tasks"]) <= 5)
+        self.assertGreaterEqual(len(l5["events"]), 3)
+        self.assertEqual((l5["theme"], l5["music"]), ("volcano_cliffs", "level_3"))
+        # A pair overlaps for every draw when the latest start of each lies before the earliest end of the other.
+        events = l5["events"]
+        overlapping = []
+        for i, a in enumerate(events):
+            for b in events[i + 1:]:
+                if a["window"][1] < b["window"][0] + b["duration_s"] and b["window"][1] < a["window"][0] + a["duration_s"]:
+                    overlapping.append((a["id"], b["id"]))
+        self.assertTrue(overlapping, "no event pair overlaps for every draw")
+
+    def test_every_level_rules(self):
+        r = rules()
+        for level_id in LEVEL_IDS:
+            level = load(level_id)
+            with self.subTest(level=level_id):
+                self.assertTrue(r["tasks_min"] <= len(level["tasks"]) <= r["tasks_max"])
+                self.assertTrue(any(t["required"] for t in level["tasks"]))
+                self.assertTrue(any(not t["required"] for t in level["tasks"]))
+                self.assertGreaterEqual(len(level["events"]), r["events_min"])
+                self.assertTrue(r["timer_min_seconds"] <= level["timer_seconds"] <= r["timer_max_seconds"])
+                self.assertIn("allocation", level["notes"].lower())
+                for task in level["tasks"]:
+                    if any(m["type"] == "before_event" for m in task.get("modifiers", [])):
+                        self.assertFalse(task["required"], task["id"])
+
+    def test_example_task_coverage(self):
+        found = set()
+        for level_id in LEVEL_IDS:
+            level = load(level_id)
+            for task in level["tasks"]:
+                found.update(name for name, match in EXAMPLES.items() if match(task, level))
+        self.assertGreaterEqual(len(found), 5, sorted(found))
+        self.assertEqual(len(found), 7, sorted(set(EXAMPLES) - found))
+
+    def test_task_signatures_unique(self):
+        seen = {}
+        for level_id in LEVEL_IDS:
+            for task in load(level_id)["tasks"]:
+                sig = signature(task)
+                with self.subTest(task="%s.%s" % (level_id, task["id"])):
+                    self.assertNotIn(sig, seen, "same as %s" % seen.get(sig))
+                seen[sig] = "%s.%s" % (level_id, task["id"])
+
+    def test_escalation(self):
+        levels = [load(level_id) for level_id in LEVEL_IDS]
+        self.assertGreater(len(levels[4]["tasks"]), len(levels[0]["tasks"]))
+        self.assertGreater(len(levels[4]["events"]), len(levels[0]["events"]))
+        per_unit = [lv["timer_seconds"] / workload(lv) for lv in levels]
+        for i in range(2, 5):
+            self.assertLessEqual(per_unit[i], per_unit[i - 1] + 1e-9, LEVEL_IDS[i])
+            self.assertLessEqual(per_unit[i], 42.0, LEVEL_IDS[i])
+        first = [min(e["window"][0] for e in lv["events"]) for lv in levels]
+        self.assertLessEqual(first[3], first[0])
+        self.assertLessEqual(first[4], first[0])
+
+    def test_impact_fits_duration(self):
+        cfg = balance("events")
+        impact = {
+            "goat_stampede": cfg["stampede_lead_seconds"] + cfg["stampede_run_seconds"] / 2.0,
+            "wave_wash": cfg["wave_sweep_seconds"] / 2.0,
+        }
+        for level_id in LEVEL_IDS:
+            for event in load(level_id)["events"]:
+                if event["type"] in impact:
+                    with self.subTest(event="%s.%s" % (level_id, event["id"])):
+                        self.assertGreater(event["duration_s"], impact[event["type"]])
+
+    def test_playtest_doc(self):
+        path = REPO / "docs" / "playtest.md"
+        self.assertTrue(path.exists())
+        text = path.read_text(encoding="utf-8")
+        rows = [line for line in text.splitlines() if line.startswith("|")]
+        for level_id in LEVEL_IDS:
+            self.assertTrue(any("`%s`" % level_id in row for row in rows), level_id)
+        self.assertTrue(any("Total" in row for row in rows))
+        self.assertIn("estimate", text.lower())
+
     def test_prompts(self):
         actions = sorted(p["action"] for p in self.l1["prompts"])
         self.assertEqual(actions, ["grab", "move", "throw", "use"])
@@ -90,7 +247,8 @@ class LevelDataTest(unittest.TestCase):
         self.assertTrue(anchors["grab"].startswith("entity:"))
         self.assertTrue(anchors["throw"].startswith("entity:"))
         self.assertEqual(anchors["use"], "target:cage")
-        self.assertFalse(self.l2.get("prompts"))
+        for level_id in LEVEL_IDS[1:]:
+            self.assertFalse(load(level_id).get("prompts"), level_id)
 
     def test_hints_use_en_dashes(self):
         with (REPO / "i18n" / "level.csv").open(encoding="utf-8", newline="") as handle:
