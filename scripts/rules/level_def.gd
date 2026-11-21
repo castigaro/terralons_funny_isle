@@ -10,9 +10,13 @@ const ID_PATTERN := "^[a-z][a-z0-9_]*$"
 const PLAYER := "player"
 const LEVEL_REQUIRED := ["format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
 		"events"]
-const LEVEL_OPTIONAL := ["three_star_share"]
+const LEVEL_OPTIONAL := ["three_star_share", "prompts"]
 const TASK_REQUIRED := ["id", "required", "conditions", "hint_key", "fail_key"]
-const TASK_OPTIONAL := ["modifiers"]
+const TASK_OPTIONAL := ["modifiers", "title_key"]
+## Contextual key prompts (BI-6): {id, anchor, action, text_key}; anchors are checked again by LevelBase.
+const PROMPT_FIELDS := ["id", "anchor", "action", "text_key"]
+const PROMPT_ACTIONS := ["move", "dash", "grab", "throw", "use"]
+const ANCHOR_PATTERN := "^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*)$"
 const EVENT_REQUIRED := ["id", "type", "window", "duration_s"]
 const EVENT_OPTIONAL := ["params"]
 const RULE_KEYS := ["timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max", "events_min"]
@@ -32,6 +36,7 @@ const PARAM_TYPES := ["string", "int", "float", "bool"]
 const EFFECTS := ["relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground"]
 
 static var _id_re: RegEx = null
+static var _anchor_re: RegEx = null
 
 var id := ""
 var title_key := ""
@@ -41,10 +46,12 @@ var level_seed := 0
 var timer_seconds := 0.0
 ## Share of the timer needed for 3 stars, or -1.0 when the level uses the balance default.
 var three_star_share := -1.0
-## Normalized tasks: {id, required, conditions, modifiers, target, hint_key, fail_key}.
+## Normalized tasks: {id, required, conditions, modifiers, target, hint_key, fail_key, title_key ("" when absent)}.
 var tasks: Array[Dictionary] = []
 ## Normalized events: {id, type, window: [min, max], duration_s, params}.
 var events: Array[Dictionary] = []
+## Normalized prompts: {id, anchor, action, text_key} (empty when the level has none).
+var prompts: Array[Dictionary] = []
 
 
 ## Returns the context for parse(): balance section "rules", event types, i18n messages {key: {en, de}} and the
@@ -199,7 +206,7 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 				flags.append(required)
 			else:
 				err.call(tpath + ".required", "must be a bool")
-		for key in ["hint_key", "fail_key"]:
+		for key in ["hint_key", "fail_key", "title_key"]:
 			if task.has(key):
 				_check_text_key(task[key], "%s.%s" % [tpath, key], messages, err)
 		var conds: Array = []
@@ -237,6 +244,7 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 			"target": int(counting[0]["count"]) if counting.size() == 1 else 1,
 			"hint_key": str(task.get("hint_key", "")),
 			"fail_key": str(task.get("fail_key", "")),
+			"title_key": str(task.get("title_key", "")),
 		})
 	if not tasks_raw.is_empty():
 		if not flags.has(true):
@@ -289,6 +297,8 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 			"params": params.duplicate(true),
 		})
 
+	var norm_prompts := _check_prompts(data.get("prompts", []), messages, err) if data.has("prompts") else []
+
 	var reserved := {PLAYER: true}
 	for key in modifier_grammar:
 		reserved[key] = true
@@ -316,7 +326,44 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 	def.three_star_share = float(data["three_star_share"]) if data.has("three_star_share") else -1.0
 	def.tasks = norm_tasks
 	def.events = norm_events
+	def.prompts.assign(norm_prompts)
 	return {"ok": true, "def": def, "errors": errors}
+
+
+static func _check_prompts(raw: Variant, messages: Dictionary, err: Callable) -> Array:
+	var out: Array = []
+	if not raw is Array:
+		err.call("prompts", "must be a list")
+		return out
+	if _anchor_re == null:
+		_anchor_re = RegEx.create_from_string(ANCHOR_PATTERN)
+	var seen := {}
+	for i in raw.size():
+		var prompt: Variant = raw[i]
+		var ppath := "prompts[%d]" % i
+		if not prompt is Dictionary:
+			err.call(ppath, "must be an object")
+			continue
+		_check_keys(prompt, PROMPT_FIELDS, [], ppath, err)
+		var pid: Variant = prompt.get("id")
+		if prompt.has("id"):
+			if not _is_name(pid):
+				err.call(ppath + ".id", "must match %s" % ID_PATTERN)
+			elif seen.has(pid):
+				err.call(ppath + ".id", "duplicate prompt id %s (also at %s)" % [pid, seen[pid]])
+			else:
+				seen[pid] = ppath
+		var anchor: Variant = prompt.get("anchor")
+		if prompt.has("anchor") and (not anchor is String or _anchor_re.search(anchor) == null):
+			err.call(ppath + ".anchor", "must be player, zone:<name> or entity:<uid>, got %s" % str(anchor))
+		var action: Variant = prompt.get("action")
+		if prompt.has("action") and not PROMPT_ACTIONS.has(action):
+			err.call(ppath + ".action", "unknown action %s (one of %s)" % [str(action), ", ".join(PROMPT_ACTIONS)])
+		if prompt.has("text_key"):
+			_check_text_key(prompt["text_key"], ppath + ".text_key", messages, err)
+		out.append({"id": str(pid), "anchor": str(anchor), "action": str(action),
+				"text_key": str(prompt.get("text_key", ""))})
+	return out
 
 
 static func _read_json(path: String) -> Dictionary:

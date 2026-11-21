@@ -5,7 +5,8 @@ Usage: python tools/validate_levels.py [--root DIR] [--path FILE] [--i18n-dir DI
 Limits (timer range, task and event counts) come from data/balance/rules.json. Text keys must exist with
 non-empty EN and DE text in root/i18n/*.csv plus every --i18n-dir. The level music must be a key of the
 "music" section of root/data/audio.json when that file exists. One line per error:
-"<file>: <field path>: <message>". A missing or empty data/levels folder is valid. The GDScript loader
+"<file>: <field path>: <message>". A missing or empty data/levels folder is valid. Tasks of the real levels
+below root/data/levels need a title_key (the HUD task name); test fixtures may omit it. The GDScript loader
 scripts/rules/level_def.gd implements the same rule set (see docs/rules.md).
 """
 import argparse
@@ -29,9 +30,13 @@ RULE_KEYS = ("timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max",
 
 LEVEL_REQUIRED = ("format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
                   "events")
-LEVEL_OPTIONAL = ("three_star_share",)
+LEVEL_OPTIONAL = ("three_star_share", "prompts")
 TASK_REQUIRED = ("id", "required", "conditions", "hint_key", "fail_key")
-TASK_OPTIONAL = ("modifiers",)
+TASK_OPTIONAL = ("modifiers", "title_key")
+# Contextual key prompts (BI-6); the level scene checks that zone and entity anchors exist.
+PROMPT_FIELDS = ("id", "anchor", "action", "text_key")
+PROMPT_ACTIONS = ("move", "dash", "grab", "throw", "use")
+ANCHOR_RE = re.compile(r"^(player|zone:[a-z][a-z0-9_]*|entity:[a-z][a-z0-9_]*)$")
 EVENT_REQUIRED = ("id", "type", "window", "duration_s")
 EVENT_OPTIONAL = ("params",)
 
@@ -236,9 +241,40 @@ def _counting(conds) -> list:
             and c.get("type") in CONDITIONS]
 
 
+def _check_prompts(prompts, catalog: dict, err) -> None:
+    if not isinstance(prompts, list):
+        err("prompts", "must be a list")
+        return
+    seen = {}
+    for i, prompt in enumerate(prompts):
+        ppath = "prompts[%d]" % i
+        if not isinstance(prompt, dict):
+            err(ppath, "must be an object")
+            continue
+        _check_keys(prompt, PROMPT_FIELDS, (), ppath, err)
+        pid = prompt.get("id")
+        if "id" in prompt:
+            if not is_name(pid):
+                err(ppath + ".id", "must match %s" % ID_RE.pattern)
+            elif pid in seen:
+                err(ppath + ".id", "duplicate prompt id %s (also at %s)" % (pid, seen[pid]))
+            else:
+                seen[pid] = ppath
+        anchor = prompt.get("anchor")
+        if "anchor" in prompt and (not isinstance(anchor, str) or not ANCHOR_RE.match(anchor)):
+            err(ppath + ".anchor", "must be player, zone:<name> or entity:<uid>, got %s" % (anchor,))
+        action = prompt.get("action")
+        if "action" in prompt and action not in PROMPT_ACTIONS:
+            err(ppath + ".action", "unknown action %s (one of %s)" % (action, ", ".join(PROMPT_ACTIONS)))
+        if "text_key" in prompt:
+            _check_text_key(prompt["text_key"], ppath + ".text_key", catalog, err)
+
+
 def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict, entity_kinds=(),
-                   music_ids=()) -> list:
+                   music_ids=(), require_titles=False) -> list:
     """Return the errors of one parsed level (pure): '<fname>: <field path>: <message>'.
+
+    require_titles: every task needs a title_key (real levels below data/levels).
 
     entity_kinds: the known animal and item kinds; when empty, entity names are not checked.
     music_ids: the music ids of data/audio.json; when empty, the music id is not checked.
@@ -329,9 +365,11 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
                 flags.append(required)
             else:
                 err(tpath + ".required", "must be a bool")
-        for key in ("hint_key", "fail_key"):
+        for key in ("hint_key", "fail_key", "title_key"):
             if key in task:
                 _check_text_key(task[key], "%s.%s" % (tpath, key), catalog, err)
+        if require_titles and "title_key" not in task:
+            err(tpath + ".title_key", "missing (real levels need a task title for the HUD)")
         conds = task.get("conditions")
         if "conditions" in task:
             if not isinstance(conds, list) or not conds:
@@ -359,6 +397,9 @@ def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: di
             err("tasks", "at least one required task is needed")
         if False not in flags:
             err("tasks", "at least one optional task is needed")
+
+    if "prompts" in data:
+        _check_prompts(data["prompts"], catalog, err)
 
     types = event_types if isinstance(event_types, dict) else {}
     for i, ev in enumerate(events):
@@ -443,6 +484,7 @@ def main(argv=None) -> int:
         more, _more_errors = load_catalog_dir(Path(extra))
         catalog.update(more)
 
+    levels_dir = (root / LEVELS_DIR).resolve()
     if opts.path:
         files = [Path(opts.path)]
     else:
@@ -454,7 +496,9 @@ def main(argv=None) -> int:
             if err:
                 errors.append("%s: %s" % (path.name, err))
                 continue
-            errors.extend(validate_level(data, path.name, rules, event_types, catalog, entity_kinds, music_ids))
+            strict = path.resolve().parent == levels_dir
+            errors.extend(validate_level(data, path.name, rules, event_types, catalog, entity_kinds, music_ids,
+                                         require_titles=strict))
     for line in errors:
         print(line)
     print("validate_levels: %d level file(s), %d error(s)" % (len(files), len(errors)))

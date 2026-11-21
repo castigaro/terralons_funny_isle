@@ -1,0 +1,19 @@
+key,en,de
+hud.hint.none,All tasks done – press the finish key or keep playing!,Alles erledigt – drück die Ziel-Taste oder spiel weiter!
+hud.hint_button,Show a hint (H),Tipp zeigen (H)
+hud.cue.animal_escaped,An animal got away!,Ein Tier ist entwischt!
+hud.cue.item_lost_sea,Lost to the sea!,Ab ins Meer!
+hud.cue.time_up,Time's up!,Die Zeit ist um!
+hud.cue.dizzy_hit,BONK! You're dizzy!,BONK! Dir ist schwindelig!
+hud.cue.event_stole,Hey! Something got stolen!,He! Da hat jemand geklaut!
+hud.banner.finish,Finish!,Ziel!
+hud.verb.grab,Grab,Packen
+hud.verb.throw,Throw,Werfen
+hud.verb.use,Use,Benutzen
+hud.key.space,Space,Leertaste
+hud.key.enter,Enter,Eingabe
+hud.key.kp_enter,Enter,Eingabe
+hud.key.shift,Shift,Umschalt
+hud.star_goal,3-star time,3-Sterne-Zeit
+hud.required,Must,Pflicht
+hud.optional,Bonus,Bonus

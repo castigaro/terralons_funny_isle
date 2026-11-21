@@ -18,9 +18,13 @@ const SURFACE_LAYERS := ["Details", "Shore", "Grass", "Sand"]
 ## Layers whose cells count as land.
 const LAND_LAYERS := ["Sand", "Shore"]
 const REQUIRED_CHILDREN := ["WaterBackdrop", "Sand", "Grass", "Shore", "Details", "Actors", "Markers/Spawn",
-		"HomePoints", "Zones", "Bounds", "EntityRegistry", "LevelCamera", "Overlay/LevelCue", "Overlay/LevelErrorPanel"]
+		"HomePoints", "Zones", "Bounds", "EntityRegistry", "LevelCamera", "Overlay/LevelCue", "Overlay/LevelErrorPanel", "Overlay/Hud", "Prompts"]
 const NEIGHBOURS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 const RESTART_CUE_KEY := "level.restarted"
+const PROMPT_SCENE := preload("res://scenes/ui/context_prompt.tscn")
+const ANCHOR_PLAYER := "player"
+const ANCHOR_ZONE := "zone:"
+const ANCHOR_ENTITY := "entity:"
 
 ## Level file (res:// path), validated by LevelDef.
 @export_file("*.json") var level_json_path := ""
@@ -31,6 +35,8 @@ const RESTART_CUE_KEY := "level.restarted"
 @export var autostart := true
 ## Handle the restart action here; a pause menu owner may switch this off.
 @export var handle_restart_key := true
+## Handle the finish action here (ends the level once the required tasks are done, D-3).
+@export var handle_finish_key := true
 ## Explicit level bounds; a zero size means the rectangle of all land cells.
 @export var bounds_override := Rect2()
 @export var castaway_path: NodePath = ^"Actors/Castaway"
@@ -47,6 +53,8 @@ var _castaway: Node2D
 var _camera: LevelCamera
 var _registry: EntityRegistry
 var _protection: EntityProtection
+var _messages := {}
+var _prompt_problems: Array = []
 
 
 func _ready() -> void:
@@ -75,19 +83,22 @@ func _ready() -> void:
 	if not loaded.is_empty():
 		_fail(loaded)
 		return
+	_registry.set_castaway(_castaway)
+	_registry.refresh()
 	var missing := _contract_problems()
 	if not missing.is_empty():
 		_fail(missing)
 		return
 	_session = LevelSession.new(_def, EventBus, Balance.get_section("rules"), session_options)
-	_registry.set_castaway(_castaway)
-	_registry.refresh()
 	_protection = EntityProtection.new(_session, _def)
 	_registry.set_protection(_protection.is_protected, _protection.confine_zone)
 	_camera.setup(_castaway, _bounds)
 	if _castaway.has_method("reset_to"):
 		_castaway.call("reset_to", spawn_position(), spawn_facing())
 	_camera.snap()
+	($Prompts as Node2D).z_index = int(Balance.get_section("hud").get("prompt_z", 0))
+	(get_node("Overlay/Hud") as Hud).bind_level(self)
+	_spawn_prompts()
 	level_ready.emit(_def.id)
 	if autostart:
 		start_level()
@@ -99,6 +110,7 @@ func _load_def() -> Array:
 	var messages := {}
 	for dir in i18n_dirs:
 		messages.merge(I18n.parse_dir(dir)["messages"])
+	_messages = messages
 	var types := LevelDef.load_event_types()
 	if not types["errors"].is_empty():
 		return types["errors"]
@@ -204,6 +216,75 @@ func castaway() -> Node2D:
 	return _castaway
 
 
+func hud() -> Hud:
+	return get_node_or_null("Overlay/Hud") as Hud
+
+
+## Translated text of a key: the game catalogue first, then the level's extra catalogues (i18n_dirs).
+func text(key: String) -> String:
+	if I18n.has_key(key) or not _messages.has(key):
+		return I18n.t(key)
+	return text_in(key, I18n.get_locale())
+
+
+## Text of a key in a locale from the game or level catalogue ("" when missing).
+func text_in(key: String, locale: String) -> String:
+	if I18n.has_key(key):
+		return I18n.text_in(key, locale)
+	var entry: Dictionary = _messages.get(key, {})
+	return String(entry.get(locale, entry.get("en", "")))
+
+
+# --- Contextual prompts -----------------------------------------------------------------------------------
+
+## The node a prompt anchor names: player -> castaway, zone:<id> -> Zone, entity:<uid> -> animal or item.
+func resolve_anchor(anchor: String) -> Node2D:
+	if anchor == ANCHOR_PLAYER:
+		return _castaway
+	if anchor.begins_with(ANCHOR_ZONE):
+		return zone(anchor.trim_prefix(ANCHOR_ZONE))
+	if anchor.begins_with(ANCHOR_ENTITY) and _registry != null:
+		return _registry.find_uid(anchor.trim_prefix(ANCHOR_ENTITY))
+	return null
+
+
+## Instances a ContextPrompt for every level prompt whose action the player has not used yet.
+func _spawn_prompts() -> void:
+	var holder := $Prompts
+	for child in holder.get_children():
+		holder.remove_child(child)
+		child.queue_free()
+	for prompt in _def.prompts:
+		if PromptMemory.is_used(String(prompt["action"])):
+			continue
+		var anchor := resolve_anchor(String(prompt["anchor"]))
+		if anchor == null:
+			_report_prompt_problem("%s: prompt %s: anchor %s not found in the level"
+					% [level_json_path.get_file(), prompt["id"], prompt["anchor"]])
+			continue
+		var node := PROMPT_SCENE.instantiate() as ContextPrompt
+		node.setup(prompt, anchor, self)
+		holder.add_child(node)
+
+
+## Records a prompt that cannot be placed once; the prompt is skipped and the level keeps running.
+func _report_prompt_problem(message: String) -> void:
+	if _prompt_problems.has(message):
+		return
+	_prompt_problems.append(message)
+	print("LevelBase: %s (prompt skipped)" % message)
+
+
+## Prompts of the level data that could not be placed (unresolved anchors); never shown to the player.
+func prompt_problems() -> Array:
+	return _prompt_problems.duplicate()
+
+
+## Live prompt nodes (freed ones excluded).
+func prompts() -> Array:
+	return $Prompts.get_children().filter(func(n: Node) -> bool: return not n.is_queued_for_deletion())
+
+
 func camera() -> LevelCamera:
 	return _camera
 
@@ -229,6 +310,7 @@ func restart_level() -> void:
 		_castaway.call("reset_to", spawn_position(), spawn_facing())
 	_registry.reset_all()
 	_camera.snap()
+	_spawn_prompts()
 	var cue := get_node_or_null("Overlay/LevelCue")
 	if cue != null:
 		cue.call("show_key", RESTART_CUE_KEY, float(_cfg.get("restart_cue_seconds", 1.0)))
@@ -248,6 +330,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if handle_restart_key and event.is_action_pressed("restart") and not event.is_echo():
 		restart_level()
 		get_viewport().set_input_as_handled()
+	elif handle_finish_key and event.is_action_pressed("finish") and not event.is_echo():
+		if finish_level():
+			get_viewport().set_input_as_handled()
+
+
+## Ends the level as won when the required tasks are done; false otherwise (no side effects).
+func finish_level() -> bool:
+	if _failed or _session == null:
+		return false
+	return _session.finish()
 
 
 # --- Snapshot -------------------------------------------------------------------------------------------

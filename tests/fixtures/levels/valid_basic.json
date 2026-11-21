@@ -10,6 +10,7 @@
 		{
 			"id": "fx_hens_in_coop",
 			"required": true,
+			"title_key": "fixture.hens_in_coop_title",
 			"conditions": [
 				{
 					"type": "in_zone",
@@ -24,6 +25,7 @@
 		{
 			"id": "fx_hat_on_goat",
 			"required": true,
+			"title_key": "fixture.hat_on_goat_title",
 			"conditions": [
 				{
 					"type": "worn",
@@ -37,6 +39,7 @@
 		{
 			"id": "fx_coconut_run",
 			"required": false,
+			"title_key": "fixture.coconut_run_title",
 			"conditions": [
 				{
 					"type": "delivered_to",
@@ -57,6 +60,7 @@
 		{
 			"id": "fx_quick_pig",
 			"required": false,
+			"title_key": "fixture.quick_pig_title",
 			"conditions": [
 				{
 					"type": "held",
