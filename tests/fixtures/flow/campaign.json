@@ -1,0 +1,8 @@
+{
+	"schema_version": 1,
+	"levels": [
+		{"id": "valid_sample_level", "scene": "res://tests/scenes/sample_level.tscn", "json": "res://tests/fixtures/levels/valid_sample_level.json"},
+		{"id": "valid_small_level", "scene": "res://tests/scenes/small_level.tscn", "json": "res://tests/fixtures/levels/valid_small_level.json"},
+		{"id": "missing_level", "scene": "res://tests/scenes/missing_level.tscn", "json": "res://tests/fixtures/levels/missing_level.json"}
+	]
+}

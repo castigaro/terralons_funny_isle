@@ -1,0 +1,10 @@
+{
+	"schema_version": 1,
+	"levels": [
+		{"id": "beach_camp"},
+		{"id": "farm_meadow"},
+		{"id": "jungle"},
+		{"id": "lagoon"},
+		{"id": "volcano_cliffs"}
+	]
+}

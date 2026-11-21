@@ -1,0 +1,95 @@
+extends "res://tests/support/flow_case.gd"
+## Mouse navigation: two clicks from the title into a level, locked tiles do nothing, every pause, result,
+## settings and credits action works by click, hovering grabs focus.
+
+
+func test_two_clicks_from_title_to_level() -> void:
+	await open_flow("nav_mouse_start")
+	await click(screen_node().get("play_button"))
+	check_eq(screen(), FlowRules.Screen.LEVEL_SELECT, "click 1: level select")
+	await click(screen_node().call("tile_button", SAMPLE))
+	check_eq(screen(), FlowRules.Screen.INTRO, "click 2: level loaded with its intro card")
+	check_ne(level(), null, "level instance")
+	var auto := Balance.get_float("flow", "intro_auto_s")
+	screen_node().advance_time(auto)
+	await frames(1)
+	check_eq(screen(), FlowRules.Screen.PLAYING, "intro card closes by itself")
+	check_eq(session().get_state(), LevelSession.State.RUNNING, "running without a third click")
+
+
+func test_click_on_locked_tile_does_nothing() -> void:
+	await open_flow("nav_mouse_locked")
+	await click(screen_node().get("play_button"))
+	await click(screen_node().call("tile_button", SMALL))
+	check_eq(screen(), FlowRules.Screen.LEVEL_SELECT, "still level select")
+	check_eq(level(), null, "no level")
+
+
+func test_hover_grabs_focus() -> void:
+	await open_flow("nav_mouse_hover")
+	var quit_button: Button = screen_node().get("quit_button")
+	await hover(quit_button)
+	check_eq(focused(), quit_button, "hover focuses")
+
+
+func test_pause_actions_by_click() -> void:
+	await open_flow("nav_mouse_pause")
+	check_true(flow.call("start_level_flow", SAMPLE, false), "start without intro")
+	await frames(1)
+	await key(KEY_ESCAPE)
+	check_eq(screen(), FlowRules.Screen.PAUSE, "paused")
+	await click(screen_node().get("resume_button"))
+	check_eq(screen(), FlowRules.Screen.PLAYING, "resume by click")
+	await key(KEY_ESCAPE)
+	await click(screen_node().get("settings_button"))
+	check_eq(screen(), FlowRules.Screen.SETTINGS, "settings from pause")
+	check_ne(screen_node().get("music_slider"), null, "music slider in pause settings")
+	check_ne(screen_node().get("effects_slider"), null, "effects slider in pause settings")
+	await click(screen_node().get("back_button"))
+	check_eq(screen(), FlowRules.Screen.PAUSE, "back to pause")
+	check_true(tree().paused, "still paused")
+	await click(screen_node().get("restart_button"))
+	check_eq(screen(), FlowRules.Screen.PLAYING, "restart by click")
+	await key(KEY_ESCAPE)
+	await click(screen_node().get("quit_button"))
+	check_eq(quit_calls, 1, "quit by click")
+	await click(screen_node().get("level_select_button"))
+	check_eq(screen(), FlowRules.Screen.LEVEL_SELECT, "level select by click")
+	check_eq(level(), null, "level abandoned")
+	check_false(tree().paused, "unpaused")
+
+
+func test_result_and_credits_by_click() -> void:
+	await open_flow("nav_mouse_result")
+	flow.call("start_level_flow", SAMPLE, false)
+	await frames(1)
+	await win_level()
+	check_eq(screen(), FlowRules.Screen.RESULT, "result")
+	await wait_guard()
+	await click(screen_node().get("retry_button"))
+	check_eq(screen(), FlowRules.Screen.PLAYING, "retry by click")
+	await win_level()
+	await wait_guard()
+	await click(screen_node().get("next_button"))
+	check_eq(screen(), FlowRules.Screen.INTRO, "next level by click")
+	check_eq(flow.call("level_id"), SMALL, "second level")
+	await wait_guard()
+	await click(screen_node())
+	check_eq(screen(), FlowRules.Screen.PLAYING, "intro closed by click")
+	await lose_level()
+	await wait_guard()
+	await click(screen_node().get("level_select_button"))
+	check_eq(screen(), FlowRules.Screen.LEVEL_SELECT, "level select by click")
+	await click(screen_node().get("back_button"))
+	check_eq(screen(), FlowRules.Screen.TITLE, "back by click")
+	await click(screen_node().get("credits_button"))
+	check_eq(screen(), FlowRules.Screen.CREDITS, "credits by click")
+	await wait_guard()
+	await click(screen_node())
+	check_eq(screen(), FlowRules.Screen.TITLE, "credits closed by click")
+	await click(screen_node().get("settings_button"))
+	check_eq(screen(), FlowRules.Screen.SETTINGS, "settings by click")
+	await click(screen_node().get("german_button"))
+	check_eq(I18n.get_locale(), "de", "language by click")
+	await click(screen_node().get("back_button"))
+	check_eq(screen(), FlowRules.Screen.TITLE, "settings closed")

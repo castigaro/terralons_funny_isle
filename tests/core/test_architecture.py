@@ -62,11 +62,12 @@ class ArchitectureTest(unittest.TestCase):
             self.assertTrue(imp.is_file(), imp)
             self.assertIn('importer="keep"', imp.read_text(encoding="utf-8"))
 
-    def test_title_stub(self):
+    def test_title_screen(self):
         text = (REPO / "scenes" / "main.tscn").read_text(encoding="utf-8")
         self.assertNotIn("ColorRect", text)
+        title = (REPO / "scripts" / "ui" / "menus" / "title.gd").read_text(encoding="utf-8")
+        self.assertIn('"core.title"', title)
         labels = re.findall(r'^text = "([^"]*)"', text, re.M)
-        self.assertTrue(labels)
         keys = i18n_keys()
         for value in labels:
             self.assertIn(value, keys)
