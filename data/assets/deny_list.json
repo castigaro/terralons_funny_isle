@@ -1,0 +1,10 @@
+{
+	"description": "Name tokens of weapon, violence and scary assets; tools/validate_assets.py fails if a used asset file name contains one of them.",
+	"tokens": [
+		"ammo", "axe", "blood", "bloody", "bomb", "bullet", "cannon", "coffin", "corpse", "dagger",
+		"dead", "death", "demon", "devil", "explosion", "fire_in_the_hole", "ghost", "gore", "grave", "grenade",
+		"gun", "guns", "kill", "knife", "medic", "monster", "muzzle", "pistol", "reload",
+		"reloading", "rifle", "rpg", "scorch", "silencer", "skeleton", "skull", "slash", "sniper", "spear",
+		"sword", "tombstone", "war", "weapon", "zombie"
+	]
+}

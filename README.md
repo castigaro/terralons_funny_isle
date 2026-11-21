@@ -39,8 +39,13 @@ Helpers: `CliArgs` (`scripts/core/cli_args.gd`) parses user arguments; `SeededRn
   - no networking classes or modules, Python standard library only;
   - no survival stats: no hunger, energy, health, food, rest, faint or stamina in identifiers, node names, balance keys or i18n keys (the game has none of these mechanics);
   - no global randomness outside `SeededRng`, no `get_meta(key, null)`, every tracked `.gd` has a tracked `.gd.uid`.
+- `tools/validate_assets.py`: every file below `assets/` lies in a pack listed in `assets/SOURCES.md` (pack, author, licence, source per row); every media file referenced by a `.tscn`, `.tres`, `.gd`, `project.godot` or `data/**/*.json` lies in such a pack, every referenced file exists with the exact letter case, and no used asset name matches the deny list `data/assets/deny_list.json` (weapons, violence, scary content). Unused imported files and imported deny-list names are listed as warnings. Format placeholders (`%s`, `{name}`) make a reference a pattern.
 - `tools/validate_basics.py`: required top-level files exist.
 - `tools/validate_levels.py`: `data/events.json` and every `data/levels/*.json` against the level schema, with limits from `data/balance/rules.json` (see `docs/rules.md`).
+
+## Assets
+
+The CC0 packs live in `assets/` (copied unchanged from the spec folder), with sources and licences in `assets/SOURCES.md`. `docs/asset_map.md` names the chosen sprites, fonts and sounds; folders the game does not use carry a `.gdignore` so Godot skips them on import.
 
 ## Conventions
 
