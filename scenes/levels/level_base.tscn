@@ -1,0 +1,68 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/levels/level_base.gd" id="1_base"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_73.png" id="2_water"]
+[ext_resource type="Shader" path="res://scenes/levels/art/water.gdshader" id="3_water_shader"]
+[ext_resource type="TileSet" path="res://scenes/levels/island_tileset.tres" id="4_tiles"]
+[ext_resource type="Script" path="res://scripts/levels/level_camera.gd" id="5_camera"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_cue.tscn" id="6_cue"]
+[ext_resource type="PackedScene" path="res://scenes/ui/level_error_panel.tscn" id="7_error"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_water"]
+resource_local_to_scene = true
+shader = ExtResource("3_water_shader")
+
+[node name="LevelBase" type="Node2D"]
+process_physics_priority = 1
+script = ExtResource("1_base")
+
+[node name="WaterBackdrop" type="Sprite2D" parent="."]
+z_index = -2
+texture_repeat = 2
+material = SubResource("ShaderMaterial_water")
+texture = ExtResource("2_water")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 128, 128)
+
+[node name="Sand" type="TileMapLayer" parent="."]
+z_index = -2
+tile_set = ExtResource("4_tiles")
+
+[node name="Grass" type="TileMapLayer" parent="."]
+z_index = -2
+tile_set = ExtResource("4_tiles")
+
+[node name="Shore" type="TileMapLayer" parent="."]
+z_index = -2
+tile_set = ExtResource("4_tiles")
+
+[node name="Details" type="TileMapLayer" parent="."]
+z_index = -2
+tile_set = ExtResource("4_tiles")
+
+[node name="Actors" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Markers" type="Node2D" parent="."]
+
+[node name="Spawn" type="Marker2D" parent="Markers"]
+
+[node name="HomePoints" type="Node2D" parent="."]
+
+[node name="Zones" type="Node2D" parent="."]
+
+[node name="Bounds" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="LevelCamera" type="Camera2D" parent="."]
+process_physics_priority = 2
+process_callback = 0
+script = ExtResource("5_camera")
+
+[node name="Overlay" type="Node" parent="."]
+
+[node name="LevelCue" parent="Overlay" instance=ExtResource("6_cue")]
+
+[node name="LevelErrorPanel" parent="Overlay" instance=ExtResource("7_error")]

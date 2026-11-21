@@ -79,3 +79,32 @@ func test_physics_layer_names() -> void:
 		check_eq(value, EXPECTED_LAYERS[i], "layer %d" % (i + 1))
 	check_eq(PhysicsLayers.WORLD_SOLID, 1 << 0, "solid bit")
 	check_eq(PhysicsLayers.ZONES, 1 << 6, "zones bit")
+
+
+func test_physics_interpolation_and_stretch() -> void:
+	check_eq(ProjectSettings.get_setting("physics/common/physics_interpolation"), true, "physics interpolation")
+	check_eq(int(ProjectSettings.get_setting("physics/common/physics_ticks_per_second")), 60, "60 Hz tick")
+	check_eq(float(ProjectSettings.get_setting("physics/common/physics_jitter_fix")), 0.0, "jitter fix off")
+	check_eq(String(ProjectSettings.get_setting("display/window/stretch/aspect")), "keep", "aspect keep")
+	check_eq(ProjectSettings.get_setting("display/window/size/resizable"), true, "resizable")
+	check(ProjectSettings.has_setting("rendering/environment/defaults/default_clear_color"), "clear colour set")
+
+
+func _collect_canvas_layers(node: Node, out: Array) -> Array:
+	if node is CanvasLayer:
+		out.append(node)
+	for child in node.get_children():
+		_collect_canvas_layers(child, out)
+	return out
+
+
+func test_level_interpolation_modes() -> void:
+	var level := (load("res://tests/scenes/sample_level.tscn") as PackedScene).instantiate() as LevelBase
+	add_node(level)
+	await physics_frames(1)
+	check(level.camera().physics_interpolation_mode != Node.PHYSICS_INTERPOLATION_MODE_OFF, "camera interpolated")
+	check(level.camera().is_physics_interpolated(), "camera interpolation active")
+	var layers := _collect_canvas_layers(level, [])
+	check(layers.size() >= 2, "overlay layers found")
+	for layer in layers:
+		check_eq(layer.physics_interpolation_mode, Node.PHYSICS_INTERPOLATION_MODE_OFF, "%s interpolation off" % layer.name)

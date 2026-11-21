@@ -1,0 +1,72 @@
+{
+	"format_version": 1,
+	"id": "valid_sample_level",
+	"title_key": "fixture.sample_title",
+	"theme": "palm_beach",
+	"music": "fixture_tune",
+	"seed": 5150,
+	"timer_seconds": 180,
+	"tasks": [
+		{
+			"id": "fx_reach_a",
+			"required": true,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "player",
+					"zone": "zone_a"
+				}
+			],
+			"hint_key": "fixture.reach_a_hint",
+			"fail_key": "fixture.reach_a_fail"
+		},
+		{
+			"id": "fx_reach_b",
+			"required": false,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "player",
+					"zone": "zone_b"
+				}
+			],
+			"hint_key": "fixture.reach_b_hint",
+			"fail_key": "fixture.reach_b_fail"
+		},
+		{
+			"id": "fx_grab_coconut",
+			"required": false,
+			"conditions": [
+				{
+					"type": "held",
+					"entity": "coconut"
+				}
+			],
+			"hint_key": "fixture.grab_coconut_hint",
+			"fail_key": "fixture.grab_coconut_fail"
+		}
+	],
+	"events": [
+		{
+			"id": "fx_ev_rain",
+			"type": "rain_panic",
+			"window": [
+				20,
+				40
+			],
+			"duration_s": 5
+		},
+		{
+			"id": "fx_ev_wave",
+			"type": "wave_wash",
+			"window": [
+				60,
+				90
+			],
+			"duration_s": 6,
+			"params": {
+				"strength": 1.0
+			}
+		}
+	]
+}

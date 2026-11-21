@@ -6,7 +6,7 @@ const FROZEN := [
 	"event_triggered", "object_grabbed", "object_thrown", "object_bonked", "settings_changed",
 	"castaway_dashed", "castaway_step", "object_used", "object_landed", "castaway_dizzy_started",
 	"castaway_dizzy_ended", "interact_verb_changed",
-	"task_progress", "timer_warning", "event_ended",
+	"task_progress", "timer_warning", "event_ended", "level_restarted",
 ]
 
 var _got: Array = []

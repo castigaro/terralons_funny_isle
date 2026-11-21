@@ -44,6 +44,8 @@ Never use the knife (`genericItem_color_134`), the axe (`_020`), saws or other s
 
 Island tiles 128×128 px from the pirate pack (`assets/graphics/pirate-pack/PNG/Retina/Tiles/`, the pack's tilesheet says 64 px at 1×):
 
+- Level TileMapLayers use the retina tilesheet `assets/graphics/pirate-pack/Tilesheet/tiles_sheet@2.png` (16×6 tiles of 128 px) through `scenes/levels/island_tileset.tres` (BI-5): shore edges and outer corners at atlas (0–2, 0–2), rocks at (0–2, 3–4), plain sand at (3–4, 4), full grass at (6–7, 1–2). The water backdrop uses the standalone `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_73.png`, because shader distortion on an atlas tile bleeds into its neighbours.
+
 - Sand island with shoreline: `tile_01`–`tile_03`, `tile_17`–`tile_19`, `tile_33`–`tile_35` (for example `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_18.png`)
 - Grass on sand: `tile_06`–`tile_09`, `tile_22`–`tile_25`, `tile_38`–`tile_41`, `tile_54`–`tile_57`; full grass `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_23.png`
 - Water (animate by UV scroll or shader): `assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_73.png`
@@ -137,4 +139,4 @@ Male voice (`assets/audio/voiceover/Male/`, the female set is excluded):
 
 ## Excluded from the import
 
-`.gdignore` folders: animal spritesheets and the outline-less animals, emote styles 2–8 and emote spritesheets, foliage and item spritesheets, pirate ships, ship parts, effects, spritesheet and tilesheet, the top-down interior tiles and tilesheet, UI colours Grey, Green, Red and all `Double` variants, the female voice, the jingle sets HIT, SAX and STEEL, and the whole `audio/sfx-digital/` pack (lasers and phasers, kept in `SOURCES.md` per D-7).
+`.gdignore` folders: animal spritesheets and the outline-less animals, emote styles 2–8 and emote spritesheets, foliage and item spritesheets, pirate ships, ship parts, effects and spritesheet (the pirate tilesheet is imported since BI-5), the top-down interior tiles and tilesheet, UI colours Grey, Green, Red and all `Double` variants, the female voice, the jingle sets HIT, SAX and STEEL, and the whole `audio/sfx-digital/` pack (lasers and phasers, kept in `SOURCES.md` per D-7).

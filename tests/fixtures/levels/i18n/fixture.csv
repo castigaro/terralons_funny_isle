@@ -16,3 +16,11 @@ fixture.penguin_home_hint,Bring the penguin to the beach wearing a hat.,Bring de
 fixture.penguin_home_fail,The penguin is still lost!,Der Pinguin ist noch verloren!
 fixture.empty_en,,Nur Deutsch
 fixture.empty_de,English only,
+fixture.sample_title,Sample Beach,Beispielstrand
+fixture.small_title,Tiny Beach,Winziger Strand
+fixture.reach_a_hint,Run to zone A.,Lauf zu Zone A.
+fixture.reach_a_fail,You never reached zone A!,Du warst nie in Zone A!
+fixture.reach_b_hint,Run to zone B.,Lauf zu Zone B.
+fixture.reach_b_fail,You never reached zone B!,Du warst nie in Zone B!
+fixture.grab_coconut_hint,Grab the coconut.,Schnapp dir die Kokosnuss.
+fixture.grab_coconut_fail,The coconut is still lying around!,Die Kokosnuss liegt noch herum!

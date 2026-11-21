@@ -80,4 +80,4 @@ func reset_look(facing: float) -> void:
 func _restart_tween() -> void:
 	if _tween != null:
 		_tween.kill()
-	_tween = create_tween()
+	_tween = create_tween().set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)

@@ -83,7 +83,10 @@ locale/fallback="en"
 [physics]
 
 common/physics_ticks_per_second=60
+common/physics_interpolation=true
+common/physics_jitter_fix=0.0
 
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.67058825, 0.8901961, 0.9607843, 1)

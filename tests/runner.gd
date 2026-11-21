@@ -1,6 +1,7 @@
 extends SceneTree
 ## Headless test runner.
-## Usage: godot --headless --path . --script res://tests/runner.gd -- [--watchdog=<s>] res://tests/x/test_a.gd [...]
+## Usage: godot --headless --path . --script res://tests/runner.gd -- [--watchdog=<s>] [--fps=<n>] res://tests/x/test_a.gd [...]
+## --fps=<n> only tells TestCase.run_fps() which --fixed-fps value the run uses; it is not a test file.
 ## Runs every test_* method without parameters (coroutines are awaited) with optional before_each/after_each and an
 ## environment reset between tests. Prints RUN/PASS/FAIL lines, one RESULT line per file and exits 1 on
 ## any failure, on a file without tests or when the watchdog fires. This entry script must stay duck-typed:

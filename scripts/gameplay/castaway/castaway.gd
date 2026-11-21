@@ -194,6 +194,7 @@ func _safety_net() -> void:
 		global_position = last_safe_position
 		velocity = Vector2.ZERO
 		_logic.stop_motion()
+		reset_physics_interpolation()
 
 
 func _emit_steps(step: CastawayStep, delta: float) -> void:

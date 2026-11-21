@@ -148,6 +148,18 @@ class ValidateAssetsTest(unittest.TestCase):
         gd = 'extends Node\n\nconst ANIMAL := "res://assets/graphics/animals/%s.webp"\n'
         self.assert_fails({"scripts/a.gd": gd}, "pattern matches no file")
 
+    def test_image_outside_assets_fails_even_unreferenced(self):
+        self.assert_fails({"scenes/levels/box.png": b"png"},
+                          "image outside assets/ (sprites must come from the asset packs): scenes/levels/box.png")
+
+    def test_project_icon_may_lie_outside_assets(self):
+        code, out = run(make_tree({"icon.svg": "<svg/>", "project.godot": 'config/icon="res://icon.svg"\n'}))
+        self.assertEqual(code, 0, out)
+
+    def test_images_below_assets_pass(self):
+        code, out = run(make_tree({"assets/graphics/animals/cow.webp": b"webp"}))
+        self.assertNotIn("image outside assets/", out)
+
     def test_comments_are_ignored(self):
         gd = 'extends Node\n\n# Example: res://nowhere/thing.png\n'
         code, out = run(make_tree({"scripts/a.gd": gd}))
@@ -170,6 +182,17 @@ class RepoAssetsTest(unittest.TestCase):
         for folder in ("audio/sfx-digital", "audio/voiceover/Female", "graphics/topdown-characters/PNG/Tiles",
                        "graphics/pirate-pack/PNG/Retina/Ships", "ui/ui-pack/PNG/Grey"):
             self.assertTrue((common.REPO / "assets" / folder / ".gdignore").is_file(), folder)
+
+    def test_island_tilesheet_is_imported_and_used(self):
+        folder = common.REPO / "assets" / "graphics" / "pirate-pack" / "Tilesheet"
+        self.assertFalse((folder / ".gdignore").exists())
+        self.assertTrue((folder / "tiles_sheet@2.png").is_file())
+        tileset = (common.REPO / "scenes" / "levels" / "island_tileset.tres").read_text(encoding="utf-8")
+        self.assertIn("res://assets/graphics/pirate-pack/Tilesheet/tiles_sheet@2.png", tileset)
+        asset_map = (common.REPO / "docs" / "asset_map.md").read_text(encoding="utf-8")
+        self.assertIn("`assets/graphics/pirate-pack/Tilesheet/tiles_sheet@2.png`", asset_map)
+        sources = (common.REPO / "assets" / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertIn("`graphics/pirate-pack/`", sources)
 
     def test_asset_map_names_every_category(self):
         text = (common.REPO / "docs" / "asset_map.md").read_text(encoding="utf-8").lower()

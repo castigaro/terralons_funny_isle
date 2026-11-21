@@ -45,3 +45,5 @@ signal task_progress(level_id: String, task_id: String, current: int, target: in
 signal timer_warning(level_id: String, seconds_left: float)
 @warning_ignore("unused_signal")
 signal event_ended(event_id: String)
+@warning_ignore("unused_signal")
+signal level_restarted(level_id: String)

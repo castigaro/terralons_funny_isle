@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/level_error_panel.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf" id="2_font"]
+
+[node name="LevelErrorPanel" type="CanvasLayer"]
+process_mode = 3
+physics_interpolation_mode = 2
+layer = 100
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Box" type="VBoxContainer" parent="Panel/Center"]
+custom_minimum_size = Vector2(640, 0)
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="Message" type="Label" parent="Panel/Center/Box"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Path" type="Label" parent="Panel/Center/Box"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Back" type="Button" parent="Panel/Center/Box"]
+custom_minimum_size = Vector2(320, 88)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 40

@@ -1,0 +1,36 @@
+{
+	"format_version": 1,
+	"colors": {
+		"sand": "#fae8c2",
+		"grass": "#2ecc71",
+		"water": "#abe3f5",
+		"water_deep": "#5bb8de",
+		"foliage": "#2e9e5b",
+		"outline": "#3b2c22",
+		"ui_panel": "#1d2733",
+		"ui_text": "#f7f3e8",
+		"ui_accent": "#ffc93c"
+	},
+	"water_tint": "water",
+	"highlight": "#ffffff",
+	"highlight_alpha": 0.2,
+	"outline": {
+		"color_key": "outline",
+		"thickness_px_1080": 3
+	},
+	"shadow": {
+		"alpha": 0.55,
+		"scale": 0.8,
+		"squash": 0.4,
+		"offset": [6, 4]
+	},
+	"outlined": [
+		"assets/graphics/items/"
+	],
+	"drawn_outline": [
+		"assets/graphics/foliage/",
+		"assets/graphics/foliage-sprites/",
+		"assets/graphics/topdown-characters/",
+		"assets/graphics/animals/PNG/Round (outline)/"
+	]
+}
