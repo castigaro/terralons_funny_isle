@@ -7,6 +7,8 @@ const FROZEN := [
 	"castaway_dashed", "castaway_step", "object_used", "object_landed", "castaway_dizzy_started",
 	"castaway_dizzy_ended", "interact_verb_changed",
 	"task_progress", "timer_warning", "event_ended",
+	"animal_fled", "animal_bonked", "animal_panicked", "animal_caught", "animal_lured", "entity_lost",
+	"entity_respawned",
 ]
 
 var _got: Array = []

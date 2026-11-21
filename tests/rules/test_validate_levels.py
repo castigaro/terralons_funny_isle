@@ -43,6 +43,7 @@ EXPECTED = {
     "invalid_count_zero": "count: count must be",
     "invalid_before_time_beyond": "seconds: before_time seconds",
     "invalid_unknown_event_ref": "before_event must name an event",
+    "invalid_unknown_entity": "tasks[0].conditions[0].entity: unknown entity kind dragon",
 }
 
 
@@ -159,6 +160,27 @@ class ValidateLevelsTest(unittest.TestCase):
         errs = validate_levels.validate_event_types(bad)
         self.assertTrue(any("unknown effect" in e for e in errs), errs)
         self.assertTrue(any("params.zone.type" in e for e in errs), errs)
+
+    def test_entity_kinds_checked_except_player_and_targets(self):
+        rules, _errors = validate_levels.load_rules(REPO)
+        types = json.loads((REPO / "data" / "events.json").read_text(encoding="utf-8"))["types"]
+        catalog = fixture_catalog()
+        kinds = validate_levels.load_entity_kinds(REPO)
+        self.assertTrue({"chicken", "duck", "goat", "pig", "monkey", "parrot", "penguin", "coconut", "hat",
+                         "bucket", "sand_pail"} <= kinds, kinds)
+        data = load_fixture("valid_basic")
+        self.assertEqual(validate_levels.validate_level(data, "valid_basic.json", rules, types, catalog, kinds), [])
+        data["tasks"][0]["conditions"][0]["entity"] = "player"
+        data["tasks"][0]["conditions"][0].pop("count")
+        data["tasks"][2]["conditions"][0]["target"] = "farmer"
+        errs = validate_levels.validate_level(data, "valid_basic.json", rules, types, catalog, kinds)
+        self.assertFalse(any("unknown entity kind" in e for e in errs), errs)
+        data = load_fixture("valid_basic")
+        data["tasks"][1]["conditions"][0]["wearer"] = "unicorn"
+        errs = validate_levels.validate_level(data, "valid_basic.json", rules, types, catalog, kinds)
+        self.assertTrue(any("wearer: unknown entity kind unicorn" in e for e in errs), errs)
+        self.assertFalse(any("unknown entity kind" in e for e in validate_levels.validate_level(
+            data, "valid_basic.json", rules, types, catalog)), "no kinds, no check")
 
     def test_prefix_convention_matches_gdscript_parity_test(self):
         for path in FIXTURES.glob("*.json"):

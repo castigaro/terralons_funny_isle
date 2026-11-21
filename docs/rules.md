@@ -98,7 +98,7 @@ The effects vocabulary is declarative. Level scenes apply effects to the world w
 }
 ```
 
-Deliveries and counters are events rather than states, so scenes report them with `report_delivery(entity, target)` and `report_count(counter, n)`.
+The `entities` list comes from `EntityRegistry.snapshot_entities()` (`docs/entities.md`). Deliveries and counters are events rather than states, so scenes report them with `report_delivery(entity, target)` and `report_count(counter, n)`.
 
 ## LevelSession
 
@@ -154,6 +154,6 @@ Ticks are ignored unless the state is `RUNNING` or `REQUIRED_DONE`. That is how 
 python tools/validate_levels.py [--root DIR] [--path FILE] [--i18n-dir DIR ...]
 ```
 
-The validator checks `data/events.json` and every `data/levels/*.json`, or a single file with `--path`. It prints one line per error as `<file>: <field path>: <message>` and exits with 1 on any error. A missing or empty levels folder is valid. `run_tests.py` runs it with every validator.
+The validator checks `data/events.json` and every `data/levels/*.json`, or a single file with `--path`. Entity names in conditions (`in_zone`, `held` and `delivered_to` entity, `worn` item and wearer) must be animal or item kinds from `data/animals.json` or `data/items.json`, except `player`; `delivered_to` targets are use-target kinds and are not checked. `LevelDef.make_context` takes the known kinds as an optional fourth argument (`EntityDefs.kinds()`); without them the names are not checked. It prints one line per error as `<file>: <field path>: <message>` and exits with 1 on any error. A missing or empty levels folder is valid. `run_tests.py` runs it with every validator.
 
 Test fixtures live in `tests/fixtures/levels/` (`valid_*` must pass, `invalid_*` must fail). Their texts are in `tests/fixtures/levels/i18n/fixture.csv`, a separate catalogue with a committed `importer="keep"` import file, so that test keys never enter the product catalogue. `tests/rules/test_level_def.gd` asserts that `LevelDef` reaches the same verdict on every fixture.

@@ -26,6 +26,8 @@ const CONDITIONS := {
 	"before_time": [{"seconds": "seconds"}, {}],
 }
 const MODIFIER_ONLY := {"before_event": [{"event": "event"}, {}]}
+## Condition fields that name an entity kind (checked against the known kinds, except "player").
+const ENTITY_FIELDS := {"in_zone": ["entity"], "held": ["entity"], "delivered_to": ["entity"], "worn": ["item", "wearer"]}
 const PARAM_TYPES := ["string", "int", "float", "bool"]
 const EFFECTS := ["relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground"]
 
@@ -45,9 +47,11 @@ var tasks: Array[Dictionary] = []
 var events: Array[Dictionary] = []
 
 
-## Returns the context for parse(): balance section "rules", event types and i18n messages {key: {en, de}}.
-static func make_context(rules: Dictionary, event_types: Dictionary, messages: Dictionary) -> Dictionary:
-	return {"rules": rules, "event_types": event_types, "messages": messages}
+## Returns the context for parse(): balance section "rules", event types, i18n messages {key: {en, de}} and the
+## known entity kinds {kind: true} (animals and items); with no kinds the entity names are not checked.
+static func make_context(rules: Dictionary, event_types: Dictionary, messages: Dictionary,
+		entity_kinds: Dictionary = {}) -> Dictionary:
+	return {"rules": rules, "event_types": event_types, "messages": messages, "entity_kinds": entity_kinds}
 
 
 ## Loads data/events.json: returns {types: Dictionary, errors: Array}.
@@ -108,6 +112,7 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 	var rules: Dictionary = ctx.get("rules", {})
 	var types: Dictionary = ctx.get("event_types", {})
 	var messages: Dictionary = ctx.get("messages", {})
+	var kinds: Dictionary = ctx.get("entity_kinds", {})
 	for key in RULE_KEYS:
 		if not rules.get(key) is int:
 			err.call("rules", "balance key %s missing or not an integer" % key)
@@ -200,7 +205,7 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 				conds = task["conditions"]
 			var only_time := not conds.is_empty()
 			for j in conds.size():
-				_check_condition(conds[j], "%s.conditions[%d]" % [tpath, j], CONDITIONS, timer, event_ids, err)
+				_check_condition(conds[j], "%s.conditions[%d]" % [tpath, j], CONDITIONS, timer, event_ids, err, kinds)
 				if not (conds[j] is Dictionary and conds[j].get("type") == "before_time"):
 					only_time = false
 			if only_time:
@@ -213,7 +218,7 @@ static func parse(data: Variant, ctx: Dictionary, fname: String = "") -> Diction
 				mods = task["modifiers"]
 		for j in mods.size():
 			var mpath := "%s.modifiers[%d]" % [tpath, j]
-			_check_condition(mods[j], mpath, modifier_grammar, timer, event_ids, err)
+			_check_condition(mods[j], mpath, modifier_grammar, timer, event_ids, err, kinds)
 			if mods[j] is Dictionary and mods[j].get("type") == "before_event" and required is bool and required:
 				err.call(mpath + ".type", "before_event is only allowed on optional tasks")
 		var counting := _counting(conds + mods)
@@ -359,7 +364,7 @@ static func _check_text_key(value: Variant, path: String, messages: Dictionary, 
 
 
 static func _check_condition(cond: Variant, path: String, grammar: Dictionary, timer: Variant, event_ids: Dictionary,
-		err: Callable) -> void:
+		err: Callable, kinds: Dictionary = {}) -> void:
 	if not cond is Dictionary:
 		err.call(path, "must be an object")
 		return
@@ -395,6 +400,12 @@ static func _check_condition(cond: Variant, path: String, grammar: Dictionary, t
 			"event":
 				if not event_ids.has(value):
 					err.call(fpath, "before_event must name an event of this level, got %s" % str(value))
+	if kinds.is_empty():
+		return
+	for key in ENTITY_FIELDS.get(ctype, []):
+		var name: Variant = cond.get(key)
+		if _is_name(name) and name != PLAYER and not kinds.has(name):
+			err.call("%s.%s" % [path, key], "unknown entity kind %s (not in data/animals.json or data/items.json)" % name)
 
 
 static func _check_params(params: Dictionary, specs: Dictionary, path: String, err: Callable) -> void:

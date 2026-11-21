@@ -19,7 +19,8 @@ Only move, dash and interact are handled by the castaway; pause, restart, hint a
 ## Rules
 
 - Input is read in the same physics frame it acts in (`CastawayInput.from_input()`); presses are never buffered.
-- Movement accelerates with `move_accel`, slows down with `move_decel`, diagonals are normalised; carrying multiplies the speed by `carry_speed_factor`. The facing turns towards the move direction at `turn_speed`.
+- Movement accelerates with `move_accel`, slows down with `move_decel`, diagonals are normalised; carrying multiplies the speed by `carry_speed_factor / weight`. The facing turns towards the move direction at `turn_speed`.
+- Carry weight: a carried object with `get_carry_weight()` (animals and items, see `docs/entities.md`) counts with its weight clamped to `carry_weight_min..carry_weight_max`, anything else with 1.0. Heavier loads walk slower and fly shorter (`throw_range / weight`, also the aim range); weight 1.0 keeps the plain numbers.
 - Dash: `dash_distance` in `dash_duration`, in the move direction or, without input, in the facing direction. The cooldown `dash_cooldown` counts from the dash start. A dash stops at the first solid object, the shoreline or a level bound and never enters them.
 - Interact priority: carrying – use on the nearest accepting use target within `use_radius`, otherwise throw; empty hands – grab, otherwise nothing. The verb the next press will perform is exposed as `Castaway.get_interact_verb()` and announced by `EventBus.interact_verb_changed(verb, target_kind)` whenever it changes (HUD prompt).
 - Grab: nearest grabbable within `grab_radius` inside the grab cone, else the nearest one within `grab_touch_radius` in any direction. `grab_cone_degrees` is a half-angle: 75 means 150 degrees in total. Ties go to the smaller distance, then the smaller instance id.
@@ -40,6 +41,8 @@ Duck-typed, because animals and items use different base classes:
 - Surface provider (group `surface_provider`): `get_surface_at(global_pos) -> String` returning `sand`, `grass` or `water`; without a provider the surface is `sand`.
 
 ## EventBus signals
+
+The castaway joins group `castaway` (used by the entity registry). Animal and item signals are listed in `docs/entities.md`.
 
 `castaway_dashed(position, direction)`, `castaway_step(position, surface)` every `step_interval` while running, `object_grabbed(kind)`, `object_used(kind, target_kind)`, `object_thrown(kind)`, `object_landed(kind, position, surface)`, `object_bonked("castaway", cause)`, `castaway_dizzy_started(cause)`, `castaway_dizzy_ended()`, `interact_verb_changed(verb, target_kind)`.
 
