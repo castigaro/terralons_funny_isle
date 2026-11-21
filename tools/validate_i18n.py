@@ -31,9 +31,14 @@ FILE_EXTENSIONS = {
 
 def load_catalog(root: Path):
     """Return ({key: {"en", "de", "file"}}, errors) for root/i18n/*.csv."""
+    return load_catalog_dir(Path(root) / "i18n")
+
+
+def load_catalog_dir(folder: Path):
+    """Return ({key: {"en", "de", "file"}}, errors) for folder/*.csv."""
     messages = {}
     errors = []
-    folder = Path(root) / "i18n"
+    folder = Path(folder)
     if not folder.is_dir():
         return messages, errors
     for path in sorted(folder.glob("*.csv")):

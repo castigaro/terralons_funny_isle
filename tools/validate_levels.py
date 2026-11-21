@@ -1,0 +1,422 @@
+"""Validate the event catalogue data/events.json and the level files data/levels/*.json (standard library only).
+
+Usage: python tools/validate_levels.py [--root DIR] [--path FILE] [--i18n-dir DIR ...]   (exit code 1 on errors)
+
+Limits (timer range, task and event counts) come from data/balance/rules.json. Text keys must exist with
+non-empty EN and DE text in root/i18n/*.csv plus every --i18n-dir. One line per error:
+"<file>: <field path>: <message>". A missing or empty data/levels folder is valid. The GDScript loader
+scripts/rules/level_def.gd implements the same rule set (see docs/rules.md).
+"""
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import REPO  # noqa: E402
+from validate_i18n import load_catalog, load_catalog_dir  # noqa: E402
+
+FORMAT_VERSION = 1
+RULES_FILE = "data/balance/rules.json"
+EVENTS_FILE = "data/events.json"
+LEVELS_DIR = "data/levels"
+ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+PLAYER = "player"
+RULE_KEYS = ("timer_min_seconds", "timer_max_seconds", "tasks_min", "tasks_max", "events_min")
+
+LEVEL_REQUIRED = ("format_version", "id", "title_key", "theme", "music", "seed", "timer_seconds", "tasks",
+                  "events")
+LEVEL_OPTIONAL = ("three_star_share",)
+TASK_REQUIRED = ("id", "required", "conditions", "hint_key", "fail_key")
+TASK_OPTIONAL = ("modifiers",)
+EVENT_REQUIRED = ("id", "type", "window", "duration_s")
+EVENT_OPTIONAL = ("params",)
+
+# Condition grammar: type -> ({required field: kind}, {optional field: kind}); kinds: name, count, seconds, event.
+CONDITIONS = {
+    "in_zone": ({"entity": "name", "zone": "name"}, {"count": "count"}),
+    "held": ({"entity": "name"}, {}),
+    "worn": ({"item": "name"}, {"wearer": "name"}),
+    "delivered_to": ({"entity": "name", "target": "name"}, {"count": "count"}),
+    "count_reached": ({"counter": "name", "count": "count"}, {}),
+    "before_time": ({"seconds": "seconds"}, {}),
+}
+MODIFIERS = dict(CONDITIONS)
+MODIFIERS["before_event"] = ({"event": "event"}, {})
+TIME_TYPES = ("before_time", "before_event")
+
+EFFECTS = ("relocate_entities", "take_held", "take_worn", "stun_player", "panic_animals", "slippery_ground")
+PARAM_TYPES = ("string", "int", "float", "bool")
+
+
+def is_int(value) -> bool:
+    """True for ints and integral floats, never for bools (matches Balance.normalize_json in GDScript)."""
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return True
+    return isinstance(value, float) and value == value and abs(value) != float("inf") and value == int(value)
+
+
+def is_number(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def is_name(value) -> bool:
+    return isinstance(value, str) and ID_RE.match(value) is not None
+
+
+def load_json(path: Path):
+    """Return (data, error) for a JSON file."""
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8")), ""
+    except (OSError, UnicodeDecodeError) as exc:
+        return None, "cannot read (%s)" % exc
+    except ValueError as exc:
+        return None, "invalid JSON (%s)" % exc
+
+
+def load_rules(root: Path):
+    """Return (rules dict, errors) from root/data/balance/rules.json."""
+    data, err = load_json(Path(root) / RULES_FILE)
+    if err:
+        return {}, ["%s: %s" % (RULES_FILE, err)]
+    if not isinstance(data, dict):
+        return {}, ["%s: top level must be an object" % RULES_FILE]
+    errors = ["%s: %s: missing or not an integer" % (RULES_FILE, key) for key in RULE_KEYS
+              if not is_int(data.get(key))]
+    return data, errors
+
+
+def validate_event_types(data, fname: str = "events.json") -> list:
+    """Return the errors of an event catalogue (the parsed data/events.json)."""
+    errors = []
+    if not isinstance(data, dict):
+        return ["%s: top level must be an object" % fname]
+    for key in data:
+        if key not in ("format_version", "types"):
+            errors.append("%s: %s: unknown field" % (fname, key))
+    if not is_int(data.get("format_version")) or int(data.get("format_version")) != FORMAT_VERSION:
+        errors.append("%s: format_version: must be %d" % (fname, FORMAT_VERSION))
+    types = data.get("types")
+    if not isinstance(types, dict) or not types:
+        errors.append("%s: types: must be a non-empty object" % fname)
+        return errors
+    for name, spec in types.items():
+        path = "types.%s" % name
+        if not is_name(name):
+            errors.append("%s: %s: type name must match %s" % (fname, path, ID_RE.pattern))
+        if not isinstance(spec, dict):
+            errors.append("%s: %s: must be an object" % (fname, path))
+            continue
+        for key in spec:
+            if key not in ("params", "effects"):
+                errors.append("%s: %s.%s: unknown field" % (fname, path, key))
+        params = spec.get("params", {})
+        if not isinstance(params, dict):
+            errors.append("%s: %s.params: must be an object" % (fname, path))
+        else:
+            for pname, pspec in params.items():
+                ppath = "%s.params.%s" % (path, pname)
+                if not is_name(pname):
+                    errors.append("%s: %s: parameter name must match %s" % (fname, ppath, ID_RE.pattern))
+                if not isinstance(pspec, dict) or set(pspec) != {"type", "required"}:
+                    errors.append("%s: %s: must be {type, required}" % (fname, ppath))
+                    continue
+                if pspec["type"] not in PARAM_TYPES:
+                    errors.append("%s: %s.type: must be one of %s" % (fname, ppath, ", ".join(PARAM_TYPES)))
+                if not isinstance(pspec["required"], bool):
+                    errors.append("%s: %s.required: must be a bool" % (fname, ppath))
+        effects = spec.get("effects")
+        if not isinstance(effects, list) or not effects:
+            errors.append("%s: %s.effects: must be a non-empty list" % (fname, path))
+        else:
+            for effect in effects:
+                if effect not in EFFECTS:
+                    errors.append("%s: %s.effects: unknown effect %r" % (fname, path, effect))
+    return errors
+
+
+def _check_keys(obj: dict, required, optional, path: str, err) -> None:
+    for key in required:
+        if key not in obj:
+            err("%s.%s" % (path, key) if path else key, "missing")
+    for key in obj:
+        if key not in required and key not in optional:
+            err("%s.%s" % (path, key) if path else key, "unknown field")
+
+
+def _check_text_key(value, path: str, catalog: dict, err) -> None:
+    if not isinstance(value, str) or not value.strip():
+        err(path, "must be a non-empty text key")
+        return
+    entry = catalog.get(value)
+    if entry is None:
+        err(path, "text key %s not found in the i18n catalogue" % value)
+        return
+    if not str(entry.get("en", "")).strip():
+        err(path, "EN text missing or empty for %s" % value)
+    if not str(entry.get("de", "")).strip():
+        err(path, "DE text missing or empty for %s" % value)
+
+
+def _check_condition(cond, path: str, grammar: dict, timer, event_ids, err) -> None:
+    if not isinstance(cond, dict):
+        err(path, "must be an object")
+        return
+    ctype = cond.get("type")
+    if ctype not in grammar:
+        err(path + ".type", "unknown condition type %r" % (ctype,))
+        return
+    required, optional = grammar[ctype]
+    for key in required:
+        if key not in cond:
+            err("%s.%s" % (path, key), "missing")
+    for key in cond:
+        if key != "type" and key not in required and key not in optional:
+            err("%s.%s" % (path, key), "unknown field")
+    fields = dict(required)
+    fields.update(optional)
+    for key, kind in fields.items():
+        if key not in cond:
+            continue
+        value = cond[key]
+        fpath = "%s.%s" % (path, key)
+        if kind == "name":
+            if not is_name(value):
+                err(fpath, "must match %s" % ID_RE.pattern)
+        elif kind == "count":
+            if not is_int(value) or int(value) < 1:
+                err(fpath, "count must be an integer >= 1")
+        elif kind == "seconds":
+            if not is_number(value) or value <= 0 or (is_number(timer) and value > timer):
+                err(fpath, "before_time seconds must be > 0 and <= timer_seconds")
+        elif kind == "event":
+            if value not in event_ids:
+                err(fpath, "before_event must name an event of this level, got %r" % (value,))
+
+
+def _counting(conds) -> list:
+    return [c for c in conds if isinstance(c, dict) and is_int(c.get("count")) and int(c.get("count")) > 1
+            and c.get("type") in CONDITIONS]
+
+
+def validate_level(data, fname: str, rules: dict, event_types: dict, catalog: dict) -> list:
+    """Return the errors of one parsed level (pure): '<fname>: <field path>: <message>'."""
+    errors = []
+
+    def err(path, message):
+        errors.append("%s: %s: %s" % (fname, path, message))
+
+    if not isinstance(data, dict):
+        err("(top)", "top level must be an object")
+        return errors
+    _check_keys(data, LEVEL_REQUIRED, LEVEL_OPTIONAL, "", err)
+    if "format_version" in data and (not is_int(data["format_version"])
+                                     or int(data["format_version"]) != FORMAT_VERSION):
+        err("format_version", "must be %d" % FORMAT_VERSION)
+    stem = Path(fname).stem
+    level_id = data.get("id")
+    if "id" in data:
+        if not is_name(level_id):
+            err("id", "must match %s" % ID_RE.pattern)
+        elif level_id != stem:
+            err("id", "level id %s must equal the file name %s" % (level_id, stem))
+    if "title_key" in data:
+        _check_text_key(data["title_key"], "title_key", catalog, err)
+    for key in ("theme", "music"):
+        if key in data and not is_name(data[key]):
+            err(key, "must match %s" % ID_RE.pattern)
+    if "seed" in data and not is_int(data["seed"]):
+        err("seed", "must be an integer")
+    timer = data.get("timer_seconds")
+    tmin, tmax = rules.get("timer_min_seconds"), rules.get("timer_max_seconds")
+    if "timer_seconds" in data:
+        if not is_int(timer):
+            err("timer_seconds", "must be an integer")
+            timer = None
+        elif not (tmin <= timer <= tmax):
+            err("timer_seconds", "%s outside %s..%s" % (timer, tmin, tmax))
+    if "three_star_share" in data:
+        share = data["three_star_share"]
+        if not is_number(share) or not (0 < share < 1):
+            err("three_star_share", "must be a number between 0 and 1 (exclusive)")
+
+    events = data.get("events")
+    event_ids = set()
+    if "events" in data:
+        if not isinstance(events, list):
+            err("events", "must be a list")
+            events = []
+        elif len(events) < rules.get("events_min", 0):
+            err("events", "%d event(s), at least %s needed" % (len(events), rules.get("events_min")))
+        for ev in events:
+            if isinstance(ev, dict) and isinstance(ev.get("id"), str):
+                event_ids.add(ev["id"])
+    else:
+        events = []
+
+    tasks = data.get("tasks")
+    if "tasks" in data:
+        if not isinstance(tasks, list):
+            err("tasks", "must be a list")
+            tasks = []
+        elif not (rules.get("tasks_min", 0) <= len(tasks) <= rules.get("tasks_max", 0)):
+            err("tasks", "%d task(s), expected %s..%s" % (len(tasks), rules.get("tasks_min"), rules.get("tasks_max")))
+    else:
+        tasks = []
+
+    ids = []
+    if is_name(level_id):
+        ids.append(("id", level_id))
+    flags = []
+    for i, task in enumerate(tasks):
+        tpath = "tasks[%d]" % i
+        if not isinstance(task, dict):
+            err(tpath, "must be an object")
+            continue
+        _check_keys(task, TASK_REQUIRED, TASK_OPTIONAL, tpath, err)
+        if "id" in task:
+            if is_name(task["id"]):
+                ids.append((tpath + ".id", task["id"]))
+            else:
+                err(tpath + ".id", "must match %s" % ID_RE.pattern)
+        required = task.get("required")
+        if "required" in task:
+            if isinstance(required, bool):
+                flags.append(required)
+            else:
+                err(tpath + ".required", "must be a bool")
+        for key in ("hint_key", "fail_key"):
+            if key in task:
+                _check_text_key(task[key], "%s.%s" % (tpath, key), catalog, err)
+        conds = task.get("conditions")
+        if "conditions" in task:
+            if not isinstance(conds, list) or not conds:
+                err(tpath + ".conditions", "must be a non-empty list")
+                conds = []
+            for j, cond in enumerate(conds):
+                _check_condition(cond, "%s.conditions[%d]" % (tpath, j), CONDITIONS, timer, event_ids, err)
+            if conds and all(isinstance(c, dict) and c.get("type") == "before_time" for c in conds):
+                err(tpath + ".conditions", "before_time cannot be the only condition")
+        else:
+            conds = []
+        mods = task.get("modifiers", [])
+        if not isinstance(mods, list):
+            err(tpath + ".modifiers", "must be a list")
+            mods = []
+        for j, mod in enumerate(mods):
+            mpath = "%s.modifiers[%d]" % (tpath, j)
+            _check_condition(mod, mpath, MODIFIERS, timer, event_ids, err)
+            if isinstance(mod, dict) and mod.get("type") == "before_event" and required is True:
+                err(mpath + ".type", "before_event is only allowed on optional tasks")
+        if len(_counting(list(conds) + list(mods))) > 1:
+            err(tpath + ".conditions", "more than one condition with count > 1 (ambiguous progress target)")
+    if tasks and isinstance(tasks, list):
+        if True not in flags:
+            err("tasks", "at least one required task is needed")
+        if False not in flags:
+            err("tasks", "at least one optional task is needed")
+
+    types = event_types if isinstance(event_types, dict) else {}
+    for i, ev in enumerate(events):
+        epath = "events[%d]" % i
+        if not isinstance(ev, dict):
+            err(epath, "must be an object")
+            continue
+        _check_keys(ev, EVENT_REQUIRED, EVENT_OPTIONAL, epath, err)
+        if "id" in ev:
+            if is_name(ev["id"]):
+                ids.append((epath + ".id", ev["id"]))
+            else:
+                err(epath + ".id", "must match %s" % ID_RE.pattern)
+        etype = ev.get("type")
+        spec = types.get(etype) if isinstance(etype, str) else None
+        if "type" in ev and spec is None:
+            err(epath + ".type", "unknown event type %r" % (etype,))
+        if "window" in ev:
+            window = ev["window"]
+            if not isinstance(window, list) or len(window) != 2 or not all(is_number(v) for v in window):
+                err(epath + ".window", "must be [min_s, max_s]")
+            elif not (0 <= window[0] <= window[1]):
+                err(epath + ".window", "needs 0 <= min <= max, got %s" % window)
+            elif is_number(timer) and window[1] >= timer:
+                err(epath + ".window", "max %s must be below timer_seconds %s" % (window[1], timer))
+        if "duration_s" in ev and (not is_number(ev["duration_s"]) or ev["duration_s"] <= 0):
+            err(epath + ".duration_s", "must be a number > 0")
+        params = ev.get("params", {})
+        if not isinstance(params, dict):
+            err(epath + ".params", "must be an object")
+        elif isinstance(spec, dict):
+            pspecs = spec.get("params", {})
+            for pname, pspec in pspecs.items():
+                if pspec.get("required") and pname not in params:
+                    err("%s.params.%s" % (epath, pname), "missing required parameter")
+            for pname, value in params.items():
+                pspec = pspecs.get(pname)
+                if pspec is None:
+                    err("%s.params.%s" % (epath, pname), "unknown parameter")
+                    continue
+                ptype = pspec.get("type")
+                ok = ((ptype == "string" and isinstance(value, str)) or (ptype == "int" and is_int(value))
+                      or (ptype == "float" and is_number(value)) or (ptype == "bool" and isinstance(value, bool)))
+                if not ok:
+                    err("%s.params.%s" % (epath, pname), "must be of type %s" % ptype)
+
+    reserved = {PLAYER} | set(MODIFIERS) | set(types)
+    seen = {}
+    for path, value in ids:
+        if value in seen:
+            err(path, "duplicate id %s (also at %s)" % (value, seen[value]))
+        else:
+            seen[value] = path
+        if value in reserved:
+            err(path, "id %s is a reserved word" % value)
+    return errors
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(description="Validate data/events.json and data/levels/*.json.")
+    parser.add_argument("--root", default=str(REPO))
+    parser.add_argument("--path", default="", help="validate only this level file")
+    parser.add_argument("--i18n-dir", action="append", default=[], help="extra folder with key,en,de CSVs")
+    opts = parser.parse_args(argv)
+    root = Path(opts.root)
+
+    rules, errors = load_rules(root)
+    rules_ok = not errors
+    events_data, err = load_json(root / EVENTS_FILE)
+    if err:
+        errors.append("%s: %s" % (EVENTS_FILE, err))
+        event_types = {}
+    else:
+        errors.extend(validate_event_types(events_data, Path(EVENTS_FILE).name))
+        event_types = events_data.get("types", {}) if isinstance(events_data, dict) else {}
+        if not isinstance(event_types, dict):
+            event_types = {}
+    catalog, _cat_errors = load_catalog(root)
+    for extra in opts.i18n_dir:
+        more, _more_errors = load_catalog_dir(Path(extra))
+        catalog.update(more)
+
+    if opts.path:
+        files = [Path(opts.path)]
+    else:
+        folder = root / LEVELS_DIR
+        files = sorted(folder.glob("*.json")) if folder.is_dir() else []
+    if rules_ok:
+        for path in files:
+            data, err = load_json(path)
+            if err:
+                errors.append("%s: %s" % (path.name, err))
+                continue
+            errors.extend(validate_level(data, path.name, rules, event_types, catalog))
+    for line in errors:
+        print(line)
+    print("validate_levels: %d level file(s), %d error(s)" % (len(files), len(errors)))
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

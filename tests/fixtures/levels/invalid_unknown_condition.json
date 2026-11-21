@@ -1,0 +1,113 @@
+{
+	"format_version": 1,
+	"id": "invalid_unknown_condition",
+	"title_key": "fixture.level_title",
+	"theme": "palm_beach",
+	"music": "fixture_tune",
+	"seed": 4242,
+	"timer_seconds": 240,
+	"tasks": [
+		{
+			"id": "fx_hens_in_coop",
+			"required": true,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "coop",
+					"count": 2
+				}
+			],
+			"hint_key": "fixture.hens_in_coop_hint",
+			"fail_key": "fixture.hens_in_coop_fail"
+		},
+		{
+			"id": "fx_hat_on_goat",
+			"required": true,
+			"conditions": [
+				{
+					"type": "worn",
+					"item": "hat",
+					"wearer": "goat"
+				},
+				{
+					"type": "teleported",
+					"entity": "goat"
+				}
+			],
+			"hint_key": "fixture.hat_on_goat_hint",
+			"fail_key": "fixture.hat_on_goat_fail"
+		},
+		{
+			"id": "fx_coconut_run",
+			"required": false,
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "coconut",
+					"target": "monkey",
+					"count": 3
+				}
+			],
+			"hint_key": "fixture.coconut_run_hint",
+			"fail_key": "fixture.coconut_run_fail",
+			"modifiers": [
+				{
+					"type": "before_event",
+					"event": "fx_ev_wave"
+				}
+			]
+		},
+		{
+			"id": "fx_quick_pig",
+			"required": false,
+			"conditions": [
+				{
+					"type": "held",
+					"entity": "pig"
+				},
+				{
+					"type": "before_time",
+					"seconds": 120
+				}
+			],
+			"hint_key": "fixture.quick_pig_hint",
+			"fail_key": "fixture.quick_pig_fail"
+		}
+	],
+	"events": [
+		{
+			"id": "fx_ev_parrot",
+			"type": "parrot_steal_hat",
+			"window": [
+				30,
+				60
+			],
+			"duration_s": 5
+		},
+		{
+			"id": "fx_ev_wave",
+			"type": "wave_wash",
+			"window": [
+				90,
+				150
+			],
+			"duration_s": 8,
+			"params": {
+				"strength": 1.5
+			}
+		},
+		{
+			"id": "fx_ev_stampede",
+			"type": "goat_stampede",
+			"window": [
+				160,
+				200
+			],
+			"duration_s": 6,
+			"params": {
+				"lane": "north_path"
+			}
+		}
+	]
+}
