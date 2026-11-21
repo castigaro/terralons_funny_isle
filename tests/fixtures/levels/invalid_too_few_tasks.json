@@ -1,0 +1,80 @@
+{
+	"format_version": 1,
+	"id": "invalid_too_few_tasks",
+	"title_key": "fixture.level_title",
+	"theme": "palm_beach",
+	"music": "fixture_tune",
+	"seed": 4242,
+	"timer_seconds": 240,
+	"tasks": [
+		{
+			"id": "fx_hens_in_coop",
+			"required": true,
+			"conditions": [
+				{
+					"type": "in_zone",
+					"entity": "chicken",
+					"zone": "coop",
+					"count": 2
+				}
+			],
+			"hint_key": "fixture.hens_in_coop_hint",
+			"fail_key": "fixture.hens_in_coop_fail"
+		},
+		{
+			"id": "fx_coconut_run",
+			"required": false,
+			"conditions": [
+				{
+					"type": "delivered_to",
+					"entity": "coconut",
+					"target": "monkey",
+					"count": 3
+				}
+			],
+			"hint_key": "fixture.coconut_run_hint",
+			"fail_key": "fixture.coconut_run_fail",
+			"modifiers": [
+				{
+					"type": "before_event",
+					"event": "fx_ev_wave"
+				}
+			]
+		}
+	],
+	"events": [
+		{
+			"id": "fx_ev_parrot",
+			"type": "parrot_steal_hat",
+			"window": [
+				30,
+				60
+			],
+			"duration_s": 5
+		},
+		{
+			"id": "fx_ev_wave",
+			"type": "wave_wash",
+			"window": [
+				90,
+				150
+			],
+			"duration_s": 8,
+			"params": {
+				"strength": 1.5
+			}
+		},
+		{
+			"id": "fx_ev_stampede",
+			"type": "goat_stampede",
+			"window": [
+				160,
+				200
+			],
+			"duration_s": 6,
+			"params": {
+				"lane": "north_path"
+			}
+		}
+	]
+}

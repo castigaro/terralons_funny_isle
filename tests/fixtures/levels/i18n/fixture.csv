@@ -1,0 +1,18 @@
+key,en,de
+fixture.level_title,Fixture Beach,Testfixture-Strand
+fixture.hens_in_coop_hint,Carry two chickens into the coop.,Trag zwei Hühner in den Stall.
+fixture.hens_in_coop_fail,The chickens are still on the loose!,Die Hühner sind noch frei!
+fixture.hat_on_goat_hint,Throw the hat onto the goat.,Wirf der Ziege den Hut auf.
+fixture.hat_on_goat_fail,The goat has no hat yet!,Die Ziege hat noch keinen Hut!
+fixture.coconut_run_hint,Bring three coconuts to the monkey before the wave.,Bring dem Affen drei Kokosnüsse vor der Welle.
+fixture.coconut_run_fail,The wave came first!,Die Welle war schneller!
+fixture.quick_pig_hint,Catch the pig in the first two minutes.,Fang das Schwein in den ersten zwei Minuten.
+fixture.quick_pig_fail,The pig was too quick!,Das Schwein war zu schnell!
+fixture.sandcastle_bits_hint,Fill four sand buckets.,Fülle vier Sandeimer.
+fixture.sandcastle_bits_fail,The sandcastle is not finished!,Die Sandburg ist nicht fertig!
+fixture.visit_dock_hint,Run to the dock.,Lauf zum Steg.
+fixture.visit_dock_fail,You never reached the dock!,Du warst nie am Steg!
+fixture.penguin_home_hint,Bring the penguin to the beach wearing a hat.,Bring den Pinguin mit Hut zum Strand.
+fixture.penguin_home_fail,The penguin is still lost!,Der Pinguin ist noch verloren!
+fixture.empty_en,,Nur Deutsch
+fixture.empty_de,English only,

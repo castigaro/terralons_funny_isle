@@ -1,0 +1,44 @@
+{
+	"format_version": 1,
+	"types": {
+		"parrot_steal_hat": {
+			"params": {
+				"flee_zone": {"type": "string", "required": false}
+			},
+			"effects": ["take_worn"]
+		},
+		"goat_stampede": {
+			"params": {
+				"lane": {"type": "string", "required": true},
+				"goats": {"type": "int", "required": false}
+			},
+			"effects": ["relocate_entities", "stun_player"]
+		},
+		"coconut_throw": {
+			"params": {
+				"thrower_zone": {"type": "string", "required": false},
+				"throws": {"type": "int", "required": false}
+			},
+			"effects": ["stun_player", "take_held"]
+		},
+		"rain_panic": {
+			"params": {
+				"kind": {"type": "string", "required": false}
+			},
+			"effects": ["panic_animals", "relocate_entities"]
+		},
+		"wave_wash": {
+			"params": {
+				"zone": {"type": "string", "required": false},
+				"strength": {"type": "float", "required": false}
+			},
+			"effects": ["relocate_entities"]
+		},
+		"mud_trail": {
+			"params": {
+				"zone": {"type": "string", "required": false}
+			},
+			"effects": ["slippery_ground"]
+		}
+	}
+}
