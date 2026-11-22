@@ -269,10 +269,15 @@ position = Vector2(1664, 1100)
 texture = ExtResource("td_hut_stilt")
 shadow_style = 1
 
+[node name="HutSouth" parent="Actors" instance=ExtResource("16_decor")]
+position = Vector2(1360, 1880)
+texture = ExtResource("td_hut_stilt_b")
+shadow_style = 1
+
 [node name="Boat1" parent="Actors" groups=["boat"] instance=ExtResource("16_decor")]
-position = Vector2(1300, 2010)
-texture = ExtResource("td_boat_small")
-shadow_base_y = -58.0
+position = Vector2(1120, 2010)
+texture = ExtResource("td_dinghy")
+shadow_base_y = -49.0
 shadow_style = 1
 bob = true
 
@@ -284,9 +289,9 @@ shadow_style = 1
 bob = true
 
 [node name="Boat3" parent="Actors" groups=["boat"] instance=ExtResource("16_decor")]
-position = Vector2(260, 2650)
-texture = ExtResource("td_dinghy")
-shadow_base_y = -49.0
+position = Vector2(280, 2650)
+texture = ExtResource("td_boat_small")
+shadow_base_y = -58.0
 shadow_style = 1
 bob = true
 

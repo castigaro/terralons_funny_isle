@@ -78,4 +78,11 @@ Each test writes its run to `<testdata>/run_tests/bot/<level>.json` (`TFI_BOT_RE
 - **Observation, not changed:** in L1 the world prompt of the use target near the top edge can sit under the task panel, and right after a restart the "Neustart!" cue and the announcer caption ("Los!") stand on top of each other for about a second. Neither clips a text; both are left for a later layout round.
 - **Export:** `python tools/export.py` built `build/TerralonsFunnyIsle.exe` (136 MB, pack embedded, version 1.0.0.0), and its headless smoke start printed `SMOKE OK`. With `APPDATA` pointed at an empty folder it exits with 3 and `export templates for 4.7.2 missing at <path>`.
 
+## Lagoon village (BI-22)
+
+- **Runs:** `python tools/playtest.py --levels l4` at 1920x1080 and 1280x720 (EN) and once in German, each with a progress file that unlocks L4 in the run's own data folder (a level-only run cannot start a locked level); the bot won L4 with 3 stars in all three runs (62.3 s bot time, 197.5 s left of 260 s, 24 % used – unchanged by the dressing). `tools/flat_area_check.py` found no flat window in the 21 in-level frames.
+- **First sight:** the start frame already shows a stilt hut on the water, the dock leading to it from the south shore and the rowing dinghy; the timed frames add the west, east and north huts with their docks and the two sailing boats. Every actor (castaway, penguin, ducks, items) draws above the docks and stays visible; the huts sit on water where no actor walks, so the y-sort never hides one. The big wave (north-east beach) and the parrot raid (north-west) happen far from the decor.
+- **L1 versus L4:** Beach Camp reads as a camp on sand (tent, campfire, crates, dune grass, no water in the middle), the Lagoon as a village on the water (thatched stilt huts, plank docks, boats on the animated water); they share no theme texture and are told apart at a glance.
+- **Observation, not changed:** the start frame still shows the "GO!" chip and the big "GO!" text together (QA-1, release preparation); the pack dinghy is upscaled 4.5× and looks slightly soft next to the crisper huts.
+
 The human first run (20–30 minutes, listening pass for the sounds) stays open: no human is available in this autonomous run.
