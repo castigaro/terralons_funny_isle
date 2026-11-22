@@ -105,6 +105,9 @@ func _run() -> void:
 			played.append(id)
 	if not played.is_empty():
 		await _lose(played[0])
+	if main.call("level") != null:
+		main.call("abandon_to_level_select")  # frees the level so no popups sit behind the credits
+		await _frames(10)
 	main.call("show_screen", 4, 2)  # credits
 	await _frames(20)
 	await _shot("credits")
