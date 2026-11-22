@@ -6,6 +6,8 @@ extends SwayProp
 
 ## Crown width on screen in pixels at 1920x1080 (0 = palm_crown_px from the level balance).
 @export var crown_px := 0.0
+## False makes a walk-through decoration palm without a trunk footprint.
+@export var solid := true
 
 
 func _ready() -> void:
@@ -27,6 +29,10 @@ func _ready() -> void:
 	if mat != null:
 		mat.set_shader_parameter("pivot_mode", SwayPhase.PIVOT_CENTRE)
 	shadow.fit(width * float(ArtPalette.shadow()["tree_width_share"]))
+	_apply_decor()
+	_read_fade_settings()
+	if not solid:
+		return
 	if footprint_radius <= 0.0:
 		footprint_radius = float(cfg.get("palm_footprint_radius", 1.0))
 	_build_footprint()

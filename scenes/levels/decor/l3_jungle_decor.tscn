@@ -1,0 +1,2764 @@
+[gd_scene load_steps=36 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/levels/props/sway_prop.tscn" id="1_sway"]
+[ext_resource type="PackedScene" path="res://scenes/levels/props/palm.tscn" id="2_palm"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0052.png" id="t_sprite_0052"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0053.png" id="t_sprite_0053"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0062.png" id="t_sprite_0062"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0063.png" id="t_sprite_0063"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0065.png" id="t_sprite_0065"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0069.png" id="t_sprite_0069"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0070.png" id="t_sprite_0070"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0084.png" id="t_sprite_0084"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0085.png" id="t_sprite_0085"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0087.png" id="t_sprite_0087"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0089.png" id="t_sprite_0089"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0092.png" id="t_sprite_0092"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0093.png" id="t_sprite_0093"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0094.png" id="t_sprite_0094"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage-sprites/PNG/Shaded/sprite_0095.png" id="t_sprite_0095"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_002.png" id="t_foliagePack_002"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_004.png" id="t_foliagePack_004"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_007.png" id="t_foliagePack_007"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_011.png" id="t_foliagePack_011"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_012.png" id="t_foliagePack_012"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_020.png" id="t_foliagePack_020"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_022.png" id="t_foliagePack_022"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_038.png" id="t_foliagePack_038"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_039.png" id="t_foliagePack_039"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_040.png" id="t_foliagePack_040"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_041.png" id="t_foliagePack_041"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_042.png" id="t_foliagePack_042"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_050.png" id="t_foliagePack_050"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_051.png" id="t_foliagePack_051"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_052.png" id="t_foliagePack_052"]
+[ext_resource type="Texture2D" path="res://assets/graphics/foliage/PNG/Retina/foliagePack_053.png" id="t_foliagePack_053"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_71.png" id="t_tile_71"]
+[ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_72.png" id="t_tile_72"]
+
+[node name="JungleDecor" type="Node2D"]
+y_sort_enabled = true
+
+[node name="Canopy001" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(491, 282)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.803
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy002" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(855, 282)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.857
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy003" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3845, 284)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.817
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy004" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(353, 285)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.842
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy005" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1723, 285)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.861
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy006" parent="." groups=["prop"] instance=ExtResource("2_palm")]
+position = Vector2(1539, 287)
+texture = ExtResource("t_tile_72")
+solid = false
+occlusion_fade = true
+
+[node name="Canopy007" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2986, 287)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.73
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy008" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3675, 287)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.844
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy009" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1404, 288)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.787
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy010" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3480, 289)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.806
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy011" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3775, 290)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.269
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy012" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(283, 291)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.302
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Canopy013" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1653, 291)
+texture = ExtResource("t_sprite_0095")
+sprite_scale = 0.283
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy014" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2099, 294)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.738
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy015" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3994, 294)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.894
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy016" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2237, 296)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.822
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy017" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1211, 297)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.74
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy018" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3143, 298)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.838
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy019" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(680, 302)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.852
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy020" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3310, 305)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.848
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy021" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1030, 308)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.795
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy022" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1933, 310)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.812
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy023" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1100, 314)
+texture = ExtResource("t_sprite_0095")
+sprite_scale = 0.312
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy024" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4144, 334)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.879
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy025" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(225, 509)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.763
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy026" parent="." groups=["prop"] instance=ExtResource("2_palm")]
+position = Vector2(4131, 512)
+texture = ExtResource("t_tile_72")
+solid = false
+occlusion_fade = true
+
+[node name="Canopy027" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(155, 515)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.301
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy028" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(210, 705)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.757
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy029" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4122, 710)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.813
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy030" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4192, 716)
+texture = ExtResource("t_sprite_0095")
+sprite_scale = 0.272
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy031" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4131, 868)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.833
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy032" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(250, 873)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.896
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy033" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4107, 1044)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.768
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy034" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(232, 1052)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.868
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy035" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3850, 1112)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.897
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy036" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(208, 1218)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.721
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy037" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(138, 1224)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.289
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Canopy038" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4122, 1233)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.846
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy039" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(246, 1409)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.8
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy040" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4112, 1417)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.81
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy041" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4182, 1423)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.31
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Canopy042" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3815, 1535)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.78
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy043" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4103, 1572)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.884
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy044" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(252, 1593)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.785
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy045" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4128, 1751)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.74
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy046" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4145, 1943)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.85
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy047" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4141, 2293)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.9
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy048" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(212, 2302)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.83
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy049" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1754, 2355)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.767
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy050" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(664, 2386)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.778
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy051" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3463, 2418)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.755
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy052" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(229, 2468)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.797
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy053" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4124, 2476)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.847
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy054" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2237, 2570)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.762
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy055" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2968, 2575)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.782
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy056" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1552, 2577)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.737
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy057" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(871, 2581)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.876
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy058" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2631, 2584)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.725
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy059" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2780, 2585)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.867
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy060" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2100, 2586)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.723
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy061" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3161, 2588)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.731
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy062" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3998, 2589)
+texture = ExtResource("t_foliagePack_007")
+sprite_scale = 0.794
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy063" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(705, 2590)
+texture = ExtResource("t_foliagePack_011")
+sprite_scale = 0.895
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy064" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(356, 2591)
+texture = ExtResource("t_foliagePack_040")
+sprite_scale = 0.785
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy065" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2438, 2594)
+texture = ExtResource("t_foliagePack_042")
+sprite_scale = 0.757
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy066" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3231, 2594)
+texture = ExtResource("t_sprite_0095")
+sprite_scale = 0.311
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Canopy067" parent="." groups=["prop"] instance=ExtResource("2_palm")]
+position = Vector2(3308, 2594)
+texture = ExtResource("t_tile_71")
+solid = false
+occlusion_fade = true
+
+[node name="Canopy068" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1742, 2595)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.759
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Canopy069" parent="." groups=["prop"] instance=ExtResource("2_palm")]
+position = Vector2(1913, 2595)
+texture = ExtResource("t_tile_72")
+solid = false
+occlusion_fade = true
+
+[node name="Canopy070" parent="." groups=["prop"] instance=ExtResource("2_palm")]
+position = Vector2(512, 2596)
+texture = ExtResource("t_tile_71")
+solid = false
+occlusion_fade = true
+
+[node name="Canopy071" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1403, 2596)
+texture = ExtResource("t_foliagePack_012")
+sprite_scale = 0.846
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Canopy072" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(426, 2597)
+texture = ExtResource("t_sprite_0095")
+sprite_scale = 0.299
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy073" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2508, 2600)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.312
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Canopy074" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1672, 2601)
+texture = ExtResource("t_sprite_0094")
+sprite_scale = 0.32
+shadow_width_share = 0.3
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Bush001" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4046, 330)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.694
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush002" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3253, 332)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.44
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush003" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(230, 335)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.436
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush004" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(328, 338)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.186
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush005" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1856, 338)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.193
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush006" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2155, 338)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.194
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush007" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1403, 339)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.19
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush008" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2321, 339)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.7
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush009" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(966, 340)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.499
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush010" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(469, 342)
+texture = ExtResource("t_foliagePack_051")
+sprite_scale = 0.602
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush011" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2461, 342)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.5
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush012" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3425, 342)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.201
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Bush013" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3096, 344)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.628
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush014" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3727, 345)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.189
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush015" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3842, 345)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.179
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush016" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1710, 350)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.207
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush017" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(627, 351)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.181
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush018" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(769, 351)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.173
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush019" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1081, 351)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.172
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush020" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3582, 351)
+texture = ExtResource("t_foliagePack_053")
+sprite_scale = 0.67
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush021" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1243, 353)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.201
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush022" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1540, 353)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.428
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush023" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2041, 356)
+texture = ExtResource("t_sprite_0093")
+sprite_scale = 0.233
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Bush024" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4037, 473)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.215
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Bush025" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1502, 476)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.63
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush026" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(367, 487)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.58
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush027" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3867, 513)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.237
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Bush028" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2398, 647)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.196
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush029" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(370, 651)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.204
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush030" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3991, 651)
+texture = ExtResource("t_foliagePack_051")
+sprite_scale = 0.565
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush031" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1381, 657)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.209
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush032" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1724, 712)
+texture = ExtResource("t_sprite_0084")
+sprite_scale = 0.184
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush033" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2204, 734)
+texture = ExtResource("t_sprite_0084")
+sprite_scale = 0.184
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush034" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4038, 793)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.193
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush035" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(364, 808)
+texture = ExtResource("t_foliagePack_039")
+sprite_scale = 0.464
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush036" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3043, 881)
+texture = ExtResource("t_foliagePack_041")
+sprite_scale = 0.478
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush037" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2760, 924)
+texture = ExtResource("t_sprite_0084")
+sprite_scale = 0.214
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush038" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4022, 942)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.669
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush039" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(330, 945)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.609
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush040" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(440, 950)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.185
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush041" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4016, 1096)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.694
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush042" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(329, 1114)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.182
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush043" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1335, 1134)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.486
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush044" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3989, 1261)
+texture = ExtResource("t_sprite_0093")
+sprite_scale = 0.218
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+
+[node name="Bush045" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1566, 1296)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.615
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush046" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3466, 1314)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.189
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush047" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1097, 1357)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.667
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush048" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(938, 1365)
+texture = ExtResource("t_sprite_0084")
+sprite_scale = 0.186
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush049" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4036, 1408)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.664
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush050" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1074, 1556)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.219
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush051" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(328, 1574)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.184
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush052" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3984, 1576)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.213
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush053" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1383, 1581)
+texture = ExtResource("t_foliagePack_051")
+sprite_scale = 0.655
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush054" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4010, 2025)
+texture = ExtResource("t_foliagePack_053")
+sprite_scale = 0.561
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush055" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(204, 2103)
+texture = ExtResource("t_foliagePack_053")
+sprite_scale = 0.66
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush056" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4093, 2124)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.621
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush057" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3442, 2126)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.418
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush058" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(512, 2219)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.6
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush059" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4013, 2336)
+texture = ExtResource("t_foliagePack_041")
+sprite_scale = 0.407
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush060" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(347, 2337)
+texture = ExtResource("t_foliagePack_041")
+sprite_scale = 0.405
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush061" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1914, 2343)
+texture = ExtResource("t_foliagePack_053")
+sprite_scale = 0.665
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush062" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3238, 2369)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.464
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush063" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1411, 2460)
+texture = ExtResource("t_foliagePack_050")
+sprite_scale = 0.56
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush064" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2655, 2462)
+texture = ExtResource("t_sprite_0084")
+sprite_scale = 0.181
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush065" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2938, 2462)
+texture = ExtResource("t_foliagePack_039")
+sprite_scale = 0.436
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush066" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(812, 2464)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.21
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush067" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2181, 2464)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.187
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush068" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1709, 2471)
+texture = ExtResource("t_foliagePack_053")
+sprite_scale = 0.599
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush069" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2493, 2472)
+texture = ExtResource("t_sprite_0085")
+sprite_scale = 0.173
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush070" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2797, 2472)
+texture = ExtResource("t_foliagePack_041")
+sprite_scale = 0.426
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush071" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3696, 2473)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.61
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush072" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(943, 2477)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.218
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Bush073" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(4036, 2478)
+texture = ExtResource("t_foliagePack_051")
+sprite_scale = 0.695
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush074" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3424, 2480)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.595
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush075" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1874, 2483)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.211
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush076" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(310, 2485)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.209
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Bush077" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(621, 2485)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.207
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+
+[node name="Bush078" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(2004, 2485)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.44
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush079" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3114, 2486)
+texture = ExtResource("t_sprite_0087")
+sprite_scale = 0.192
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Bush080" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1539, 2488)
+texture = ExtResource("t_foliagePack_038")
+sprite_scale = 0.415
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush081" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3226, 2488)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.236
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Bush082" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3509, 2571)
+texture = ExtResource("t_foliagePack_041")
+sprite_scale = 0.452
+shadow_width_share = 0.7
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush083" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1191, 2577)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.678
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+
+[node name="Bush084" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(1031, 2581)
+texture = ExtResource("t_foliagePack_052")
+sprite_scale = 0.611
+shadow_width_share = 1
+occlusion_fade = true
+tint_key = "jungle_canopy"
+flip_h = true
+
+[node name="Bush085" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3831, 2588)
+texture = ExtResource("t_sprite_0092")
+sprite_scale = 0.209
+shadow_width_share = 0.4
+occlusion_fade = true
+tint_key = "jungle_leaf_deep"
+flip_h = true
+
+[node name="Bush086" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+position = Vector2(3640, 2593)
+texture = ExtResource("t_sprite_0089")
+sprite_scale = 0.204
+shadow_width_share = 0.6
+occlusion_fade = true
+tint_key = "jungle_leaf"
+flip_h = true
+
+[node name="Ground001" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3912, 312)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground002" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(416, 320)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.106
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground003" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(317, 329)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.101
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground004" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3983, 332)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.107
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground005" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2231, 398)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.108
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground006" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3903, 398)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.107
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground007" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1268, 399)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.106
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground008" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1761, 399)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground009" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3331, 399)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.109
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground010" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2334, 400)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.625
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground011" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(426, 401)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground012" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1638, 403)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.099
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground013" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(304, 404)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground014" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1158, 405)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.096
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground015" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1514, 407)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.096
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground016" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(932, 409)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.491
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground017" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2103, 409)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.109
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground018" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3578, 409)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.102
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground019" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1396, 416)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground020" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2021, 416)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.11
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground021" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3772, 417)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.091
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground022" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3420, 418)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground023" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1858, 424)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground024" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(4042, 425)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground025" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2432, 469)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.108
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground026" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2180, 480)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.092
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground027" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3005, 498)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.549
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground028" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1771, 530)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.099
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground029" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1131, 541)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground030" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1921, 543)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.731
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground031" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(402, 550)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.639
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground032" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3942, 563)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground033" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3811, 643)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.702
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground034" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(407, 676)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.105
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground035" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1921, 680)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.706
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground036" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3918, 692)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.098
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground037" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2980, 699)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground038" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2538, 703)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.09
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground039" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3689, 731)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.098
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground040" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1587, 735)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.103
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground041" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(526, 738)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.085
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground042" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3949, 788)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.696
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground043" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(397, 805)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.102
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground044" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3804, 871)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground045" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1278, 884)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground046" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2641, 904)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.107
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground047" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1144, 910)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground048" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2381, 915)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.745
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground049" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3937, 923)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.627
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground050" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(421, 929)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.086
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground051" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1536, 956)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.094
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground052" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(422, 1050)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.488
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground053" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3952, 1056)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground054" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(903, 1066)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.092
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground055" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3242, 1091)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.105
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground056" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(646, 1094)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.09
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground057" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1537, 1102)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.533
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground058" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2760, 1129)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.521
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground059" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3695, 1150)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.099
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground060" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2591, 1151)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.673
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground061" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1697, 1157)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.662
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground062" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3962, 1167)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.632
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground063" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3463, 1172)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground064" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2981, 1173)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground065" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(407, 1176)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.099
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground066" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(325, 1248)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.583
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground067" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(664, 1290)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.09
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground068" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3926, 1300)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground069" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2960, 1303)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.105
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground070" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1702, 1305)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.54
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground071" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(437, 1310)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.455
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground072" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2425, 1315)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.107
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground073" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1372, 1320)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.595
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground074" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2643, 1339)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.689
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground075" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3626, 1343)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.09
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground076" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3274, 1361)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground077" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2776, 1375)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground078" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3930, 1407)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground079" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(331, 1408)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.105
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground080" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2142, 1486)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.092
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground081" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3044, 1509)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.608
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground082" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3945, 1515)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground083" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(385, 1529)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.088
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground084" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(541, 1531)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.107
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground085" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1505, 1534)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.463
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground086" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2573, 1544)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.643
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground087" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2848, 1544)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.088
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground088" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2435, 1548)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.092
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground089" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1983, 1568)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.101
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground090" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1794, 1571)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground091" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(677, 1573)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.106
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground092" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3241, 1575)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.088
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground093" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(901, 1580)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground094" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3605, 1595)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.085
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground095" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1067, 2121)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground096" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1321, 2124)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.725
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground097" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2006, 2125)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground098" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(745, 2126)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.106
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground099" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(422, 2131)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.104
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground100" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3948, 2132)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.095
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground101" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(876, 2150)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.101
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground102" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(345, 2162)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.086
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground103" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3015, 2184)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground104" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(4038, 2184)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground105" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2365, 2193)
+texture = ExtResource("t_sprite_0062")
+sprite_scale = 0.091
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground106" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2800, 2195)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.086
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground107" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3802, 2196)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.085
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground108" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3641, 2199)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.086
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground109" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2179, 2210)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground110" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1489, 2214)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.722
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground111" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3208, 2220)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground112" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2566, 2225)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground113" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3912, 2260)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.098
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground114" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(418, 2269)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.103
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground115" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3023, 2324)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.108
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground116" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1574, 2325)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.109
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground117" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3957, 2370)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground118" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1299, 2390)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.66
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground119" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1738, 2390)
+texture = ExtResource("t_sprite_0069")
+sprite_scale = 0.108
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground120" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(806, 2391)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.45
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground121" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2455, 2392)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.66
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground122" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3437, 2392)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.72
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground123" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3797, 2392)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.095
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground124" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1136, 2394)
+texture = ExtResource("t_foliagePack_002")
+sprite_scale = 0.472
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground125" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2701, 2394)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.484
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground126" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(316, 2395)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.09
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground127" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2104, 2395)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.099
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground128" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3182, 2395)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground129" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1400, 2396)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.708
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground130" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3545, 2396)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.575
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground131" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3666, 2401)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.085
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground132" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1039, 2403)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground133" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(891, 2405)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.625
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground134" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2003, 2405)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.109
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground135" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2606, 2408)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.637
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground136" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(4048, 2410)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.102
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground137" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(533, 2411)
+texture = ExtResource("t_sprite_0053")
+sprite_scale = 0.086
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground138" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1902, 2411)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.586
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground139" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(2817, 2412)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.499
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground140" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1507, 2413)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.087
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground141" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3337, 2413)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.103
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground142" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1611, 2414)
+texture = ExtResource("t_foliagePack_022")
+sprite_scale = 0.705
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground143" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(699, 2417)
+texture = ExtResource("t_foliagePack_004")
+sprite_scale = 0.48
+shadow_width_share = 1
+cast_shadow = false
+flip_h = true
+
+[node name="Ground144" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3893, 2462)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.093
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground145" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(3542, 2473)
+texture = ExtResource("t_foliagePack_020")
+sprite_scale = 0.681
+shadow_width_share = 1
+cast_shadow = false
+
+[node name="Ground146" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(328, 2474)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.089
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground147" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1104, 2476)
+texture = ExtResource("t_sprite_0052")
+sprite_scale = 0.096
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true
+
+[node name="Ground148" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(1243, 2481)
+texture = ExtResource("t_sprite_0063")
+sprite_scale = 0.1
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground149" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(4024, 2481)
+texture = ExtResource("t_sprite_0065")
+sprite_scale = 0.097
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+
+[node name="Ground150" parent="." groups=["prop"] instance=ExtResource("1_sway")]
+z_index = -2
+position = Vector2(405, 2507)
+texture = ExtResource("t_sprite_0070")
+sprite_scale = 0.108
+shadow_width_share = 1
+cast_shadow = false
+tint_key = "jungle_fern"
+flip_h = true

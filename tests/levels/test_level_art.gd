@@ -235,6 +235,7 @@ func test_only_ground_layers_use_negative_z() -> void:
 			var ground := GROUND_LAYERS.has(path) and item.z_index == -2
 			var shadow := item.name == "Shadow" and item.z_index == -1
 			var gate_art := item.z_index == -1 and item.get_parent() is UseTargetBase
-			check(ground or shadow or gate_art, "%s: %s has z_index %d – only ground layers (-2), shadows and use target ground art (-1) go below the actors"
+			var ground_cover := item is SwayProp and item.z_index == -2 and not (item as SwayProp).cast_shadow
+			check(ground or shadow or gate_art or ground_cover, "%s: %s has z_index %d – only ground layers and shadowless ground cover (-2), shadows and use target ground art (-1) go below the actors"
 					% [level_id, path, item.z_index])
 		lvl.free()

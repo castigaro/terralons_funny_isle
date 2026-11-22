@@ -1,23 +1,33 @@
 extends SceneTree
-## One-off art tool (BI-20): derives the theme props of Beach Camp and Farm Meadow from CC0 Kenney art – the
-## topdown-shooter tilesheet (planks, crates, rails, rocks, sticks, dirt), the pirate pack ship parts (a plain
-## sail, a plank) and the white grass tufts of the foliage sprites – and writes them as PNGs to assets/graphics/theme-derived/ (deterministic, the committed PNGs are
-## the result). The source folders stay excluded from the import.
+## One-off art tool (BI-20, BI-22): derives the theme props of Beach Camp, Farm Meadow and the Lagoon from CC0 Kenney
+## art – the topdown-shooter tilesheet (planks, crates, rails, rocks, sticks, dirt), the pirate pack ship parts (plain
+## sails, hulls, a plank), the pirate pack dinghy and the white grass tufts of the foliage sprites – and writes them as
+## PNGs to assets/graphics/theme-derived/ (deterministic, the committed PNGs are the result). The source folders stay
+## excluded from the import.
 ## Usage: godot --headless --path . --script res://tools/derive_theme_props.gd
 ## Outputs: fence_h and fence_v (repeatable fence runs with a baked shadow), barn, tent, crate_stack, barrels,
 ## campfire, driftwood_0 and driftwood_1 (baked shadow), field (a ploughed field with crop rows) and beach_grass_0–3
-## (the white tufts downscaled to 112 px, tinted per instance through SwayProp.tint).
+## (the white tufts downscaled to 112 px, tinted per instance through SwayProp.tint); for the Lagoon (prefix lagoon_):
+## dock_h and dock_v (repeatable plank dock runs on posts), hut_stilt and hut_stilt_b (thatched stilt huts on a deck),
+## boat_small, boat_large and dinghy (intact hulls with plain sails, turned to lie horizontally).
 
 const SHEET := "res://assets/graphics/topdown-characters/Tilesheet/tilesheet_complete_2X.png"
 const SHIP_DIR := "res://assets/graphics/pirate-pack/PNG/Retina/Ship parts/"
 const SAIL := "sailLarge (8).png"
 const PLANK := "wood (4).png"
+const HULL_LARGE := "hullLarge (1).png"
+const HULL_SMALL := "hullSmall (1).png"
+## A plain red furled sail without skull or emblem (all sailSmall files are plain stripes; this one has a smooth edge).
+const SAIL_FURLED := "sailSmall (4).png"
+const DINGHY := "res://assets/graphics/pirate-pack/PNG/Retina/Ships/dinghyLarge1.png"
 const TUFT_DIR := "res://assets/graphics/foliage-sprites/PNG/Shaded/"
 const TUFTS := ["sprite_0052.png", "sprite_0057.png", "sprite_0062.png", "sprite_0068.png"]
 const TUFT_PX := 112
 const OUT_DIR := "res://assets/graphics/theme-derived/"
 const NAMES := ["fence_h", "fence_v", "barn", "tent", "crate_stack", "barrels", "campfire", "driftwood_0",
-		"driftwood_1", "field", "beach_grass_0", "beach_grass_1", "beach_grass_2", "beach_grass_3"]
+		"driftwood_1", "field", "beach_grass_0", "beach_grass_1", "beach_grass_2", "beach_grass_3", "lagoon_dock_h",
+		"lagoon_dock_v", "lagoon_hut_stilt", "lagoon_hut_stilt_b", "lagoon_boat_small", "lagoon_boat_large",
+		"lagoon_dinghy"]
 
 ## Crop rects in pixels of tilesheet_complete_2X.png (128 px cells, no spacing).
 const DIRT := Rect2i(512, 0, 256, 128)
@@ -51,6 +61,20 @@ const OCHRE := Color(0.8, 0.62, 0.32)
 const FIELD_SIZE := Vector2i(320, 384)
 const FIELD_LUMA := 0.55
 const FURROW := 32
+## Lagoon props: dock run length and deck width, plank and gap colours, thatch tints of the two huts, boat scales.
+const DOCK_RUN := 128
+const DOCK_WIDTH := 56
+const DOCK_TINT := Color(0.96, 0.86, 0.7)
+const DOCK_GAP := Color(0.27, 0.19, 0.14)
+const POST_DARK := Color(0.33, 0.22, 0.15)
+const POST_LIGHT := Color(0.5, 0.35, 0.22)
+const THATCH_TINT := Color(0.86, 0.72, 0.42)
+const THATCH_TINT_B := Color(0.8, 0.74, 0.5)
+const HUT_WALL_TINT := Color(0.78, 0.6, 0.48)
+const RIPPLE := Color(0.88, 0.96, 1.0)
+const BOAT_SMALL_SCALE := 2.0
+const BOAT_LARGE_SCALE := 2.5
+const DINGHY_SCALE := 4.5
 
 
 func _initialize() -> void:
@@ -71,11 +95,12 @@ func _initialize() -> void:
 	quit(0)
 
 
-## Source images {sheet, sail, plank, tuft_0..3} read straight from the files (the sheet and ship part folders are not
+## Source images {sheet, sail, plank, hull_large, hull_small, sail_furled, dinghy, tuft_0..3} read straight from the files (the sheet and ship part folders are not
 ## imported); {} on failure.
 static func load_sources() -> Dictionary:
 	var out := {}
-	var files := {"sheet": SHEET, "sail": SHIP_DIR + SAIL, "plank": SHIP_DIR + PLANK}
+	var files := {"sheet": SHEET, "sail": SHIP_DIR + SAIL, "plank": SHIP_DIR + PLANK, "hull_large": SHIP_DIR + HULL_LARGE,
+			"hull_small": SHIP_DIR + HULL_SMALL, "sail_furled": SHIP_DIR + SAIL_FURLED, "dinghy": DINGHY}
 	for i in TUFTS.size():
 		files["tuft_%d" % i] = TUFT_DIR + TUFTS[i]
 	for key in files:
@@ -104,6 +129,13 @@ static func derive(sources: Dictionary) -> Dictionary:
 	}
 	for i in TUFTS.size():
 		out["beach_grass_%d" % i] = _tuft_sprite(sources["tuft_%d" % i])
+	out["lagoon_dock_h"] = _dock(sheet, false)
+	out["lagoon_dock_v"] = _dock(sheet, true)
+	out["lagoon_hut_stilt"] = _stilt_hut(sheet, 0)
+	out["lagoon_hut_stilt_b"] = _stilt_hut(sheet, 1)
+	out["lagoon_boat_small"] = _boat(sources["hull_small"], sources["sail"], null, BOAT_SMALL_SCALE)
+	out["lagoon_boat_large"] = _boat(sources["hull_large"], sources["sail"], sources["sail_furled"], BOAT_LARGE_SCALE)
+	out["lagoon_dinghy"] = _dinghy(sources["dinghy"])
 	return out
 
 
@@ -379,6 +411,169 @@ static func _tuft_sprite(src: Image) -> Image:
 	img.resize(maxi(1, int(round(img.get_width() * k))), maxi(1, int(round(img.get_height() * k))),
 			Image.INTERPOLATE_LANCZOS)
 	return _trim(img, 2)
+
+
+# --- Lagoon props (BI-22) ---------------------------------------------------------------------------
+
+## Dock run of light planks laid across the run between two dark side beams, with a round post every 64 px, a baked
+## shadow and open ends, so runs of DOCK_RUN px join without a seam.
+static func _dock(sheet: Image, vertical: bool) -> Image:
+	var period := DOCK_RUN
+	var boards := _scaled(_region(sheet, PLANKS_LIGHT, false), 384, 64)
+	var top := 10
+	var height := DOCK_WIDTH + 2 * top
+	var canvas := Image.create(3 * period, height, false, Image.FORMAT_RGBA8)
+	for x in 3 * period:
+		var board := x / 16
+		var k := 0.9 + 0.14 * _hash(board, 3, 21)
+		for y in range(top, top + DOCK_WIDTH):
+			var c: Color
+			if x % 16 >= 14:
+				c = DOCK_GAP
+			elif y < top + 5 or y >= top + DOCK_WIDTH - 5:
+				c = _shade(_mul(boards.get_pixel((x * 2) % 384, (y * 3) % 64), POST_LIGHT), 1.1)
+			else:
+				c = _shade(_mul(boards.get_pixel((x * 3 + board * 37) % 384, (y * 2) % 64), DOCK_TINT), k)
+				if (x % 16 == 3 or x % 16 == 10) and (y - top) % 26 == 13:
+					c = DOCK_GAP
+			canvas.set_pixel(x, y, c)
+	for i in 6:
+		for side in [top + 2, top + DOCK_WIDTH - 3]:
+			_post(canvas, Vector2(i * 64 + 32, side), 7.0)
+	if vertical:
+		canvas.rotate_90(CLOCKWISE)
+		canvas.flip_x()
+	_outline(canvas, 2, OUTLINE)
+	_drop_shadow(canvas)
+	return canvas.get_region(Rect2i(0, period, height, period) if vertical else Rect2i(period, 0, period, height))
+
+
+## Round wooden post top (dark rim, lighter cut face) of radius r centred on at.
+static func _post(canvas: Image, at: Vector2, r: float) -> void:
+	for y in range(int(at.y - r) - 1, int(at.y + r) + 2):
+		for x in range(int(at.x - r) - 1, int(at.x + r) + 2):
+			if x < 0 or y < 0 or x >= canvas.get_width() or y >= canvas.get_height():
+				continue
+			var d := (Vector2(x + 0.5, y + 0.5) - at).length()
+			if d <= r - 2.5:
+				canvas.set_pixel(x, y, POST_LIGHT.lerp(POST_DARK, 0.25 * _hash(x, y, 41)))
+			elif d <= r:
+				canvas.set_pixel(x, y, POST_DARK)
+
+
+## Stilt hut in a 3/4 top-down view: a thatched roof with furrow rows, a ridge and a ragged fringe, a plank front wall
+## with a dark door and a window, a plank deck and four stilts standing in pale ripple rings. Variant 1 is mirrored
+## with a paler thatch.
+static func _stilt_hut(sheet: Image, variant: int) -> Image:
+	var size := Vector2i(220, 264)
+	var canvas := Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
+	var wood := _scaled(_region(sheet, PLANKS_BROWN, false), 384, 64)
+	var light := _scaled(_region(sheet, PLANKS_LIGHT, false), 384, 64)
+	var thatch_tint := THATCH_TINT if variant == 0 else THATCH_TINT_B
+	var stilts := [26, 78, 142, 194]
+	var deck := Rect2i(10, 186, 200, 36)
+	for sx: int in stilts:
+		for y in range(deck.end.y - 2, 246):
+			for x in range(sx - 5, sx + 5):
+				var c := _shade(_mul(wood.get_pixel(x * 3 % 384, y % 64), POST_LIGHT), 1.3 - 0.06 * float(x - sx + 5))
+				canvas.set_pixel(x, y, c)
+	for y in range(deck.position.y, deck.end.y):
+		for x in range(deck.position.x, deck.end.x):
+			var row := (y - deck.position.y) / 9
+			var c := _shade(_mul(light.get_pixel((x + row * 53) % 384, (y * 3) % 64), DOCK_TINT), 0.92 + 0.12 * _hash(row, 1, 5))
+			if (y - deck.position.y) % 9 == 8:
+				c = DOCK_GAP
+			if y >= deck.end.y - 4:
+				c = _shade(c, 0.62)
+			canvas.set_pixel(x, y, c)
+	var wall := Rect2i(36, 128, 148, 62)
+	var door := Rect2i(96, 146, 30, 44)
+	var window := Rect2i(50, 146, 26, 20)
+	for y in range(wall.position.y, wall.end.y):
+		for x in range(wall.position.x, wall.end.x):
+			var c := _mul(wood.get_pixel((x * 2) % 384, (y * 2) % 64), HUT_WALL_TINT)
+			if (x - wall.position.x) % 18 < 2:
+				c = _shade(c, 0.66)
+			if door.has_point(Vector2i(x, y)):
+				var edge := mini(mini(x - door.position.x, door.end.x - 1 - x), y - door.position.y)
+				c = POST_DARK if edge < 3 else Color(0.16, 0.11, 0.09).lerp(Color(0.24, 0.17, 0.13), float(y - door.position.y) / 44.0)
+			elif window.has_point(Vector2i(x, y)):
+				var edge := mini(mini(x - window.position.x, window.end.x - 1 - x), mini(y - window.position.y, window.end.y - 1 - y))
+				c = POST_LIGHT if edge < 3 else Color(0.14, 0.1, 0.09)
+			canvas.set_pixel(x, y, c)
+	var roof_top := 8
+	var roof_bottom := 140
+	var ridge := 58
+	for y in range(roof_top, roof_bottom + 8):
+		var t := float(y - roof_top) / float(roof_bottom - roof_top)
+		var inset := int(round(26.0 * (1.0 - clampf(t * 1.6, 0.0, 1.0))))
+		for x in range(6 + inset, size.x - 6 - inset):
+			var fringe := roof_bottom + int(_hash(x / 3, 2, 31) * 8.0)
+			if y >= fringe:
+				continue
+			var furrow := (y - roof_top) % 9
+			var c := _mul(light.get_pixel((x + (y / 9) * 71) % 384, (y * 2) % 64), thatch_tint)
+			c = _shade(c, 1.12 - 0.22 * float(furrow) / 8.0 + 0.1 * (_hash(x / 2, y / 9, 13) - 0.5))
+			if y < ridge:
+				c = _shade(c, 1.08)
+			elif y < ridge + 4:
+				c = _shade(c, 0.6)
+			else:
+				c = _shade(c, 0.9)
+			if y >= fringe - 3:
+				c = _shade(c, 0.78)
+			canvas.set_pixel(x, y, c)
+	_outline(canvas, 3, OUTLINE)
+	for sx: int in stilts:
+		for i in 3:
+			var ring := 15.0 - 3.5 * float(i)
+			_ring(canvas, Vector2(sx, 248), ring, ring * 0.42, Color(RIPPLE, 0.6 - 0.15 * float(i)))
+	if variant == 1:
+		canvas.flip_x()
+	return _trim(canvas, 2)
+
+
+## Ellipse ring (outer radii rx, ry) of colour c blended onto the canvas.
+static func _ring(canvas: Image, at: Vector2, rx: float, ry: float, c: Color) -> void:
+	for y in range(int(at.y - ry) - 1, int(at.y + ry) + 2):
+		for x in range(int(at.x - rx) - 1, int(at.x + rx) + 2):
+			if x < 0 or y < 0 or x >= canvas.get_width() or y >= canvas.get_height():
+				continue
+			var e := ((Vector2(x + 0.5, y + 0.5) - at) / Vector2(rx, ry)).length()
+			if e <= 1.0 and e >= 0.7:
+				canvas.blend_rect(_pixel(c, c.a), Rect2i(0, 0, 1, 1), Vector2i(x, y))
+
+
+## Boat: an intact pack hull scaled up (bilinear), a plain sail across it with a mast top, an optional furled sail on
+## the fore mast, turned to lie horizontally (bow to the right) and outlined.
+static func _boat(hull: Image, sail: Image, furled: Variant, scale: float) -> Image:
+	var h := _scaled(hull, int(round(hull.get_width() * scale)), int(round(hull.get_height() * scale)))
+	var sail_scale := scale * 0.82
+	var s := _scaled(sail, int(round(sail.get_width() * sail_scale)), int(round(sail.get_height() * sail_scale)))
+	var w := maxi(h.get_width(), s.get_width()) + 8
+	var canvas := Image.create(w, h.get_height() + 8, false, Image.FORMAT_RGBA8)
+	var cx := w / 2
+	canvas.blend_rect(h, Rect2i(Vector2i.ZERO, h.get_size()), Vector2i(cx - h.get_width() / 2, 4))
+	if furled is Image:
+		var f_img := furled as Image
+		var f := _scaled(f_img, int(round(f_img.get_width() * scale * 0.7)), int(round(f_img.get_height() * scale * 0.7)))
+		canvas.blend_rect(f, Rect2i(Vector2i.ZERO, f.get_size()), Vector2i(cx - f.get_width() / 2, 4 + int(h.get_height() * 0.8)))
+	var sail_y := 4 + int(h.get_height() * 0.38)
+	canvas.blend_rect(s, Rect2i(Vector2i.ZERO, s.get_size()), Vector2i(cx - s.get_width() / 2, sail_y))
+	_post(canvas, Vector2(cx, sail_y + 4), 3.0 * scale)
+	canvas.rotate_90(CLOCKWISE)
+	_outline(canvas, 2, OUTLINE)
+	return _trim(canvas, 2)
+
+
+## Rowing dinghy: the pack dinghy scaled up (bilinear), turned to lie horizontally (bow to the left) and outlined.
+static func _dinghy(src: Image) -> Image:
+	var img := _scaled(src, int(round(src.get_width() * DINGHY_SCALE)), int(round(src.get_height() * DINGHY_SCALE)))
+	var canvas := Image.create(img.get_width() + 8, img.get_height() + 8, false, Image.FORMAT_RGBA8)
+	canvas.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), Vector2i(4, 4))
+	canvas.rotate_90(COUNTERCLOCKWISE)
+	_outline(canvas, 2, OUTLINE)
+	return _trim(canvas, 2)
 
 
 # --- Image helpers ----------------------------------------------------------------------------------

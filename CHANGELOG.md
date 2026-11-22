@@ -7,6 +7,7 @@ All notable changes to this project are documented in this file. The format foll
 ### Added
 
 - Beach Camp reads as a camp (tent, crates, barrels, campfire, driftwood, dune grass) and Farm Meadow as a farm (fenced pig pen, barn, ploughed field with crops); gameplay positions and collision are unchanged (BI-20).
+- The Lagoon reads as a lagoon village: four thatched stilt huts on the water, plank docks leading to them from the shore, two sailing boats plus a rowing dinghy that bob gently on the water (still with "reduce screen shake and flashes"); huts and boats cast a soft water reflection instead of a ground shadow. Gameplay positions, collision, tasks and events are unchanged (BI-22).
 - Volcano Cliffs reads as a volcano: dark textured basalt ground with scorched ash instead of grass, cliff faces along the coast, glowing lava fissures on the rock clusters and three smoking vents; animals get a light halo and items a light outline there, drop shadows are tinted darker, and lava glow holds still under "reduce screen shake and flashes". Layout, collision, tasks and events are unchanged (BI-23).
 
 ### Changed

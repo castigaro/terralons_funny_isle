@@ -178,7 +178,7 @@ texture = ExtResource("t_tree14")
 sprite_scale = 0.6
 footprint_radius = 30
 shadow_width_share = 0.7
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop9" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(3200, 1956)
@@ -186,7 +186,7 @@ texture = ExtResource("t_tree16")
 sprite_scale = 0.6
 footprint_radius = 30
 shadow_width_share = 0.7
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop10" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(704, 1956)
@@ -194,7 +194,7 @@ texture = ExtResource("t_tree14")
 sprite_scale = 0.55
 footprint_radius = 30
 shadow_width_share = 0.7
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop11" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(2176, 2240)
@@ -202,7 +202,7 @@ texture = ExtResource("t_grass19")
 sprite_scale = 0.6
 footprint_radius = 0
 shadow_width_share = 1
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop12" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(448, 2048)
@@ -210,7 +210,7 @@ texture = ExtResource("t_grass21")
 sprite_scale = 0.6
 footprint_radius = 0
 shadow_width_share = 1
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop13" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(3456, 384)
@@ -218,7 +218,7 @@ texture = ExtResource("t_bush52")
 sprite_scale = 0.6
 footprint_radius = 0
 shadow_width_share = 1
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="Prop14" parent="Actors" groups=["prop"] instance=ExtResource("6_prop")]
 position = Vector2(3968, 832)
@@ -226,7 +226,7 @@ texture = ExtResource("t_bush53")
 sprite_scale = 0.6
 footprint_radius = 0
 shadow_width_share = 1
-tint = Color(0.4314, 0.4078, 0.3765, 1)
+tint_key = "volcano_ash"
 
 [node name="ShelterGate" type="Node2D" parent="Actors"]
 position = Vector2(576, 1880)
