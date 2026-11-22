@@ -18,6 +18,7 @@ Every pack below was copied unchanged from the `assets/` folder of the product s
 | `graphics/splats/` | splat-pack | Kenney | CC0 1.0 | https://opengameart.org/content/splat-pack | 36 |
 | `graphics/emotes/` | emotes-pack | Kenney | CC0 1.0 | https://opengameart.org/content/emotes-pack | 272 |
 | `ui/ui-pack/` | ui-pack | Kenney | CC0 1.0 | https://opengameart.org/content/ui-pack | 870 |
+| `ui/fonts-derived/` | Kenney Future – derived glyphs | Kenney (derived by `tools/derive_font.py`) | CC0 1.0 | https://opengameart.org/content/ui-pack | 1 |
 | `ui/fonts/` | kenney-fonts | Kenney | CC0 1.0 | https://opengameart.org/content/kenney-fonts | 11 |
 | `audio/sfx-rpg/` | rpg-sounds | Kenney | CC0 1.0 | https://opengameart.org/content/50-rpg-sound-effects | 51 |
 | `audio/sfx-ui/` | ui-sounds | Kenney | CC0 1.0 | https://opengameart.org/content/51-ui-sound-effects-buttons-switches-and-clicks | 51 |
@@ -27,6 +28,6 @@ Every pack below was copied unchanged from the `assets/` folder of the product s
 | `audio/voiceover/` | voiceover | Kenney | CC0 1.0 | https://opengameart.org/content/voiceover-pack-40-lines | 94 |
 | `audio/music/` | chiptunes-action | Juhani Junkala | CC0 1.0 | https://opengameart.org/content/5-chiptunes-action | 6 |
 
-The `graphics/pirate-pack-derived/` row is the only folder not copied unchanged; all its files stay CC0. `tools/derive_grass_edges.gd` builds the textured grass fill variants (tinted with the mean colour of the pack's grass tile), the grass-to-sand transitions and the shore inner corners from tiles of the pirate pack; `tools/derive_sandcastle.gd` recolours the pack's tower tiles (`tile_13`, `tile_14`) and the sand specks of `tile_69` into the five sandcastle frames; `tools/derive_zone_marker.gd` redraws the outer line of the UI pack's `button_round_line.png` as the double-stroke zone marker nine-patch.
+The `graphics/pirate-pack-derived/` and `ui/fonts-derived/` rows are the only folders not copied unchanged. `tools/derive_grass_edges.gd` builds the textured grass fill variants (tinted with the mean colour of the pack's grass tile), the grass-to-sand transitions and the shore inner corners from tiles of the pirate pack; `tools/derive_sandcastle.gd` recolours the pack's tower tiles (`tile_13`, `tile_14`) and the sand specks of `tile_69` into the five sandcastle frames; `tools/derive_zone_marker.gd` redraws the outer line of the UI pack's `button_round_line.png` as the double-stroke zone marker nine-patch. `Kenney Future Fixed.ttf` is Kenney Future of the UI pack with diagonal X and x, a slashed %, sharp s drawn as SS and the en dash mapped to the hyphen, rebuilt by `tools/derive_font.py`. All stay CC0.
 
 The `audio/sfx-digital/` row stays (decision D-7): the pack is present as 62 mp3 files, but the game does not use it and the folder is excluded from the import.

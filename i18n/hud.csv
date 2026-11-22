@@ -14,7 +14,8 @@ hud.key.space,Space,Leertaste
 hud.key.enter,Enter,Eingabe
 hud.key.kp_enter,Enter,Eingabe
 hud.key.shift,Shift,Umschalt
-hud.star_goal,3-star time,3-Sterne-Zeit
+hud.star_goal,needs {time} left,braucht {time} Rest
+hud.star_goal_tip,Finish all tasks with at least {time} left to earn 3 stars.,Erledige alle Aufgaben mit mindestens {time} Rest für 3 Sterne.
 hud.required,Must,Pflicht
 hud.optional,Bonus,Bonus
 hud.cue.warn.parrot_steal_hat,Parrot incoming!,Papagei im Anflug!

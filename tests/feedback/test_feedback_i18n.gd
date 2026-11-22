@@ -34,7 +34,7 @@ func test_popups_do_not_auto_translate() -> void:
 	for label in labels:
 		check_eq((label as Label).auto_translate_mode, Node.AUTO_TRANSLATE_MODE_DISABLED, "auto translate off")
 		check((label as Label).label_settings != null, "label settings with the comic font")
-		check_eq((label as Label).label_settings.font, FeedbackDirector.FONT, "Kenney Future")
+		check_eq((label as Label).label_settings.font.resource_path, MenuTheme.FONT, "UI font")
 
 
 func test_every_fx_key_has_short_en_and_de() -> void:

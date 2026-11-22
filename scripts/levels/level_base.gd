@@ -52,12 +52,18 @@ var _bounds := Rect2()
 var _cfg := {}
 var _castaway: Node2D
 var _camera: LevelCamera
+const RESULT_RESTORED_PATHS := ["Overlay/Hud", "Prompts"]
+const RESULT_CUE_PATH := "Overlay/LevelCue"
+
 var _registry: EntityRegistry
 var _protection: EntityProtection
 var _messages := {}
 var _prompt_problems: Array = []
 ## Event surface overrides: key -> {zone: Zone, surface: String}, checked before the tiles.
 var _surface_overrides := {}
+## Visibility of the HUD, cue and prompt layers before the result screen hid them (node path -> visible).
+var _result_hidden := {}
+var _result_on := false
 
 
 func _ready() -> void:
@@ -306,6 +312,37 @@ func event_effects() -> EventEffects:
 ## The FeedbackDirector child (null in levels without one).
 func feedback_director() -> FeedbackDirector:
 	return get_node_or_null("FeedbackDirector") as FeedbackDirector
+
+
+## Result mode hides the HUD, the level cue and the world prompts and suppresses popup words, so the result screen
+## shows the only headline. Off restores the remembered HUD and prompt visibility; the cue manages its own visibility
+## and comes back with its next show_key (for example "Restarted!"). Calling on twice keeps the first memory.
+func set_result_mode(on: bool) -> void:
+	if on:
+		if _result_hidden.is_empty():
+			for path in RESULT_RESTORED_PATHS:
+				var node := get_node_or_null(path)
+				if node != null:
+					_result_hidden[path] = bool(node.get("visible"))
+		for path in _result_hidden:
+			get_node(String(path)).set("visible", false)
+		var cue := get_node_or_null(RESULT_CUE_PATH)
+		if cue != null:
+			cue.set("visible", false)
+	else:
+		for path in _result_hidden:
+			var node := get_node_or_null(String(path))
+			if node != null:
+				node.set("visible", bool(_result_hidden[path]))
+		_result_hidden.clear()
+	_result_on = on
+	var director := feedback_director()
+	if director != null:
+		director.set_text_suppressed(on)
+
+
+func result_mode() -> bool:
+	return _result_on
 
 
 ## Forwards a delivery by a use target to the session (delivered_to conditions); ignored while failed.

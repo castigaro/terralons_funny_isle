@@ -9,3 +9,4 @@ build/
 !tests/fixtures/levels/i18n/*.csv.import
 !tests/fixtures/flow/i18n/*.csv.import
 !assets/audio/music/*.wav.import
+!assets/ui/fonts-derived/*.ttf.import

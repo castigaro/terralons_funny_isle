@@ -120,6 +120,10 @@ func test_palette_is_valid() -> void:
 	var b := _luminance(ArtPalette.color("ui_panel"))
 	var ratio := (maxf(a, b) + 0.05) / (minf(a, b) + 0.05)
 	check(ratio >= 4.5, "ui_text on ui_panel contrast %.2f" % ratio)
+	var grey := ArtPalette.color("ui_panel").lerp(ArtPalette.color("ui_text"), float(Balance.get_value("hud", "star_goal_missed_alpha")))
+	var g := _luminance(grey)
+	var grey_ratio := (maxf(g, b) + 0.05) / (minf(g, b) + 0.05)
+	check(grey_ratio >= 4.5, "greyed star goal on ui_panel contrast %.2f" % grey_ratio)
 	check(ArtPalette.outline_px() > 0.0, "outline thickness")
 	check(ArtPalette.validate({"colors": {}}).size() > 0, "an empty palette is invalid")
 
