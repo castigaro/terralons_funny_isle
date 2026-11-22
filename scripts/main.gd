@@ -50,6 +50,9 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if _level != null and is_inside_tree():
 		get_tree().paused = false
+	var caption := Audio.caption()
+	if caption != null and caption.has_method("set_suppressed"):
+		caption.call("set_suppressed", false)
 
 
 # --- Queries (also used by tests) ------------------------------------------------------------------------
@@ -84,6 +87,7 @@ func last_result() -> Dictionary:
 ## Shows a menu screen; came_from decides where Back leads (FlowRules.back_target).
 func show_screen(screen: int, came_from: int = FlowRules.Screen.NONE) -> MenuScreen:
 	_clear_screen()
+	_set_result_quiet(screen == FlowRules.Screen.RESULT)
 	_screen = screen
 	if came_from != FlowRules.Screen.NONE:
 		_came_from[screen] = came_from
@@ -108,8 +112,19 @@ func _clear_screen() -> void:
 
 func _set_playing() -> void:
 	_clear_screen()
+	_set_result_quiet(false)
 	_screen = FlowRules.Screen.PLAYING
 	screen_changed.emit(_screen)
+
+
+## Quiets everything that could show a second headline behind the result screen: the HUD, cue and prompts of the
+## level, its popup words and the announcer caption (the voice line still plays).
+func _set_result_quiet(on: bool) -> void:
+	if _level != null and is_instance_valid(_level):
+		_level.set_result_mode(on)
+	var caption := Audio.caption()
+	if caption != null and caption.has_method("set_suppressed"):
+		caption.call("set_suppressed", on)
 
 
 func _connect_screen(screen: int, node: MenuScreen) -> void:
@@ -255,6 +270,8 @@ func _free_level() -> void:
 		var caption := Audio.caption()
 		if caption != null and caption.has_method("hide_now"):
 			caption.call("hide_now")
+		if caption != null and caption.has_method("set_suppressed"):
+			caption.call("set_suppressed", false)
 	_level = null
 	_level_id = ""
 
