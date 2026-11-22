@@ -94,6 +94,28 @@ def folder_snapshot(root: Path):
     return snap
 
 
+def snapshot_diff(before: set, after: set):
+    """Return sorted (added, removed, changed) relpaths between two folder snapshots."""
+    old = {rel: (size, mtime) for rel, size, mtime in before}
+    new = {rel: (size, mtime) for rel, size, mtime in after}
+    added = sorted(set(new) - set(old))
+    removed = sorted(set(old) - set(new))
+    changed = sorted(rel for rel in set(old) & set(new) if old[rel] != new[rel])
+    return added, removed, changed
+
+
+def format_userdata_diff(added, removed, changed, limit=20):
+    """Return (title, detail) naming the changed files of the real user folder by relative path only."""
+    entries = [("+", rel) for rel in added] + [("-", rel) for rel in removed] + [("~", rel) for rel in changed]
+    title = "hygiene: real user folder changed (%d files)" % len(entries)
+    lines = ["  %s %s" % entry for entry in entries[:limit]]
+    if len(entries) > limit:
+        lines.append("  (showing %d of %d, truncated)" % (limit, len(entries)))
+    if any(rel.startswith("logs/") or rel == "progress.json" for _sign, rel in entries):
+        lines.append("  likely parallel play, rerun without playing")
+    return title, "\n".join(lines)
+
+
 def gd_test_files(filter_text):
     files = []
     for gd in sorted((REPO / "tests").rglob("test_*.gd")):
@@ -399,8 +421,9 @@ def stage_hygiene(stage, before_git, before_userdata, userdata_dir):
             stage.fail("git status changed by the test run", "\n".join(others))
         else:
             stage.ok()
-    if folder_snapshot(userdata_dir) != before_userdata:
-        stage.fail("the real user folder changed: %s" % userdata_dir)
+    added, removed, changed = snapshot_diff(before_userdata, folder_snapshot(userdata_dir))
+    if added or removed or changed:
+        stage.fail(*format_userdata_diff(added, removed, changed))
     else:
         stage.ok()
 

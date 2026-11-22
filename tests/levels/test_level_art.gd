@@ -148,7 +148,8 @@ func test_grass_borders_use_soft_edge_tiles() -> void:
 			borders += 1
 			check_eq(grass.get_cell_source_id(cell), DERIVED_SOURCE, "grass border cell %s uses a derived edge tile" % cell)
 		else:
-			check_eq(grass.get_cell_source_id(cell), 0, "inner grass cell %s is full grass" % cell)
+			check_eq(grass.get_cell_source_id(cell), DERIVED_SOURCE, "inner grass cell %s uses a derived fill tile" % cell)
+			check_eq(grass.get_cell_atlas_coords(cell).y, 4, "inner grass cell %s uses fill row 4" % cell)
 		check_eq(level.get_surface_at(level.cell_center(cell)), "grass", "grass surface on %s" % cell)
 	check(borders >= 4, "border cells found (%d)" % borders)
 

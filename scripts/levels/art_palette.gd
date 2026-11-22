@@ -4,7 +4,7 @@ extends RefCounted
 
 const PATH := "res://data/art/palette.json"
 const REQUIRED_COLORS := ["sand", "grass", "water", "water_deep", "foliage", "outline", "ui_panel", "ui_text",
-		"ui_accent", "shadow"]
+		"ui_accent", "shadow", "zone_marker"]
 const FALLBACK_COLOR := "#ff00ff"
 const OUTLINE_SHADER := preload("res://scenes/levels/art/outline.gdshader")
 

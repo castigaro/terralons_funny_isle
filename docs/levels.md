@@ -28,6 +28,7 @@ Every level is a scene that inherits `scenes/levels/level_base.tscn` (`LevelBase
 |---|---|---|
 | `WaterBackdrop` | `Sprite2D` | animated water under everything, sized at runtime to the bounds plus one viewport per side |
 | `Sand`, `Grass`, `Shore`, `Details` | `TileMapLayer` | the layout, all with `scenes/levels/island_tileset.tres` |
+| `ZoneMarkers/<zone_id>` | `ZoneMarker` (`scenes/levels/props/zone_marker.tscn`) | outline of a player-action zone; `z_index = -2`, after `Details` and before `Actors` |
 | `Actors` | `Node2D`, y-sorted | castaway (`Actors/Castaway`, `castaway_path`), animals, items, props |
 | `Markers/Spawn` | `Marker2D` | castaway start; its rotation is the start facing |
 | `HomePoints/<uid>` | `Marker2D` | home of the level entity with that uid (reset after restart or when unreachable) |
@@ -41,6 +42,8 @@ Every level is a scene that inherits `scenes/levels/level_base.tscn` (`LevelBase
 | `EventEffects` | `Node2D` with `EventEffects` | shipped levels: applies the event effects to the world (see below) |
 
 `FeedbackDirector`, `EventAnchors` and `EventEffects` are not in `REQUIRED_CHILDREN` (sample levels stay minimal); `tests/levels/test_shipped_levels.gd` requires them in every shipped level.
+
+Zone markers (BI-19): every player-action zone of a shipped level gets one instance of `scenes/levels/props/zone_marker.tscn` below `ZoneMarkers`, named after the zone, with `zone_id` set. Action zones are the zone ids a task names through a `zone` field (in_zone conditions and modifiers), as a `delivered_to` target, or as the `target_kind` of a `PenTarget`, `DeliveryTarget` or `BuildTarget`; the large area zones of L4 (`beach`, `lagoon`) are exempt, helper zones (lanes, flee areas, event perches) must stay unmarked. `ZoneMarker` (`scripts/levels/zone_marker.gd`) sizes its nine-patch from the axis-aligned bounds of the zone's `CollisionShape2D` in `_ready` and hides itself with a warning when the zone is missing; it has no collision, input or per-frame work and never changes the zone. `tools/validate_level_art.py` (validators stage) and `tests/levels/test_zone_markers.gd` check the set. `ZoneMarkers` is not in `REQUIRED_CHILDREN`.
 
 ## Groups
 
@@ -133,7 +136,7 @@ Generic `UseTarget` implementations in `scripts/levels/` (base `UseTargetBase`, 
 - `PenTarget`: at a pen gate or jetty; puts a carried animal on the next `Marker2D` slot inside its pen zone (slots cycle). Throwing into the zone works as well.
 - `BuildTarget` (`scripts/levels/build_target.gd`, a `DeliveryTarget`): something built from deliveries (the L4 sandcastle). Exports `stage_frames` (empty … finished) and `flattened_frame`. Its `Art` sprite shows frame `min(current * (frames - 1) / target, frames - 1)` of the session progress of every task with a `delivered_to` condition naming its `target_kind`, and the flattened frame (plus an `fx_anchor("sand")`) once such a task is missed and not done. It refreshes on `task_progress`, `task_completed` and `event_triggered`, resets on `level_restarted` and stops accepting once finished. Presentation only: the progress counter stays in the session.
 
-A target may carry an `Art` sprite (gate, jetty, feed bowl, boat, sandcastle stage).
+A target may carry an `Art` sprite (gate, jetty, feed bowl, boat, sandcastle stage). The L4 sandcastle frames are the derived sand frames of `tools/derive_sandcastle.gd` without a tint; its zone outline is a separate `ZoneMarker`, not part of the `Art` sprite.
 
 ## Camera (`LevelCamera`)
 
@@ -169,7 +172,7 @@ Shore rules (keep the water collision closed):
 
 Grass rules (soft grass-to-sand transitions from `assets/graphics/pirate-pack-derived/grass_edges@2.png`):
 
-- A grass cell with sand or rock on one side gets an edge tile, on two adjacent sides an outer corner tile, and with sand only on one diagonal an inner corner tile (all atlas source 1 on the `Grass` layer, plain sand below). Inner grass cells keep the full grass tiles of the pirate sheet.
+- A grass cell with sand or rock on one side gets an edge tile, on two adjacent sides an outer corner tile, and with sand only on one diagonal an inner corner tile (all atlas source 1 on the `Grass` layer, plain sand below). Inner grass cells get a textured fill variant (atlas source 1, row 4) from `fill_variant(cell)`: cells with an even `x + y` use variants 0 or 1, odd cells 2 or 3, picked by a deterministic cell hash, so no two 4-neighbours and no 2×2 block repeat one tile.
 - Grass patches must be at least 2 cells wide in both directions; a one-cell strip is a layout error.
 - Grass must not touch the shore or water (8-neighbours): keep one plain sand cell between grass and any shore tile.
 - Other shapes (for example sand on one side plus a sand diagonal on the far side) are rejected; round the patch off.

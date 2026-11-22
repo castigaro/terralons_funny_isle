@@ -104,6 +104,14 @@ texture_region_size = Vector2i(128, 128)
 3:3/0 = 0
 3:3/0/physics_layer_1/polygon_0/points = PackedVector2Array(42, 42, 64, 42, 64, 64, 42, 64)
 3:3/0/custom_data_0 = "sand"
+0:4/0 = 0
+0:4/0/custom_data_0 = "grass"
+1:4/0 = 0
+1:4/0/custom_data_0 = "grass"
+2:4/0 = 0
+2:4/0/custom_data_0 = "grass"
+3:4/0 = 0
+3:4/0/custom_data_0 = "grass"
 
 [resource]
 tile_size = Vector2i(128, 128)

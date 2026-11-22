@@ -207,6 +207,29 @@ class RepoAssetsTest(unittest.TestCase):
         self.assertIn("res://" + rel, tileset)
         self.assertTrue((common.REPO / "tools" / "derive_grass_edges.gd").is_file())
 
+    def test_derived_sandcastle_and_marker_are_listed_imported_and_used(self):
+        folder = common.REPO / "assets" / "graphics" / "pirate-pack-derived"
+        users = {
+            "grass_edges@2.png": "scenes/levels/island_tileset.tres",
+            "sandcastle_0@2.png": "scenes/levels/l4_lagoon.tscn",
+            "sandcastle_1@2.png": "scenes/levels/l4_lagoon.tscn",
+            "sandcastle_2@2.png": "scenes/levels/l4_lagoon.tscn",
+            "sandcastle_3@2.png": "scenes/levels/l4_lagoon.tscn",
+            "sandcastle_flat@2.png": "scenes/levels/l4_lagoon.tscn",
+            "zone_marker@2.png": "scenes/levels/props/zone_marker.tscn",
+        }
+        self.assertEqual(sorted(p.name for p in folder.glob("*.png")), sorted(users))
+        sources = (common.REPO / "assets" / "SOURCES.md").read_text(encoding="utf-8")
+        row = [ln for ln in sources.splitlines() if ln.startswith("| `graphics/pirate-pack-derived/` |")][0]
+        for tool in ("derive_grass_edges.gd", "derive_sandcastle.gd", "derive_zone_marker.gd"):
+            self.assertIn(tool, row)
+            self.assertTrue((common.REPO / "tools" / tool).is_file(), tool)
+        self.assertTrue(row.rstrip().endswith("| %d |" % len(users)), "file count in the row")
+        for name, user in users.items():
+            self.assertTrue((folder / (name + ".import")).is_file(), "%s imported" % name)
+            text = (common.REPO / user).read_text(encoding="utf-8")
+            self.assertIn("res://assets/graphics/pirate-pack-derived/" + name, text)
+
     def test_asset_map_names_every_category(self):
         text = (common.REPO / "docs" / "asset_map.md").read_text(encoding="utf-8").lower()
         for word in ("castaway", "animals", "items", "tiles", "ui", "fonts", "particles", "music", "sfx"):
