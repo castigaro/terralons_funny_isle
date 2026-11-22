@@ -43,14 +43,23 @@ Bottom to top in every level (`scenes/levels/level_base.tscn`):
 
 1. `WaterBackdrop` – one repeating standalone water texture (`tile_73.png`) with `water.gdshader`, sampled in world space; it covers the level bounds plus one viewport on every side, so no clear colour ever shows.
 2. `Sand` – plain sand under every interior land cell.
-3. `Grass` – full grass tiles on top of sand; border cells use the derived soft grass-to-sand edge, outer corner and inner corner tiles (`assets/graphics/pirate-pack-derived/grass_edges@2.png`, wavy border measured from the pack's grass blob, sand strip 40 px deep), never a hard full-grass square next to sand.
+3. `Grass` – textured grass on top of sand: inner cells use one of four derived fill variants (palette grass shaded by value noise that wraps on the tile, a few foliage-coloured blade marks; luma standard deviation 0.025–0.04; all variants share a 6 px border band, so any neighbours are seamless) and border cells the derived soft grass-to-sand edge, outer corner and inner corner tiles built from fill variant 0 (`assets/graphics/pirate-pack-derived/grass_edges@2.png`, wavy border measured from the pack's grass blob, sand strip 40 px deep), never a hard or flat grass square.
 4. `Shore` – shoreline edge and outer corner tiles of the pack and the derived inner corner tiles on the outer land cells (their transparent outer part shows the water).
 5. `Details` – rocks.
-6. `Actors` – castaway, animals, items and props, `y_sort_enabled`.
+6. `ZoneMarkers` – one `ZoneMarker` per player-action zone (pens, ponds, perches, the trough, the sandcastle site, the shelter and the mud pool): a nine-patch outline on the zone bounds, `z_index = -2`, drawn after the ground and below the actors.
+7. `Actors` – castaway, animals, items and props, `y_sort_enabled`.
 
-- The ground layers (1–5) have `z_index = -2`, shadows `-1`, everything else 0 or more. No other node uses a negative z-index.
+- The ground layers (1–5) and `ZoneMarkers` have `z_index = -2`, shadows `-1`, everything else 0 or more. No other node uses a negative z-index.
 - Everything in `Actors` is y-sorted at its base: props have their origin at the bottom of the sprite, actors at their feet or centre.
 - UI is drawn on `CanvasLayer`s above the level (cue layer 90, error panel layer 100).
+
+## No flat placeholder ground (BI-19)
+
+- No flat single-colour ground, zone or filled sprite: `tools/validate_code.py` rule (j) bans `ColorRect`, `Polygon2D` and `Line2D` nodes in level scenes and `draw_rect`, `draw_circle`, `draw_colored_polygon` and `draw_polygon` in gameplay, level and feedback scripts.
+- Two thresholds on the sRGB luma (`tests/support/ground_art.gd`): the green pixels of every grass tile and every opaque filled sprite (opaque share of at least 0.9) need a standard deviation of at least 0.02; every other ground tile (sand, shore, details) at least 0.005. The pack's full grass tile (6,1) has 0 and fails both. Sand keeps the pack tiles (0.007–0.008); themed sand textures follow in later items.
+- Zone markers: `assets/graphics/pirate-pack-derived/zone_marker@2.png`, a 64 px nine-patch (margins 24, transparent centre) with a dark outer line in palette `outline` (3 px, at least 3:1 on grass and on sand) and a light inner line in palette `zone_marker` (2.5 px), scaled ×2 in the world. Shape and the zone props are the non-colour cue; there is no fill and no animation. Area zones (the L4 beach and lagoon) and helper zones (lanes, flee areas, event perches) stay unmarked.
+- Sandcastle frames: `tools/derive_sandcastle.gd` recolours the pack's tower tiles onto a ramp of palette sand (site ring, small tower, tower, keep) and draws the flattened frame as a wide low mound; every frame is transparent around its silhouette.
+- Opt-in screenshot check: `python tools/flat_area_check.py <playtest dir>` reports 96 px windows with a luma standard deviation below 0.015 outside the HUD bands, water and sand.
 
 ## Motion
 

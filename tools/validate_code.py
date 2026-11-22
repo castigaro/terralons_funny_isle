@@ -28,8 +28,9 @@ Usage: python tools/validate_code.py [--root <dir>]   (exit code 1 on any error)
     set_cell(), set_cells_terrain_connect(), set_cells_terrain_path() or FastNoiseLite in .gd below scripts/
     (layouts are painted offline by tools/build_level_layout.gd).
 (j) No placeholder graphics: no ColorRect, Polygon2D or Line2D node in .tscn files below scenes/ (scenes/ui/ is
-    allowed) and no ColorRect.new(), Polygon2D.new(), draw_rect(), draw_circle() or draw_polygon() in
-    scripts/gameplay, scripts/levels and scripts/feedback. GradientTexture2D and NoiseTexture2D stay allowed.
+    allowed) and no ColorRect.new(), Polygon2D.new(), draw_rect(), draw_circle(), draw_colored_polygon() or
+    draw_polygon() in scripts/gameplay, scripts/levels and scripts/feedback (no flat single-colour ground or zone).
+    GradientTexture2D and NoiseTexture2D stay allowed.
     A .gd line may opt out of (i) and (j) with the comment "# art-exempt: <reason>".
 (k) Engine.time_scale is global (hit-stop): only scripts/feedback/feedback_director.gd may assign it; files below
     tests/ are exempt (they restore it between tests).
@@ -115,7 +116,7 @@ PLACEHOLDER_TSCN_RE = re.compile(r'^\[node [^\]]*type="(%s)"' % "|".join(PLACEHO
 PLACEHOLDER_TSCN_DIRS = ("scenes",)
 PLACEHOLDER_TSCN_ALLOWED = ("scenes/ui/",)
 PLACEHOLDER_GD_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback")
-PLACEHOLDER_GD_RE = re.compile(r"\b(ColorRect|Polygon2D)\s*\.\s*new\s*\(|(?<![\w])(draw_rect|draw_circle|draw_polygon)\s*\(")
+PLACEHOLDER_GD_RE = re.compile(r"\b(ColorRect|Polygon2D)\s*\.\s*new\s*\(|(?<![\w])(draw_rect|draw_circle|draw_colored_polygon|draw_polygon)\s*\(")
 
 
 def _line(text: str, offset: int) -> int:

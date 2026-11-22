@@ -106,6 +106,34 @@ func test_sandcastle_stages_follow_deliveries() -> void:
 	check(art.texture == castle.stage_frames[0], "first frame after the restart")
 
 
+func test_sandcastle_frames_are_derived_sand_art() -> void:
+	var share := func(tex: Texture2D) -> float:
+		var img := Image.load_from_file(ProjectSettings.globalize_path(tex.resource_path))
+		img.convert(Image.FORMAT_RGBA8)
+		var n := 0
+		for y in img.get_height():
+			for x in img.get_width():
+				if img.get_pixel(x, y).a > 0.5:
+					n += 1
+		return float(n) / float(img.get_width() * img.get_height())
+	await open_level(L4)
+	var castle := level.get_node("Actors/Sandcastle") as BuildTarget
+	var art := castle.get_node("Art") as Sprite2D
+	check(art.modulate.is_equal_approx(Color.WHITE), "no tint on the castle art: %s" % art.modulate)
+	var frames: Array = castle.stage_frames.duplicate()
+	frames.append(castle.flattened_frame)
+	var shares := []
+	for tex: Texture2D in frames:
+		check(tex.resource_path.begins_with("res://assets/graphics/pirate-pack-derived/sandcastle_"),
+				"derived frame %s" % tex.resource_path)
+		var s: float = share.call(tex)
+		check(s < 0.9, "%s is not a filled square (%.2f)" % [tex.resource_path, s])
+		shares.append(s)
+	check(shares[0] < 0.35, "build site is a low outline (%.2f)" % shares[0])
+	check(absf(shares[4] - shares[0]) >= 0.15, "flattened differs from the site (%.2f vs %.2f)" % [shares[4], shares[0]])
+	check(absf(shares[4] - shares[3]) >= 0.15, "flattened differs from the keep (%.2f vs %.2f)" % [shares[4], shares[3]])
+
+
 func test_wave_flattens_only_an_unfinished_castle() -> void:
 	for pails in [1, 3]:
 		await open_level(L4, {"session_options": {"schedule_mode": "earliest"}})

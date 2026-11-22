@@ -22,9 +22,24 @@ func test_3x3_grass_patch_gets_edges_and_corners() -> void:
 	for cell in expected:
 		check_eq(_grass(res, cell), [DERIVED, expected[cell]], "grass tile at %s" % cell)
 	var centre := _grass(res, Vector2i(4, 4))
-	check(centre.size() == 2 and centre[0] == 0 and Builder.GRASS_TILES.has(centre[1]), "full grass in the middle")
+	check_eq(centre, [DERIVED, Builder.fill_variant(Vector2i(4, 4))], "full grass in the middle")
+	check(Builder.GRASS_FILL.has(centre[1]), "middle uses a fill variant")
 	for cell in expected.keys() + [Vector2i(4, 4)]:
 		check(res["cells"]["Sand"].has(cell), "sand below grass at %s" % cell)
+
+
+func test_full_grass_uses_fill_variants() -> void:
+	var text := "~~~~~~~~~~\n~........~\n~........~\n~..,,,,..~\n~..,,,,..~\n~..,,,,..~\n~..,,,,..~\n~........~\n~........~\n~~~~~~~~~~\n"
+	var res := Builder.build(text)
+	check_eq(res["errors"], [], "no errors")
+	for cell in [Vector2i(4, 4), Vector2i(5, 4), Vector2i(4, 5), Vector2i(5, 5)]:
+		var tile := _grass(res, cell)
+		check(tile.size() == 2 and tile[0] == DERIVED and tile[1].y == 4, "inner cell %s uses fill row 4: %s" % [cell, tile])
+		check_eq(tile[1], Builder.fill_variant(cell), "inner cell %s variant" % cell)
+	check_ne(_grass(res, Vector2i(4, 4)), _grass(res, Vector2i(5, 4)), "neighbours differ")
+	check_eq(_grass(res, Vector2i(3, 3)), [DERIVED, Builder.GRASS_EDGE["NW"]], "corner unchanged")
+	check_eq(_grass(res, Vector2i(4, 3)), [DERIVED, Builder.GRASS_EDGE["N"]], "edge unchanged")
+	check_eq(_grass(res, Vector2i(6, 5)), [DERIVED, Builder.GRASS_EDGE["E"]], "east edge unchanged")
 
 
 func test_l_shaped_grass_gets_an_inner_corner() -> void:

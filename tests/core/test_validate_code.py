@@ -243,6 +243,14 @@ class ValidateCodeArtRulesTest(unittest.TestCase):
                      "draw_polygon([], [])", "var r := ColorRect.new()"):
             self.assert_fails({"scripts/levels/a.gd": gd("func _draw() -> void:\n\t" + body)}, "placeholder shape")
 
+    def test_colored_polygon_fails_in_level_scripts(self):
+        self.assert_fails({"scripts/levels/a.gd": gd(
+            "func _draw() -> void:\n\tdraw_colored_polygon(PackedVector2Array(), Color.GREEN)")}, "draw_colored_polygon")
+
+    def test_colored_polygon_art_exempt_comment_passes(self):
+        self.assert_passes({"scripts/levels/a.gd": gd(
+            "func _draw() -> void:\n\tdraw_colored_polygon(PackedVector2Array(), Color.GREEN)  # art-exempt: debug")})
+
     def test_drawing_passes_in_ui_scripts(self):
         self.assert_passes({"scripts/ui/a.gd": gd("func _draw() -> void:\n\tdraw_rect(Rect2(), Color.RED)")})
 

@@ -8,15 +8,18 @@ extends SceneTree
 ## with water only on a diagonal becomes a shore inner corner (derived tile with a water collision square). A land
 ## cell with water on two opposite sides is not supported (no one-tile strips).
 ## Grass cells next to sand or rock get a soft grass-to-sand edge, outer corner or inner corner tile from the
-## derived atlas (source 1, tools/derive_grass_edges.gd) on the Grass layer, with plain sand below. Grass patches
-## must be at least 2 cells wide in both directions and must not touch the shore or water (8-neighbours).
+## derived atlas (source 1, tools/derive_grass_edges.gd) on the Grass layer, with plain sand below; full grass cells
+## get one of the four textured fill variants (atlas row 4) so that no two 4-neighbours and no 2x2 block repeat the
+## same tile. Grass patches must be at least 2 cells wide in both directions and must not touch the shore or water
+## (8-neighbours).
 
 const TILESET := "res://scenes/levels/island_tileset.tres"
 const LAYERS := ["Sand", "Grass", "Shore", "Details"]
 const SOURCE := 0
 const DERIVED := 1
 const SAND_TILES := [Vector2i(3, 4), Vector2i(4, 4)]
-const GRASS_TILES := [Vector2i(6, 1), Vector2i(7, 1), Vector2i(6, 2), Vector2i(7, 2)]
+## Textured grass fill variants (source 1, row 4); even cells (x + y) use the first two, odd cells the last two.
+const GRASS_FILL := [Vector2i(0, 4), Vector2i(1, 4), Vector2i(2, 4), Vector2i(3, 4)]
 const ROCK_TILES := [Vector2i(0, 3), Vector2i(1, 3), Vector2i(2, 3), Vector2i(0, 4), Vector2i(1, 4), Vector2i(2, 4)]
 const DIAGONALS := {"NW": Vector2i(-1, -1), "NE": Vector2i(1, -1), "SW": Vector2i(-1, 1), "SE": Vector2i(1, 1)}
 const SIDES := {"N": Vector2i.UP, "S": Vector2i.DOWN, "W": Vector2i.LEFT, "E": Vector2i.RIGHT}
@@ -62,8 +65,7 @@ func _initialize() -> void:
 ## Paints the layers from the layout text: returns {data: {layer: PackedByteArray}, land: int, errors: Array,
 ## cells: {layer: {cell: [source, atlas coords]}}}.
 static func build(text: String) -> Dictionary:
-	var rows := text.replace("", "").split("
-")
+	var rows := text.replace("\r", "").split("\n")
 	while rows.size() > 0 and rows[rows.size() - 1].strip_edges() == "":
 		rows.remove_at(rows.size() - 1)
 	var grid := {}
@@ -89,7 +91,8 @@ static func build(text: String) -> Dictionary:
 	var errors: Array = []
 	var coast := {}
 	for cell: Vector2i in grid:
-		if _open_sides(cell, func(c: Vector2i) -> bool: return grid.has(c)) != "" 				or not _open_diagonals(cell, func(c: Vector2i) -> bool: return grid.has(c)).is_empty():
+		if _open_sides(cell, func(c: Vector2i) -> bool: return grid.has(c)) != "" \
+				or not _open_diagonals(cell, func(c: Vector2i) -> bool: return grid.has(c)).is_empty():
 			coast[cell] = true
 	var keys := grid.keys()
 	keys.sort()
@@ -121,7 +124,7 @@ static func build(text: String) -> Dictionary:
 		if ch == ",":
 			var tile := _grass_tile(cell, grid, coast, errors)
 			if tile.size() == 2:
-				paint.call("Grass", cell, tile[0], tile[1] if tile[0] == DERIVED else GRASS_TILES[pick % GRASS_TILES.size()])
+				paint.call("Grass", cell, tile[0], tile[1])
 		elif ch == "#":
 			paint.call("Details", cell, SOURCE, ROCK_TILES[pick % ROCK_TILES.size()])
 	var data := {}
@@ -148,7 +151,7 @@ static func _open_diagonals(cell: Vector2i, is_inside: Callable) -> Array:
 	return out
 
 
-## [source, coords] of the grass tile of a grass cell ([] after an error); full grass returns [SOURCE, ZERO].
+## [source, coords] of the grass tile of a grass cell ([] after an error); full grass returns a fill variant.
 static func _grass_tile(cell: Vector2i, grid: Dictionary, coast: Dictionary, errors: Array) -> Array:
 	for dy in [-1, 0, 1]:
 		for dx in [-1, 0, 1]:
@@ -157,14 +160,15 @@ static func _grass_tile(cell: Vector2i, grid: Dictionary, coast: Dictionary, err
 				errors.append("cell %d,%d: grass touches the shore or water" % [cell.x, cell.y])
 				return []
 	var is_grass := func(c: Vector2i) -> bool: return grid.get(c, "") == ","
-	if (not is_grass.call(cell + Vector2i.LEFT) and not is_grass.call(cell + Vector2i.RIGHT)) 			or (not is_grass.call(cell + Vector2i.UP) and not is_grass.call(cell + Vector2i.DOWN)):
+	if (not is_grass.call(cell + Vector2i.LEFT) and not is_grass.call(cell + Vector2i.RIGHT)) \
+			or (not is_grass.call(cell + Vector2i.UP) and not is_grass.call(cell + Vector2i.DOWN)):
 		errors.append("cell %d,%d: grass patch thinner than 2 cells" % [cell.x, cell.y])
 		return []
 	var sides := _open_sides(cell, is_grass)
 	var diagonals := _open_diagonals(cell, is_grass)
 	if sides == "":
 		if diagonals.is_empty():
-			return [SOURCE, Vector2i.ZERO]
+			return [DERIVED, fill_variant(cell)]
 		if diagonals.size() == 1:
 			return [DERIVED, GRASS_INNER[diagonals[0]]]
 	elif GRASS_EDGE.has(sides):
@@ -174,6 +178,13 @@ static func _grass_tile(cell: Vector2i, grid: Dictionary, coast: Dictionary, err
 	errors.append("cell %d,%d: grass shape with sand on %s and diagonals %s is not supported"
 			% [cell.x, cell.y, sides, ",".join(diagonals)])
 	return []
+
+
+## Fill variant of a full grass cell: the cell parity picks the pair, a deterministic cell hash the tile in it.
+static func fill_variant(cell: Vector2i) -> Vector2i:
+	var pair := 2 * posmod(cell.x + cell.y, 2)
+	var h := (cell.x * 73856093) ^ (cell.y * 19349663)
+	return GRASS_FILL[pair + ((absi(h) >> 4) & 1)]
 
 
 ## Replaces the tile_map_data line of the four layer override sections in a level .tscn; returns "" or an error.

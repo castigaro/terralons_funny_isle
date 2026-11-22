@@ -11,7 +11,8 @@
 		"ui_text": "#f7f3e8",
 		"ui_accent": "#ffc93c",
 		"ui_warning": "#ff6b4a",
-		"shadow": "#1e3b3f"
+		"shadow": "#1e3b3f",
+		"zone_marker": "#fff4d6"
 	},
 	"water_tint": "water",
 	"highlight": "#ffffff",
@@ -37,6 +38,7 @@
 		"assets/graphics/foliage/",
 		"assets/graphics/foliage-sprites/",
 		"assets/graphics/pirate-pack/PNG/Retina/Tiles/",
+		"assets/graphics/pirate-pack-derived/",
 		"assets/graphics/topdown-characters/",
 		"assets/graphics/animals/PNG/Round (outline)/"
 	]
