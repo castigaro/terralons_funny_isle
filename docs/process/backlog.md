@@ -1,7 +1,20 @@
-# Backlog – Release 1.0.0
+# Backlog – Release 1.1.0
+
+Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 and BI-25; BI-20 to BI-24 stay open (6-item cap). Items done in 1.0.0 follow below the new ones with their original priorities.
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
+| 1 | BI-15 | Readable display font with full EN/DE glyphs and one-line HUD task names | small | clear | no | yes | planned for 1.1.0 |
+| 2 | BI-16 | Result screen with one headline and one star animation | small | clear | no | yes | planned for 1.1.0 |
+| 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | planned for 1.1.0 |
+| 4 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | planned for 1.1.0 |
+| 5 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | planned for 1.1.0 |
+| 6 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | open |
+| 7 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | open |
+| 8 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | open |
+| 9 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | open |
+| 10 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
+| 11 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | planned for 1.1.0 |
 | 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
 | 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
 | 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | done in 1.0.0 |
@@ -16,6 +29,214 @@
 | 12 | BI-11 | Levels 3–5: Jungle, Lagoon and Volcano Cliffs | large | clear | no | yes | done in 1.0.0 |
 | 13 | BI-12 | Bot playthrough of all levels under worst-case event timing | large | clear | no | no | done in 1.0.0 |
 | 14 | BI-14 | Windowed smoke run, performance, German clip check, content review and export | large | clear | no | no | done in 1.0.0 |
+
+### BI-15 – Readable display font with full EN/DE glyphs and one-line HUD task names
+
+- Status: planned for 1.1.0
+- Priority: 1
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want every text in the game to be readable with even letter spacing and correct glyphs, so that I never misread 'NEXT', a percentage or a task name.
+
+**Acceptance criteria:**
+
+1. The UI theme uses one display font (an existing Kenney font variant or a derived/fixed version of kenpixel) that renders A–Z, a–z, 0–9, %, X, ★, ✓ and ä ö ü Ä Ö Ü ß correctly; a headless test renders these glyphs and fails if any falls back to a missing-glyph box or wrong character.
+2. 'NEXT' reads as NEXT, '100 %' shows a percent sign, and 'COCONUTS'/'SANDCASTLE' show no visible gap inside the word in playtest screenshots.
+3. Every HUD task title fits on one line in EN and DE at 1280x720 and 1920x1080; titles that do not fit are shortened in the i18n files (EN and DE), and validate_i18n or a new check fails if a task title exceeds the measured one-line width.
+4. tools/playtest.py screenshots of title, level select, settings, intro card, HUD, pause, result and credits in EN and DE show no clipped or overlapping text; the windowed clip stage of run_tests.py passes.
+5. The font source is listed in assets/SOURCES.md and credits; run_tests.py default stages stay green.
+
+### BI-16 – Result screen with one headline and one star animation
+
+- Status: planned for 1.1.0
+- Priority: 2
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player finishing a level I want one clear headline and my stars shown once, so that the result screen reads cleanly instead of three overlapping 'LEVEL COMPLETE!' texts.
+
+**Acceptance criteria:**
+
+1. After a win exactly one headline node is visible (e.g. 'LEVEL COMPLETE!' / German equivalent); the banner and the giant text behind the panel are removed or merged, verified by a scene test that counts visible headline labels = 1.
+2. After a loss exactly one loss headline is visible, with the same layout rules.
+3. Earned stars animate in once (one after another) and then stay; no second star row is shown.
+4. No two visible text nodes on the result screen overlap (test compares global rects), for win and loss in EN and DE.
+5. tools/playtest.py result screenshots for win and loss in EN and DE at 1920x1080 and 1280x720 show the clean layout; scoring, retry and next-level buttons work as before.
+
+### BI-17 – Clear HUD 3-star target with live reachability
+
+- Status: planned for 1.1.0
+- Priority: 3
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want to see at a glance how much time must remain for 3 stars and whether that is still possible, so that I know if I should hurry.
+
+**Acceptance criteria:**
+
+1. The HUD shows the 3-star condition as a self-explaining label next to the timer, e.g. '★★★ if ≥ 1:00 left' / 'DE: ★★★ bei ≥ 1:00 Rest', using the existing 3-star threshold from the level data; wording is in both i18n files.
+2. The state is shown as 'reachable' (normal colour, no tick at level start) while time left is above the threshold and all tasks can still be done; it switches to 'missed' (greyed or struck through, no tick) as soon as the timer drops below the threshold; a tick appears only once 3 stars are actually secured at level end.
+3. A unit test drives the HUD with time-left values above, at and below the threshold and asserts the three states.
+4. Star thresholds, timers and scoring are unchanged (existing balance tests stay green).
+5. tools/playtest.py HUD screenshots in EN and DE show the label on one line without overlapping the timer at 1280x720 and 1920x1080.
+
+### BI-19 – Textured ground with edge tiles and no flat placeholder shapes in any level
+
+- Status: planned for 1.1.0
+- Priority: 4
+- Size: large
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want grass, sand and zones in every level to look like real terrain, so that the levels look finished instead of showing flat coloured rectangles.
+
+**Acceptance criteria:**
+
+1. The flat green rectangles (L1 bottom right, L4 strip) and the flat orange sandcastle-zone square (L4) are replaced by tiles or sprites with textured fill and visible edges/transitions.
+2. Grass in all five levels uses a textured tile with grass-to-sand edge tiles (existing pirate-pack or pirate-pack-derived tiles, new derived tiles via a tool script if needed).
+3. Task zones (e.g. sandcastle zone, pens, drop-offs) use a sprite-based marker (border/decal from existing packs) that stays clearly recognisable as a zone.
+4. A validator (validate_levels.py or new) fails if any level scene or level_base draws a flat single-colour ColorRect/Polygon2D/draw_rect as ground or zone; it passes for all five levels.
+5. Gameplay positions, collision shapes and zone areas are unchanged (level layout/collision tests stay green; bot playthrough still wins every level).
+6. tools/playtest.py screenshots of all five levels show no flat single-colour rectangle; any derived asset is recorded in assets/SOURCES.md.
+
+### BI-18 – Live island scene behind title, level select and settings
+
+- Status: planned for 1.1.0
+- Priority: 5
+- Size: large
+- Clarity: clear
+- Novel: yes
+- UX-relevant: yes
+
+**User story:** As a player opening the game I want to see a living island behind the menus, so that the game feels inviting from the first second instead of showing plain light blue.
+
+**Acceptance criteria:**
+
+1. Title, level select, settings and credits show an animated backdrop scene: animated water (existing water shader), beach and grass tiles, a few palms and at least three animals from the existing sprites that wander and idle.
+2. Menus stay readable: menu panels have a backing or the backdrop is dimmed/blurred so that text contrast is at least 4.5:1 against its immediate background in screenshots.
+3. The backdrop persists across menu screens without restarting or flickering, pauses or is removed while a level runs, and adds no errors or warnings in the headless and windowed smoke stages.
+4. The menu stays responsive (keyboard navigation unchanged) and the perf stage of run_tests.py --windowed still passes.
+5. tools/playtest.py screenshots of title (EN/DE), level select, settings and credits at 1920x1080 and 1280x720 show the backdrop and readable menus.
+
+### BI-20 – Themed Beach Camp and Farm Meadow
+
+- Status: open
+- Priority: 6
+- Size: large
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want Beach Camp to read as a camp on the beach and Farm Meadow as a farm, so that each level has its own identity at first sight.
+
+**Acceptance criteria:**
+
+1. Farm Meadow shows fences around pens or fields, a barn (composed/derived from existing CC0 sprites if no pack contains one), a ploughed or crop field area and textured meadow grass.
+2. Beach Camp shows camp decoration (e.g. tent/crates/campfire/driftwood from existing packs) distinct from the other levels.
+3. Decoration is non-blocking or only placed where layout already has obstacles: layout files, collision, task and spawn positions are unchanged (layout tests and bot playthrough green).
+4. Every used or derived asset lies in a folder listed in assets/SOURCES.md; validate_assets and validate_credits pass.
+5. tools/playtest.py screenshots of L1 and L2 next to each other show clearly different themes; animals and items stay at least 24 px and visible against the new ground.
+
+### BI-21 – Themed Jungle with dense vegetation
+
+- Status: open
+- Priority: 7
+- Size: large
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the Jungle level to feel dense and overgrown, so that it clearly differs from the open beach and meadow levels.
+
+**Acceptance criteria:**
+
+1. L3 shows dense vegetation from the foliage packs (layered bushes, large leaves, vines/palms) along borders and in non-play areas, plus a darker jungle ground tile with edges.
+2. Vegetation never hides the castaway, animals, items or task zones in play areas (foreground foliage is semi-transparent or outside play paths); verified by playtest screenshots and the bot playthrough still winning L3.
+3. Layout, collision, tasks and events are unchanged.
+4. All assets are from listed CC0 packs; asset and credit validators pass.
+5. tools/playtest.py L3 screenshots read as jungle at first sight compared with L1 and L2.
+
+### BI-22 – Themed Lagoon with huts, boats and docks
+
+- Status: open
+- Priority: 8
+- Size: large
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the Lagoon level to show huts, boats and wooden docks on the water, so that it reads as a lagoon village.
+
+**Acceptance criteria:**
+
+1. L4 shows wooden docks/piers at the water edge, at least two boats (pirate-pack ships/boats) on the water and huts (composed/derived from existing sprites if needed).
+2. Water areas use the animated water shader with shore edge tiles; no flat colour areas remain.
+3. Layout, collision, tasks and events are unchanged; bot playthrough still wins L4.
+4. All assets are from listed CC0 packs or derived ones recorded in SOURCES.md; validators pass.
+5. tools/playtest.py L4 screenshots read as a lagoon village at first sight.
+
+### BI-23 – Themed Volcano Cliffs with dark rock, cliff edges and lava glow
+
+- Status: open
+- Priority: 9
+- Size: large
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want Volcano Cliffs to look dangerous with dark rock, cliff edges and glowing lava, so that the final level feels like a climax.
+
+**Acceptance criteria:**
+
+1. L5 uses a dark rock ground (tinted or derived from existing tiles) with visible cliff edges around the island outline.
+2. Lava or glowing cracks are shown in non-play areas using existing particle/smoke sprites and a shader or tint (no new pack download); they are purely decorative and do not change gameplay.
+3. Layout, collision, tasks and events are unchanged; bot playthrough still wins L5; perf stage still passes with the added particles.
+4. All assets are from listed CC0 packs or derived ones recorded in SOURCES.md; validators pass.
+5. tools/playtest.py L5 screenshots read as a volcano at first sight; animals and items remain clearly visible against the dark ground.
+
+### BI-24 – Clean exit without leaked-instance warnings
+
+- Status: open
+- Priority: 10
+- Size: small
+- Clarity: unclear
+- Novel: no
+- UX-relevant: no
+
+**User story:** As a player I want the game to close cleanly, so that no hidden resource leaks build up and logs stay free of noise.
+
+**Acceptance criteria:**
+
+1. A headless start-to-quit run (title, one level start, quit) is repeated 5 times and the output is checked for 'ObjectDB instances leaked' and 'resources still in use'.
+2. If reproduced, the cause is fixed (e.g. freeing orphaned nodes or tweens at exit) and the 5 runs show no such warning; if not reproducible, the check is added to the smoke stage so a future regression fails.
+3. The finding (reproduced or not, cause) is recorded in the release run report.
+
+### BI-25 – Release 1.1.0: full visual pass, tag and fresh export
+
+- Status: planned for 1.1.0
+- Priority: 11
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: no
+
+**User story:** As the user I want release 1.1.0 delivered as a fresh, verified Windows build with honest release notes, so that I can hand it to human players for feedback.
+
+**Acceptance criteria:**
+
+1. Version is 1.1.0 in project.godot and the game; CHANGELOG lists BI-15 to BI-24 and states that difficulty, timers, tasks and events are unchanged.
+2. run_tests.py (default and --windowed stages) pass; tools/playtest.py runs over all screens and levels in EN and DE at 1920x1080 and a 1280x720 pass, with no clipped or overlapping text and no flat placeholder shapes.
+3. A fresh build/TerralonsFunnyIsle.exe is exported via tools/export.py and starts; the run report names its absolute path and build time.
+4. The backlog status in docs/process/backlog.md is updated per item as it merges, and the release commit is tagged v1.1.0 (local tag only, no push).
+5. The run report lists remaining open points (human playtest, listening pass, unsigned exe) as still open.
 
 ### BI-1 – Project foundation, reused tooling and core autoloads
 

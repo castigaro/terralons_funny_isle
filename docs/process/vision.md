@@ -20,3 +20,9 @@ BI-1 split into foundation/tooling (BI-1) and asset import/validator (BI-13); BI
 ## Suggested build order (4 parallel worktrees)
 
 BI-1 first; then BI-13, BI-3, BI-2 in parallel; then BI-5, BI-4, BI-8, BI-9; then BI-6, BI-7, BI-10; then BI-11, BI-12, BI-14.
+
+## Release 1.1.0 – Finished-look release
+
+Release 1.1.0 makes the game look and read finished without touching gameplay: a readable display font with full EN/DE glyphs, one clean result screen, a HUD 3-star target a player understands at a glance, a live island scene behind every menu, and textured ground without flat placeholder shapes. Difficulty, timers, tasks and events stay as in 1.0.0 until human player feedback is in. Per-theme level items BI-20 to BI-23 and BI-24 stay open (6-item cap).
+
+PO assumptions: (1) no external services, so no new packs are downloaded; missing elements (barn, huts, lava) are composed or derived from existing CC0 sprites by a tool script and recorded in assets/SOURCES.md; (2) readability is verified by tools/playtest.py screenshots at 1920x1080 plus a 1280x720 pass and the windowed clip stage; (3) level scene files are per-level, so theme items can run in parallel after BI-19; (4) the release is 1.1.0 with a local v1.1.0 tag.
