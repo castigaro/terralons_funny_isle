@@ -1,8 +1,10 @@
 extends "res://tests/support/level_case.gd"
 ## Volcano Cliffs set dressing (BI-23): the play fingerprint and the surfaces stay as recorded before the dressing,
 ## lava decor sits only on solid rock away from zones and points and adds no physics, every coast cell has exactly
-## its cliff face piece, which never covers walkable ground, the glow pulses slowly and holds still under "reduce
-## screen shake and flashes", the particle budget stays small and the ground material copies the palette.
+## its cliff face piece, which never covers walkable ground, closes the water collision strip (also at the corners)
+## and joins its neighbours without a seam, the L5 foliage tints from the palette, the glow pulses slowly and holds
+## still under "reduce screen shake and flashes", the particle budget stays small and the ground material copies the
+## palette.
 
 const Fingerprint := preload("res://tests/support/play_fingerprint.gd")
 const VolcanoArt := preload("res://tools/derive_volcano_art.gd")
@@ -240,6 +242,177 @@ func test_cliff_pieces_cover_no_walkable_ground() -> void:
 						fail("cliff piece %s covers walkable ground at %s" % [piece.name, world])
 	check(samples > 1000, "cliff texels sampled (%d)" % samples)
 	check_eq(bad, 0, "no cliff texel over walkable ground")
+
+
+## Cliff atlas image and the decor pieces as {cell: [Sprite2D]} for every cell a piece overlaps.
+func _atlas() -> Image:
+	var img := Image.load_from_file(ProjectSettings.globalize_path(VolcanoArt.OUT_DIR + "cliff_face@2.png"))
+	img.convert(Image.FORMAT_RGBA8)
+	return img
+
+
+func _pieces_by_cell(decor: Node) -> Dictionary:
+	var out := {}
+	for piece: Sprite2D in decor.get_node("CliffFace").get_children():
+		var a := _cell_of(piece.position)
+		var b := _cell_of(piece.position + Vector2(VolcanoArt.PIECE - 1, VolcanoArt.PIECE - 1))
+		for y in range(a.y, b.y + 1):
+			for x in range(a.x, b.x + 1):
+				if not out.has(Vector2i(x, y)):
+					out[Vector2i(x, y)] = []
+				out[Vector2i(x, y)].append(piece)
+	return out
+
+
+## Combined alpha of every cliff piece over a world pixel (alpha compositing of the overlapping pieces).
+func _cover(atlas: Image, by_cell: Dictionary, world: Vector2i) -> float:
+	var clear := 1.0
+	for piece: Sprite2D in by_cell.get(_cell_of(Vector2(world)), []):
+		var local := world - Vector2i(piece.position)
+		if local.x < 0 or local.y < 0 or local.x >= VolcanoArt.PIECE or local.y >= VolcanoArt.PIECE:
+			continue
+		var region := Rect2i((piece.texture as AtlasTexture).region)
+		clear *= 1.0 - atlas.get_pixel(region.position.x + local.x, region.position.y + local.y).a
+	return 1.0 - clear
+
+
+## Pixels of a coast cell that show the water below the shore tile and must be closed by the cliff: the transparent
+## pixels of the shore tile on its water collision strip (outer and side kinds), or the whole water collision square
+## at the water diagonal (inner kinds, whose tiles are opaque up to the corner).
+func _strip_pixels(sources: Dictionary, kind: String) -> Array:
+	var out := []
+	var strip := VolcanoArt.STRIP_PX
+	if kind.begins_with("I"):
+		var x0 := CELL - strip if kind.contains("E") else 0
+		var y0 := 0 if kind.contains("N") else CELL - strip
+		for ty in range(y0, y0 + strip):
+			for tx in range(x0, x0 + strip):
+				out.append(Vector2i(tx, ty))
+		return out
+	var mask := VolcanoArt.tile_mask(sources, kind)
+	for ty in CELL:
+		for tx in CELL:
+			if mask[ty * CELL + tx] == 0 and VolcanoArt.fill_strip(kind, tx, ty):
+				out.append(Vector2i(tx, ty))
+	return out
+
+
+func _piece_kinds(decor: Node) -> Dictionary:
+	var out := {}
+	for piece in decor.get_node("CliffFace").get_children():
+		var parts := String(piece.name).split("_")
+		out[Vector2i(int(parts[1]), int(parts[2]))] = parts[3]
+	return out
+
+
+func test_cliff_corners_cover_shore_water() -> void:
+	var decor := (load(DECOR_SCENE) as PackedScene).instantiate()
+	add_node(decor)
+	var atlas := _atlas()
+	var sources := VolcanoArt.load_sources()
+	var by_cell := _pieces_by_cell(decor)
+	var kinds := _piece_kinds(decor)
+	var open := 0
+	var checked := 0
+	for cell: Vector2i in kinds:
+		for p: Vector2i in _strip_pixels(sources, kinds[cell]):
+			checked += 1
+			var a := _cover(atlas, by_cell, cell * CELL + p)
+			if a < 0.9:
+				open += 1
+				if open <= 5:
+					fail("water shows through the %s cliff of cell %s at tile pixel %s (cover %.2f) – rerun tools/derive_volcano_art.gd"
+							% [kinds[cell], cell, p, a])
+	check(checked > 10000, "strip pixels checked (%d)" % checked)
+	check_eq(open, 0, "every water collision strip pixel of a coast cell is closed by the cliff")
+
+
+func test_south_inlet_corners_closed() -> void:
+	var decor := (load(DECOR_SCENE) as PackedScene).instantiate()
+	add_node(decor)
+	var atlas := _atlas()
+	var sources := VolcanoArt.load_sources()
+	var by_cell := _pieces_by_cell(decor)
+	var kinds := _piece_kinds(decor)
+	var strip := VolcanoArt.STRIP_PX
+	var expected := {Vector2i(13, 20): "SE", Vector2i(19, 20): "SW", Vector2i(13, 19): "ISE", Vector2i(19, 19): "ISW"}
+	for cell: Vector2i in expected:
+		check_eq(kinds.get(cell, ""), expected[cell], "inlet cell %s is %s" % [cell, expected[cell]])
+		var open := 0
+		for p: Vector2i in _strip_pixels(sources, expected[cell]):
+			if _cover(atlas, by_cell, cell * CELL + p) < 0.9:
+				open += 1
+		check_eq(open, 0, "inlet cell %s shows no water inside the land cell" % cell)
+	# The strip intersection square of the two outer corners is closed completely.
+	for cell: Vector2i in [Vector2i(13, 20), Vector2i(19, 20)]:
+		var x0 := CELL - strip if expected[cell] == "SE" else 0
+		var low := 1.0
+		for ty in range(CELL - strip, CELL):
+			for tx in range(x0, x0 + strip):
+				low = minf(low, _cover(atlas, by_cell, cell * CELL + Vector2i(tx, ty)))
+		check(low >= 0.999, "corner square of %s fully covered (min %.3f)" % [cell, low])
+	# The face wraps into the water cells beside the corners: their corner next to the land is closed.
+	for pair in [[Vector2i(14, 20), 0], [Vector2i(18, 20), CELL - VolcanoArt.MARGIN / 2]]:
+		var low := 1.0
+		for ty in range(0, VolcanoArt.FACE_DEPTH / 2):
+			for tx in range(pair[1], pair[1] + VolcanoArt.MARGIN / 2):
+				low = minf(low, _cover(atlas, by_cell, pair[0] * CELL + Vector2i(tx, ty)))
+		check(low >= 0.9, "water cell %s is closed next to the inlet corner (min %.3f)" % [pair[0], low])
+
+
+## Premultiplied luminance of an atlas texel (the face over black).
+func _lum(img: Image, x: int, y: int) -> float:
+	var c := img.get_pixel(x, y)
+	return (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b) * c.a
+
+
+func test_cliff_face_has_no_seams() -> void:
+	var atlas := _atlas()
+	var m := VolcanoArt.MARGIN
+	var lo := m + CELL - VolcanoArt.STRIP_PX
+	var hi := m + CELL + VolcanoArt.FACE_DEPTH
+	var band_lo := m - VolcanoArt.BAND_PX
+	var band_hi := m + VolcanoArt.STRIP_PX
+	# [kind, run along x (S, N) or along y (E, W), first and last cross row of the face or band]
+	for spec in [["S", true, lo, hi], ["N", true, band_lo, band_hi], ["E", false, lo, hi], ["W", false, band_lo, band_hi]]:
+		var r := VolcanoArt.region(spec[0])
+		var seam := 0.0
+		var inner := 0.0
+		var n := 0
+		for k in range(spec[2], spec[3]):
+			var a: Array = [m + CELL - 1, k] if spec[1] else [k, m + CELL - 1]
+			var b: Array = [m, k] if spec[1] else [k, m]
+			var c: Array = [m + CELL / 2 - 1, k] if spec[1] else [k, m + CELL / 2 - 1]
+			var d: Array = [m + CELL / 2, k] if spec[1] else [k, m + CELL / 2]
+			seam += absf(_lum(atlas, r.position.x + a[0], r.position.y + a[1]) - _lum(atlas, r.position.x + b[0], r.position.y + b[1]))
+			inner += absf(_lum(atlas, r.position.x + c[0], r.position.y + c[1]) - _lum(atlas, r.position.x + d[0], r.position.y + d[1]))
+			n += 1
+		check(seam / n <= inner / n + 2.0 / 255.0,
+				"%s pieces join without a seam (step %.4f, inner %.4f)" % [spec[0], seam / n, inner / n])
+	# The strata shading repeats with the tile, so the right edge of one piece continues into the next.
+	var worst := 0.0
+	for depth in range(0, VolcanoArt.FACE_DEPTH + 1):
+		for tx in range(-VolcanoArt.MARGIN, VolcanoArt.MARGIN):
+			worst = maxf(worst, absf(VolcanoArt.strata(tx, depth) - VolcanoArt.strata(tx + CELL, depth)))
+	check(worst <= 0.0001, "strata shading repeats every tile (max step %.4f)" % worst)
+
+
+func test_l5_props_use_palette_tint_key() -> void:
+	var lvl := await _open()
+	var want := ArtPalette.color("volcano_ash")
+	var found := 0
+	for i in range(8, 15):
+		var prop := lvl.get_node_or_null("Actors/Prop%d" % i) as SwayProp
+		check(prop != null, "L5 Prop%d is a SwayProp" % i)
+		if prop == null:
+			continue
+		found += 1
+		check_eq(prop.tint, Color.WHITE, "Prop%d keeps no fixed tint colour" % i)
+		check_eq(prop.tint_key, "volcano_ash", "Prop%d tints from the palette key volcano_ash" % i)
+		check(prop.sprite.self_modulate.is_equal_approx(want), "Prop%d self_modulate is the ash colour" % i)
+		var m := prop.sprite.modulate
+		check(Color(m.r, m.g, m.b).is_equal_approx(Color.WHITE), "Prop%d modulate keeps only the canopy fade alpha" % i)
+	check_eq(found, 7, "seven ash-tinted props")
 
 
 # --- (e) reduce motion and flashing ----------------------------------------------------------------

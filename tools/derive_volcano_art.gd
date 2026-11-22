@@ -45,7 +45,7 @@ const SHORE := {"N": Vector2i(1, 0), "S": Vector2i(1, 2), "W": Vector2i(0, 1), "
 const SHORE_INNER := {"INW": Vector2i(0, 3), "INE": Vector2i(1, 3), "ISW": Vector2i(2, 3), "ISE": Vector2i(3, 3)}
 ## Width of the water collision strip of the shore tiles (scenes/levels/island_tileset.tres, 64 - 42 px).
 const STRIP_PX := 22
-## Radius of the quarter-ring drawn into the water collision square of an inner corner tile.
+## Radius of the lighter quarter-ring lip drawn into the water collision square of an inner corner tile.
 const INNER_RADIUS := 22.0
 
 
@@ -195,8 +195,23 @@ static func allowed(kind: String, tx: int, ty: int) -> bool:
 	return (sides.contains("N") and ty < STRIP_PX) or (sides.contains("S") and ty >= TILE - STRIP_PX) 			or (sides.contains("W") and tx < STRIP_PX) or (sides.contains("E") and tx >= TILE - STRIP_PX)
 
 
-## One piece: a south face below the land edge (rim line, dark strata fading into the water) and a thin dark drop
-## band on the other water sides; transparent on land.
+## Strata shading factor: periodic in the tile coordinate (integer cycles per tile), so neighbouring pieces join
+## without a seam.
+static func strata(tx: int, depth: int) -> float:
+	return 0.88 + 0.12 * sin(TAU * tx * 7.0 / TILE + depth * 0.35) * sin(TAU * tx * 2.0 / TILE)
+
+
+## Whether a piece pixel (tile coordinates) is a non-land pixel inside the tile on the water collision strip of a
+## water side, including the whole strip intersection square of an outer corner: it gets an opaque cliff base.
+static func fill_strip(kind: String, tx: int, ty: int) -> bool:
+	if tx < 0 or ty < 0 or tx >= TILE or ty >= TILE:
+		return false
+	return allowed(kind, tx, ty)
+
+
+## One piece: an opaque cliff base on the water collision strip, a south face below the land edge (rim line, dark
+## strata fading into the water) that wraps around the south outer corners, and a thin dark drop band on the other
+## water sides; transparent on land.
 static func cliff_piece(sources: Dictionary, kind: String) -> Image:
 	if kind.begins_with("I"):
 		return inner_piece(sources, kind)
@@ -225,9 +240,19 @@ static func cliff_piece(sources: Dictionary, kind: String) -> Image:
 						next[i] = step + 1
 						break
 		dist = next
+	# The south face of an outer corner continues across columns without land at the straight S tile's edge row.
+	# Only pieces with a south water side carry the face; the other sides get the strip fill and the band.
+	var faces := kind.contains("S")
+	var wraps := kind in ["SE", "SW"]
+	var edge_y := TILE - STRIP_PX - 1
 	for px in PIECE:
 		var tx := px - MARGIN
-		var last_land := -1000
+		var has_land := false
+		for ty in TILE:
+			if land.call(tx, ty):
+				has_land = true
+				break
+		var last_land := edge_y if wraps and not has_land else -1000
 		for py in PIECE:
 			var ty := py - MARGIN
 			if land.call(tx, ty):
@@ -237,35 +262,41 @@ static func cliff_piece(sources: Dictionary, kind: String) -> Image:
 				continue
 			var best := Color(0, 0, 0, 0)
 			var depth := ty - last_land
-			if last_land >= 0 and depth >= 1 and depth <= FACE_DEPTH:
-				var strata := 0.88 + 0.12 * sin(float(px) * 0.9 + float(depth) * 0.35) * sin(float(px) * 0.23)
-				var shade := cliff.lerp(top, 0.55 * (1.0 - float(depth) / FACE_DEPTH)) * strata
+			if faces and last_land >= 0 and depth >= 1 and depth <= FACE_DEPTH:
+				var shade := cliff.lerp(top, 0.55 * (1.0 - float(depth) / FACE_DEPTH)) * strata(tx, depth)
 				var c := rim if depth <= RIM_PX else shade
 				c.a = clampf(float(FACE_DEPTH - depth + 1) / FADE_PX, 0.0, 1.0)
 				best = c
 			var d := dist[py * PIECE + px]
 			if d <= BAND_PX:
-				var band := cliff
+				var band := cliff * strata(tx, d)
 				band.a = BAND_ALPHA * (1.0 - float(d - 1) / BAND_PX)
 				if band.a > best.a:
 					best = band
+			if fill_strip(kind, tx, ty):
+				var base := cliff * strata(tx, maxi(depth, 0) if last_land >= 0 else 0)
+				best = Color(base.lerp(best, best.a), 1.0)
 			if best.a > 0.0:
 				img.set_pixel(px, py, Color(best.r, best.g, best.b, best.a))
 	return img
 
 
-## Inner corner piece: the inner corner tiles are opaque sand up to the corner, so the cliff shows as a dark
-## quarter-ring inside the tile's water collision square at the water diagonal.
+## Inner corner piece: the inner corner tiles are opaque sand up to the corner, so the cliff fills the tile's water
+## collision square at the water diagonal with an opaque base and a lighter quarter-ring lip.
 static func inner_piece(sources: Dictionary, kind: String) -> Image:
 	var cliff: Color = sources["volcano_cliff"]
+	var rim: Color = sources["volcano_rim"]
 	var corner := Vector2(TILE if kind.contains("E") else 0, 0 if kind.contains("N") else TILE)
+	var x0 := TILE - STRIP_PX if kind.contains("E") else 0
+	var y0 := 0 if kind.contains("N") else TILE - STRIP_PX
 	var img := Image.create(PIECE, PIECE, false, Image.FORMAT_RGBA8)
-	for ty in TILE:
-		for tx in TILE:
+	for ty in range(y0, y0 + STRIP_PX):
+		for tx in range(x0, x0 + STRIP_PX):
 			var d := (Vector2(tx, ty) + Vector2.ONE * 0.5).distance_to(corner)
-			if d > INNER_RADIUS:
-				continue
-			var c := cliff
-			c.a = BAND_ALPHA * clampf((INNER_RADIUS - d) / FADE_PX, 0.0, 1.0)
-			img.set_pixel(tx + MARGIN, ty + MARGIN, c)
+			var depth := absi(int(round(INNER_RADIUS - d)))
+			var c := cliff * strata(tx, depth)
+			var ring := absf(d - (INNER_RADIUS - 1.0))
+			if ring < RIM_PX * 0.5:
+				c = c.lerp(rim, 0.6 * (1.0 - ring / (RIM_PX * 0.5)))
+			img.set_pixel(tx + MARGIN, ty + MARGIN, Color(c, 1.0))
 	return img
