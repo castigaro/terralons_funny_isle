@@ -1,20 +1,22 @@
 # Backlog – Release 1.1.0
 
-Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 and BI-25; BI-20 to BI-24 stay open (6-item cap). Items done in 1.0.0 follow below the new ones with their original priorities.
+Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 and BI-25; BI-15, BI-16 and BI-17 shipped in 1.1.0, BI-19 (merge failed on the hygiene check), BI-18 and BI-25 stay open and move on; BI-20 to BI-24 stay open (6-item cap). Items done in 1.0.0 follow below the new ones with their original priorities.
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | BI-15 | Readable display font with full EN/DE glyphs and one-line HUD task names | small | clear | no | yes | planned for 1.1.0 |
-| 2 | BI-16 | Result screen with one headline and one star animation | small | clear | no | yes | planned for 1.1.0 |
-| 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | planned for 1.1.0 |
-| 4 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | planned for 1.1.0 |
-| 5 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | planned for 1.1.0 |
+| 1 | BI-15 | Readable display font with full EN/DE glyphs and one-line HUD task names | small | clear | no | yes | done in 1.1.0 |
+| 2 | BI-16 | Result screen with one headline and one star animation | small | clear | no | yes | done in 1.1.0 |
+| 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | done in 1.1.0 |
+| 4 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | open |
+| 5 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | open |
 | 6 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | open |
 | 7 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | open |
 | 8 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | open |
 | 9 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | open |
 | 10 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
-| 11 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | planned for 1.1.0 |
+| 11 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | open |
+| 12 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | open |
+| 13 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | open |
 | 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
 | 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
 | 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | done in 1.0.0 |
@@ -32,7 +34,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-15 – Readable display font with full EN/DE glyphs and one-line HUD task names
 
-- Status: planned for 1.1.0
+- Status: done in 1.1.0
 - Priority: 1
 - Size: small
 - Clarity: clear
@@ -51,7 +53,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-16 – Result screen with one headline and one star animation
 
-- Status: planned for 1.1.0
+- Status: done in 1.1.0
 - Priority: 2
 - Size: small
 - Clarity: clear
@@ -70,7 +72,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-17 – Clear HUD 3-star target with live reachability
 
-- Status: planned for 1.1.0
+- Status: done in 1.1.0
 - Priority: 3
 - Size: small
 - Clarity: clear
@@ -89,7 +91,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-19 – Textured ground with edge tiles and no flat placeholder shapes in any level
 
-- Status: planned for 1.1.0
+- Status: open
 - Priority: 4
 - Size: large
 - Clarity: clear
@@ -109,7 +111,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-18 – Live island scene behind title, level select and settings
 
-- Status: planned for 1.1.0
+- Status: open
 - Priority: 5
 - Size: large
 - Clarity: clear
@@ -221,7 +223,7 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 
 ### BI-25 – Release 1.1.0: full visual pass, tag and fresh export
 
-- Status: planned for 1.1.0
+- Status: open
 - Priority: 11
 - Size: small
 - Clarity: clear
@@ -237,6 +239,44 @@ Release 1.1.0 "Finished-look release" plans BI-15, BI-16, BI-17, BI-19, BI-18 an
 3. A fresh build/TerralonsFunnyIsle.exe is exported via tools/export.py and starts; the run report names its absolute path and build time.
 4. The backlog status in docs/process/backlog.md is updated per item as it merges, and the release commit is tagged v1.1.0 (local tag only, no push).
 5. The run report lists remaining open points (human playtest, listening pass, unsigned exe) as still open.
+
+### QA-1 – One 'GO!' cue at level start instead of chip plus giant text
+
+- Status: open
+- Priority: 12
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the level start to show a single 'GO!' / 'LOS!' cue, so that the start looks clean like the result screen.
+
+**Acceptance criteria:**
+
+1. At level start in all five levels, EN and DE, exactly one start cue is visible (no dark chip with 'GO!' plus a giant outlined 'GO!' below it).
+2. The cue does not overlap HUD panels or context prompts at 1280x720 and 1920x1080.
+3. tools/playtest.py start screenshots (05, 11, 19, 27, 38 in EN and DE) show one cue; run_tests.py stays green.
+
+*Found in the 1.1.0 QA run (release/en/05_l1_beach_camp_start_en.png, release/de/27_l4_lagoon_start_de.png).*
+
+### QA-2 – No leftover popup behind the credits panel
+
+- Status: open
+- Priority: 13
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the credits to show only the credits panel, so that no stray bubble shows through its title.
+
+**Acceptance criteria:**
+
+1. Opening the credits right after leaving a level (won or lost) shows no popup, cue chip or bubble behind or through the panel, EN and DE.
+2. On the loss result screen, popups from the level (for example 'HA HA') are removed or hidden once the panel is shown, or documented as intended.
+3. tools/playtest.py credits shot (49) in EN and DE shows only the panel on the backdrop.
+
+*Found in the 1.1.0 QA run (release/de/49_credits_de.png: a dark chip is visible behind 'MITWIRKENDE').*
 
 ### BI-1 – Project foundation, reused tooling and core autoloads
 

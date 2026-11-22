@@ -4,7 +4,7 @@ A hectic, single-player, keyboard-first slapstick action game for Windows (Godot
 
 ## Installation and usage
 
-Windows only, no installer. Either run the exported `build/TerralonsFunnyIsle.exe` (produced by `python tools/export.py`, pack embedded, version 1.0.0, no Godot needed) or start the project from source with `python tools/play.py` (needs Godot 4.7.2 and Python 3).
+Windows only, no installer. Either run the exported `build/TerralonsFunnyIsle.exe` (produced by `python tools/export.py`, pack embedded, version 1.1.0, no Godot needed) or start the project from source with `python tools/play.py` (needs Godot 4.7.2 and Python 3).
 
 Controls: WASD or arrow keys move, Shift dashes, Space or E grabs, throws and uses (the context prompt shows which), H shows a hint, F finishes a level once all required tasks are done, R restarts the level, Esc pauses. Menus work with the keyboard (arrows, Enter, Esc). Language (English or German), music and effects volume are set under Settings and, like the stars and best times per level, are saved in the data folder (`user://`, or `--data-dir=<path>`).
 
@@ -37,7 +37,7 @@ The default `run_tests.py` run opens no window. `--windowed` adds four opt-in st
 
 `tools/playtest.py [--out <dir>] [--levels l1,l3] [--every 9] [--locale en|de]` is the visual check for reviews and QA (opt-in, about 4 minutes for all levels): it starts the windowed Godot binary at 1920x1080 on `tools/playtest.gd` in the given locale (default `en`) and takes screenshots of title, level select and settings, then lets the bot play every level through the real flow with shots of the intro card, the start, the pause menu, one every `--every` seconds and the win result; the first played level is replayed once and lost for the loss result, the level is left and the run ends on the credits. APPDATA and the data folder go to `<out>/data`. Output (default `<testdata>/playtest-<locale>`): numbered PNGs whose names end in `_<locale>` and `log.txt` with EventBus events, announcer lines, audio bus peaks and one line per level `PLAYTEST level=… won=… stars=… bot_s=… timer_s=… time_left_s=… used=…%` (`used` = share of the level timer the bot needed; a human needs roughly two to three times the bot time). Exit codes: 0 ok, 1 failure or watchdog, 2 Godot missing.
 
-`tools/export.py` exports the preset `Windows Desktop` of `export_presets.cfg` (version 1.0.0.0, pack embedded) to `build/TerralonsFunnyIsle.exe` (git-ignored) and starts the exe headless with `-- --smoke` in `<testdata>/export`. The Godot 4.7.2 export templates are read from the real `%APPDATA%/Godot/export_templates/4.7.2.stable`. Exit codes: 0 built and smoke OK, 1 export or smoke failed, 2 Godot missing, 3 export templates missing (message `export templates for 4.7.2 missing at <path>`).
+`tools/export.py` exports the preset `Windows Desktop` of `export_presets.cfg` (version 1.1.0.0, pack embedded) to `build/TerralonsFunnyIsle.exe` (git-ignored) and starts the exe headless with `-- --smoke` in `<testdata>/export`. The Godot 4.7.2 export templates are read from the real `%APPDATA%/Godot/export_templates/4.7.2.stable`. Exit codes: 0 built and smoke OK, 1 export or smoke failed, 2 Godot missing, 3 export templates missing (message `export templates for 4.7.2 missing at <path>`).
 
 ## Autoloads
 
