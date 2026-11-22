@@ -16,5 +16,10 @@
 	"boat_bob_speed": 0.9,
 	"boat_bob_tilt_deg": 1.5,
 	"water_shadow_alpha_share": 0.6,
-	"water_shadow_widen": 1.15
+	"water_shadow_widen": 1.15,
+	"canopy_fade_alpha": 0.45,
+	"canopy_fade_seconds": 0.2,
+	"canopy_fade_margin_px": 24,
+	"canopy_fade_hysteresis_px": 16,
+	"canopy_crown_share": 0.75
 }

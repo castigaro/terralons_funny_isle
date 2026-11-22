@@ -86,3 +86,15 @@ Each test writes its run to `<testdata>/run_tests/bot/<level>.json` (`TFI_BOT_RE
 - **Observation, not changed:** the start frame still shows the "GO!" chip and the big "GO!" text together (QA-1, release preparation); the pack dinghy is upscaled 4.5× and looks slightly soft next to the crisper huts.
 
 The human first run (20–30 minutes, listening pass for the sounds) stays open: no human is available in this autonomous run.
+
+## Jungle look (BI-21)
+
+`python tools/playtest.py --levels l2,l3 --every 6` at 1920x1080 and with `--size 1280x720`, output below the coding testdata folder (`bi21-playtest-l2l3-<size>`; the data folder was seeded with a progress file that unlocks L2 and L3, because `--levels` alone cannot start a locked level). L2 is main's Farm Meadow (assumption A-J4: BI-27 repeats the comparison after BI-20).
+
+- Shots compared side by side: `07`–`12_l2_farm_meadow_t003`–`t033_en.png` against `17`–`22_l3_jungle_t003`–`t033_en.png` at both sizes. L3 reads as jungle at first sight: deep green tinted grass, ferns and grass tufts everywhere, large leaves and bushes in the grass pockets and a closed wall of trees, creepers and palms on the outer ring; L2 shows bright open grass with a few flowers. They cannot be confused.
+- Grass luma (mean sRGB luma of the green pixels between the HUD bands): L2 0.639–0.641, L3 0.374–0.421, 34–42 % darker (required at least 15 %). The `GrassTint` mirror gives a 22 % drop on the bare fill tile; the shots drop more because ferns and leaves add darker greens.
+- Contrast against the tinted grass (WCAG): white animal bodies 3.0:1 (L2 1.8:1), the dark outline of the animals and zone markers 3.9:1, the light zone-marker line 3.1:1. The red parrot is close in luma (1.35:1) but separated by hue and its dark drawn outline.
+- Canopy fade seen in the shots: the castaway carrying the goat behind a bottom-ring crown (`18_l3_jungle_t009_en.png`) and a frog behind a bush stay visible through the faded sprite; no actor was hidden by more than half.
+- `python tools/flat_area_check.py <dir> --glob "*_l3_*_t*.png"`: no hit on the ground; 41 windows at 1920x1080 and 7 at 1280x720 sit inside the flat-shaded crowns of the large foliage-pack trees on the bottom ring (drawn art of a listed pack, not placeholders). L2: no hits.
+- Bot: L3 won with 3 stars in 38.4 s (main: 38.1 s), L2 in 36.0 s; the headless bot playthrough and `test_complete_l3_jungle.gd` win as before (no decoration has collision).
+- Performance: the windowed perf stage pointed once at `l3_jungle` (about 310 decoration props, about 160 of them polling for the canopy fade) gave 17944 frames, average 3.29 ms, maximum 28.17 ms, none above 33 ms at 1920x1080.
