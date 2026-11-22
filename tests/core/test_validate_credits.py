@@ -73,6 +73,26 @@ class CreditsTest(unittest.TestCase):
         path.write_text(json.dumps(flow), encoding="utf-8")
         self.assertEqual(validate_credits.check_flow_balance(self.root), [])
 
+    def write_flow(self, **changes):
+        path = self.root / "data" / "balance" / "flow.json"
+        flow = json.loads(path.read_text(encoding="utf-8"))
+        flow.update(changes)
+        path.write_text(json.dumps(flow), encoding="utf-8")
+
+    def test_star_animation_limits(self):
+        self.assertEqual(validate_credits.check_flow_balance(self.root), [])
+        self.write_flow(result_star_interval_s=0.6, result_star_pop_s=0.3)
+        errors = validate_credits.check_flow_balance(self.root)
+        self.assertTrue(any("star animation" in e for e in errors), errors)
+        self.write_flow(result_star_interval_s=0, result_star_pop_s=-0.1, result_star_pop_scale=0.5)
+        errors = validate_credits.check_flow_balance(self.root)
+        self.assertTrue(any("result_star_interval_s must be above 0" in e for e in errors), errors)
+        self.assertTrue(any("result_star_pop_s must be above 0" in e for e in errors), errors)
+        self.assertTrue(any("result_star_pop_scale" in e for e in errors), errors)
+        self.write_flow(result_star_interval_s="x")
+        errors = validate_credits.check_flow_balance(self.root)
+        self.assertTrue(any("result_star_interval_s must be a number" in e for e in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()
