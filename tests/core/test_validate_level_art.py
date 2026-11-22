@@ -52,25 +52,25 @@ class ValidateLevelArtTest(unittest.TestCase):
         root = make_root({"l1_beach_camp": lambda t: t.replace(marker_block("cage", "cage"), "")})
         code, out = run(root)
         self.assertEqual(code, 1, out)
-        self.assertIn("zone 'cage' (in_zone) has no ZoneMarker", out)
+        self.assertIn("scenes/levels/l1_beach_camp.tscn: missing ZoneMarker: zone 'cage' (in_zone) has no ZoneMarker", out)
 
     def test_marker_on_helper_zone_fails(self):
         root = make_root({"l1_beach_camp": lambda t: t + marker_block("parrot_flee", "parrot_flee")})
         code, out = run(root)
         self.assertEqual(code, 1, out)
-        self.assertIn("ZoneMarker 'parrot_flee' marks helper or area zone 'parrot_flee'", out)
+        self.assertIn("l1_beach_camp.tscn: extra ZoneMarker 'parrot_flee' marks helper or area zone 'parrot_flee'", out)
 
     def test_marker_naming_unknown_zone_fails(self):
         root = make_root({"l1_beach_camp": lambda t: t + marker_block("ghost", "ghost_zone")})
         code, out = run(root)
         self.assertEqual(code, 1, out)
-        self.assertIn("ZoneMarker 'ghost' names unknown zone 'ghost_zone'", out)
+        self.assertIn("extra ZoneMarker 'ghost' names unknown zone 'ghost_zone'", out)
 
     def test_duplicate_marker_fails(self):
         root = make_root({"l1_beach_camp": lambda t: t + marker_block("cage_2", "cage")})
         code, out = run(root)
         self.assertEqual(code, 1, out)
-        self.assertIn("zone 'cage' has 2 ZoneMarkers", out)
+        self.assertIn("extra ZoneMarker: zone 'cage' has 2 ZoneMarkers", out)
 
     def test_build_target_zone_needs_a_marker(self):
         root = make_root({"l4_lagoon": lambda t: t.replace(marker_block("sandcastle", "sandcastle"), "")})

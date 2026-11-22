@@ -133,14 +133,14 @@ def validate_level(root: Path, level_path: Path) -> list:
     for name, zone_id in facts["markers"]:
         counts[zone_id] = counts.get(zone_id, 0) + 1
         if zone_id not in facts["zones"]:
-            errors.append("%s: ZoneMarker '%s' names unknown zone '%s'" % (rel, name, zone_id))
+            errors.append("%s: extra ZoneMarker '%s' names unknown zone '%s'" % (rel, name, zone_id))
         elif zone_id not in needed:
-            errors.append("%s: ZoneMarker '%s' marks helper or area zone '%s'" % (rel, name, zone_id))
+            errors.append("%s: extra ZoneMarker '%s' marks helper or area zone '%s'" % (rel, name, zone_id))
     for zone_id in sorted(needed):
         if counts.get(zone_id, 0) == 0:
-            errors.append("%s: zone '%s' (%s) has no ZoneMarker" % (rel, zone_id, needed[zone_id]))
+            errors.append("%s: missing ZoneMarker: zone '%s' (%s) has no ZoneMarker" % (rel, zone_id, needed[zone_id]))
         elif counts[zone_id] > 1:
-            errors.append("%s: zone '%s' has %d ZoneMarkers" % (rel, zone_id, counts[zone_id]))
+            errors.append("%s: extra ZoneMarker: zone '%s' has %d ZoneMarkers" % (rel, zone_id, counts[zone_id]))
     return errors
 
 

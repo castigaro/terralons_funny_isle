@@ -232,7 +232,17 @@ class ValidateCodeArtRulesTest(unittest.TestCase):
     def test_placeholder_nodes_fail_in_gameplay_scenes(self):
         for kind in ("ColorRect", "Polygon2D", "Line2D"):
             tscn = '[gd_scene format=3]\n\n[node name="Box" type="%s"]\n' % kind
-            self.assert_fails({"scenes/levels/a.tscn": tscn}, "placeholder node %s" % kind)
+            self.assert_fails({"scenes/levels/a.tscn": tscn}, "placeholder node %s 'Box'" % kind)
+
+    def test_placeholder_messages_name_file_and_hint(self):
+        hint = "use a textured tile or ZoneMarker, or mark `# art-exempt:`"
+        tscn = '[gd_scene format=3]\n\n[node name="Ground" type="ColorRect" parent="."]\n'
+        self.assert_fails({"scenes/levels/a.tscn": tscn}, "scenes/levels/a.tscn:3: placeholder node ColorRect 'Ground'")
+        self.assert_fails({"scenes/levels/a.tscn": tscn}, hint)
+        draw = {"scripts/levels/b.gd": gd("func _draw() -> void:\n\tdraw_rect(Rect2(), Color.RED)")}
+        self.assert_fails(draw, "scripts/levels/b.gd:")
+        self.assert_fails(draw, "draw_rect draws a placeholder shape")
+        self.assert_fails(draw, hint)
 
     def test_placeholder_nodes_pass_in_ui_scenes(self):
         tscn = '[gd_scene format=3]\n\n[node name="Dim" type="ColorRect"]\n'

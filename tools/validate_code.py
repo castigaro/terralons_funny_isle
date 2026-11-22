@@ -113,6 +113,8 @@ PROC_MAP_RE = re.compile(r"(?<![\w.])(set_cell|set_cells_terrain_connect|set_cel
                          r"\.(set_cell|set_cells_terrain_connect|set_cells_terrain_path)\s*\(|\b(FastNoiseLite)\b")
 PLACEHOLDER_TYPES = ("ColorRect", "Polygon2D", "Line2D")
 PLACEHOLDER_TSCN_RE = re.compile(r'^\[node [^\]]*type="(%s)"' % "|".join(PLACEHOLDER_TYPES))
+NODE_NAME_RE = re.compile(r'name="([^"]*)"')
+PLACEHOLDER_HINT = "use a textured tile or ZoneMarker, or mark `# art-exempt:`"
 PLACEHOLDER_TSCN_DIRS = ("scenes",)
 PLACEHOLDER_TSCN_ALLOWED = ("scenes/ui/",)
 PLACEHOLDER_GD_DIRS = ("scripts/gameplay", "scripts/levels", "scripts/feedback")
@@ -572,10 +574,11 @@ def check_placeholders(root: Path) -> list:
         for line_no, line in enumerate(_read(path).splitlines(), start=1):
             match = PLACEHOLDER_TSCN_RE.match(line)
             if match:
-                errors.append("%s:%d: placeholder node %s in a gameplay scene – use sprites from assets/"
-                              % (rel, line_no, match.group(1)))
+                name = NODE_NAME_RE.search(line)
+                errors.append("%s:%d: placeholder node %s '%s' in a gameplay scene – %s"
+                              % (rel, line_no, match.group(1), name.group(1) if name else "?", PLACEHOLDER_HINT))
     errors += _gd_matches(root, PLACEHOLDER_GD_DIRS, PLACEHOLDER_GD_RE,
-                          "draws a placeholder shape – use sprites from assets/")
+                          "draws a placeholder shape – " + PLACEHOLDER_HINT)
     return errors
 
 
