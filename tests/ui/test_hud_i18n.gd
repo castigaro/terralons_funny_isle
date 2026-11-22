@@ -26,6 +26,12 @@ func test_texts_switch_live_between_en_and_de() -> void:
 	EventBus.interact_verb_changed.emit("grab", "coconut")
 	await frames(1)
 	var en := _snapshot(hud)
+	var star: Array = hud.star_goal_binding()
+	var star_label := star[0] as Label
+	var star_en := star_label.text
+	var tip_en := hud.panel("TimerPanel").tooltip_text
+	check_eq(star_en, I18n.t(String(star[1]), star[2]), "EN star goal line")
+	check_eq(tip_en, I18n.t(Hud.STAR_GOAL_TIP_KEY, star[2]), "EN star goal tooltip")
 	var keys := en.map(func(e: Dictionary) -> String: return e["key"])
 	for want in ["hud.required", "hud.optional", "hud.cue.dizzy_hit", "hud.verb.grab", "fixture.reach_a_hint",
 			"fixture.reach_a_title", "fixture.prompt_move"]:
@@ -45,7 +51,15 @@ func test_texts_switch_live_between_en_and_de() -> void:
 		if de != e["text"]:
 			changed += 1
 	check(changed * 2 >= en.size(), "most texts changed (%d of %d)" % [changed, en.size()])
+	star = hud.star_goal_binding()
+	check(star[0] == star_label, "same star goal label")
+	check_eq(star_label.text, I18n.t(String(star[1]), star[2]), "DE star goal line")
+	check(star_label.text != star_en, "star goal line changed")
+	check_eq(hud.panel("TimerPanel").tooltip_text, I18n.t(Hud.STAR_GOAL_TIP_KEY, star[2]), "DE star goal tooltip")
+	check(hud.panel("TimerPanel").tooltip_text != tip_en, "tooltip changed")
 	I18n.set_locale("en")
 	await frames(1)
 	for e in en:
 		check_eq((e["node"] as Label).text, e["text"], "back to EN %s" % e["key"])
+	check_eq(star_label.text, star_en, "back to EN star goal line")
+	check_eq(hud.panel("TimerPanel").tooltip_text, tip_en, "back to EN star goal tooltip")

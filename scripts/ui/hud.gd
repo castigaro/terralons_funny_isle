@@ -1,7 +1,7 @@
 class_name Hud
 extends CanvasLayer
-## In-level HUD: task list with progress and required/optional marks, countdown with warning pulse, 3-star time
-## goal, hint button and hint panel, failure cue slot, "Finish!" banner and the interact prompt. It polls the
+## In-level HUD: task list with progress and required/optional marks, countdown with warning pulse, 3-star goal
+## line, hint button and hint panel, failure cue slot, "Finish!" banner and the interact prompt. It polls the
 ## LevelSession every frame, reacts to EventBus signals and never changes the session. The layout uses logical
 ## 1920x1080 coordinates at the screen edges; panels fade when the castaway walks under them. See docs/hud.md.
 
@@ -17,6 +17,8 @@ const WARN_KEY_PREFIX := "hud.cue.warn."
 const KEY_CAP_SCENE := preload("res://scenes/ui/key_cap.tscn")
 const HINT_BUTTON_KEY := "hud.hint_button"
 const STAR_GOAL_KEY := "hud.star_goal"
+const STAR_GOAL_TIP_KEY := "hud.star_goal_tip"
+const STAR_GOAL_ICONS := ["StarGoalIcon", "StarGoalIcon2", "StarGoalIcon3"]
 const BANNER_KEY := "hud.banner.finish"
 const REQUIRED_KEY := "hud.required"
 const OPTIONAL_KEY := "hud.optional"
@@ -52,8 +54,7 @@ var _hint_panel: PanelContainer
 var _hint_label: Label
 var _timer_panel: PanelContainer
 var _timer_label: Label
-var _star_caption: Label
-var _star_icon: TextureRect
+var _star_icons: Array[TextureRect] = []
 var _star_label: Label
 var _star_state: TextureRect
 var _cue_panel: PanelContainer
@@ -74,6 +75,8 @@ var _warning := false
 var _pulse_time := 0.0
 var _alpha := {}
 var _forced_castaway_rect := Rect2()
+var _star_goal_state := -1
+var _star_goal_seconds := 0.0
 
 
 func _ready() -> void:
@@ -163,13 +166,27 @@ func _build() -> void:
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.custom_minimum_size = Vector2(_text_width(TIME_SAMPLE, int(_cfg.get("timer_font_size", 1))), 0.0)
 	timer_box.add_child(_timer_label)
-	_star_caption = _label("StarGoalCaption", int(_cfg.get("tag_font_size", 1)))
-	timer_box.add_child(_star_caption)
-	_star_icon = _icon("StarGoalIcon", STAR_FULL)
-	timer_box.add_child(_star_icon)
-	_star_label = _label("StarGoalLabel", int(_cfg.get("font_size", 1)))
+	var stars_box := HBoxContainer.new()
+	stars_box.name = "StarGoalStars"
+	stars_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stars_box.add_theme_constant_override("separation", 0)
+	timer_box.add_child(stars_box)
+	var star_px := float(_cfg.get("star_goal_icon_px", 1))
+	for icon_name in STAR_GOAL_ICONS:
+		var star := _icon(icon_name, STAR_FULL)
+		star.custom_minimum_size = Vector2(star_px, star_px)
+		stars_box.add_child(star)
+		_star_icons.append(star)
+	var star_gap := Control.new()
+	star_gap.name = "StarGoalGap"
+	star_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	star_gap.custom_minimum_size = Vector2(float(_cfg.get("star_goal_gap_px", 0)), 0.0)
+	timer_box.add_child(star_gap)
+	_star_label = _label("StarGoalLabel", int(_cfg.get("star_goal_font_size", 1)))
 	timer_box.add_child(_star_label)
 	_star_state = _icon("StarGoalState", ICON_DONE)
+	_star_state.custom_minimum_size = Vector2(star_px, star_px)
+	_star_state.visible = false
 	timer_box.add_child(_star_state)
 
 	_cue_panel = _panel("CueSlot")
@@ -355,12 +372,13 @@ func refresh() -> void:
 		(row["name"] as Label).modulate.a = 0.5 if st["done"] or st["missed"] else 1.0
 	var left := _session.time_left()
 	_set_text(_timer_label, HudModel.format_time(left))
-	var goal := _session.three_star_time()
-	_set_text(_star_label, HudModel.format_time(goal))
-	var reachable := HudModel.star_goal_reachable(left, goal)
-	_star_icon.texture = load(STAR_FULL if reachable else STAR_EMPTY)
-	_star_state.texture = load(ICON_DONE if reachable else ICON_MISSED)
 	var state := _session.get_state()
+	var goal := _session.three_star_time()
+	if goal != _star_goal_seconds:
+		_star_goal_seconds = goal
+		_relabel_star_goal()
+	var stars := int(_session.result().get("stars", 0)) if state == LevelSession.State.WON else 0
+	_apply_star_goal(HudModel.star_goal_state(left, goal, progress, state, stars))
 	_set_warning(HudModel.is_warning(left, _warn_seconds, state))
 	_banner.visible = state == LevelSession.State.REQUIRED_DONE
 
@@ -368,6 +386,41 @@ func refresh() -> void:
 func _set_text(label: Label, text: String) -> void:
 	if label.text != text:
 		label.text = text
+
+
+## Shows a HudModel.StarGoal state: full stars while reachable, greyed outlines once missed, a tick once secured.
+func _apply_star_goal(goal_state: int) -> void:
+	if goal_state == _star_goal_state:
+		return
+	_star_goal_state = goal_state
+	var missed := goal_state == HudModel.StarGoal.MISSED
+	var alpha := float(_cfg.get("star_goal_missed_alpha", 1.0)) if missed else 1.0
+	var tex: Texture2D = load(STAR_EMPTY if missed else STAR_FULL)
+	for star in _star_icons:
+		star.texture = tex
+		star.modulate.a = alpha
+	_star_label.modulate.a = alpha
+	_star_state.texture = load(ICON_DONE)
+	var tick := goal_state == HudModel.StarGoal.SECURED
+	if _star_state.visible != tick:
+		_star_state.visible = tick
+		# The result screen pauses the tree, so _process no longer refits the timer panel for the tick.
+		force_layout()
+
+
+## Current HudModel.StarGoal state, -1 before the first refresh or in sample mode.
+func star_goal_state() -> int:
+	return _star_goal_state
+
+
+func _star_goal_args() -> Dictionary:
+	return {"time": HudModel.format_time(_star_goal_seconds)}
+
+
+func _relabel_star_goal() -> void:
+	_star_label.text = I18n.t(STAR_GOAL_KEY, _star_goal_args())
+	_timer_panel.tooltip_text = I18n.t(STAR_GOAL_TIP_KEY, _star_goal_args())
+	force_layout()
 
 
 func _set_warning(on: bool) -> void:
@@ -599,8 +652,7 @@ func _text(key: String) -> String:
 
 func _relabel_all() -> void:
 	_hint_button.tooltip_text = I18n.t(HINT_BUTTON_KEY)
-	_timer_panel.tooltip_text = I18n.t(STAR_GOAL_KEY)
-	_star_caption.text = I18n.t(STAR_GOAL_KEY)
+	_relabel_star_goal()
 	_banner_label.text = I18n.t(BANNER_KEY)
 	var tag_width := 0.0
 	for key in [REQUIRED_KEY, OPTIONAL_KEY]:
@@ -643,7 +695,6 @@ func text_bindings() -> Array:
 	for row in _rows:
 		out.append([row["name"], row["title_key"]])
 		out.append([row["tag"], REQUIRED_KEY if row["required"] else OPTIONAL_KEY])
-	out.append([_star_caption, STAR_GOAL_KEY])
 	if _hint_panel.visible:
 		out.append([_hint_label, _hint_key])
 	if _cue_panel.visible:
@@ -656,6 +707,11 @@ func text_bindings() -> Array:
 		if cap.is_visible_in_tree() and cap.bound_key() != "":
 			out.append([cap.label(), cap.bound_key()])
 	return out
+
+
+## [label, key, args] of the formatted 3-star goal line (tests compare it with I18n.t(key, args)).
+func star_goal_binding() -> Array:
+	return [_star_label, STAR_GOAL_KEY, _star_goal_args()]
 
 
 ## True for texts that need no translation: m:ss, n/n and raw key glyphs.
@@ -834,7 +890,15 @@ func overflow_sample(title_keys: Array = [], hint_key_override: String = "") -> 
 		(row["progress"] as Label).text = DIGITS_SAMPLE
 		(row["state"] as TextureRect).texture = load(ICON_DONE if i % 2 == 0 else ICON_MISSED)
 	_timer_label.text = HudModel.format_time(float(Balance.get_section("rules").get("timer_max_seconds", 0)))
-	_star_label.text = _timer_label.text
+	_star_goal_seconds = float(Balance.get_section("rules").get("timer_max_seconds", 0))
+	_relabel_star_goal()
+	for star in _star_icons:
+		star.texture = load(STAR_FULL)
+		star.modulate.a = 1.0
+	_star_label.modulate.a = 1.0
+	_star_state.texture = load(ICON_DONE)
+	_star_state.visible = true
+	_star_goal_state = -1
 	_hint_key = hint_key_override if hint_key_override != "" else _longest(keys + [HudModel.NO_HINT_KEY])
 	_hint_label.text = _text(_hint_key)
 	_hint_panel.visible = true
