@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Beach Camp reads as a camp (tent, crates, barrels, campfire, driftwood, dune grass) and Farm Meadow as a farm (fenced pig pen, barn, ploughed field with crops); gameplay positions and collision are unchanged (BI-20).
+
+### Changed
+
+- The credits list the pack names in the smallest menu font, so the added theme props row still fits at 1280x720.
+
 ## [1.1.0] – 2026-11-22
 
 Readability pass: font, result screen and HUD 3-star target. Gameplay, tasks, timers and difficulty are unchanged.

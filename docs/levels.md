@@ -28,6 +28,7 @@ Every level is a scene that inherits `scenes/levels/level_base.tscn` (`LevelBase
 |---|---|---|
 | `WaterBackdrop` | `Sprite2D` | animated water under everything, sized at runtime to the bounds plus one viewport per side |
 | `Sand`, `Grass`, `Shore`, `Details` | `TileMapLayer` | the layout, all with `scenes/levels/island_tileset.tres` |
+| `GroundDecor` | `Node2D`, `z_index = -2` | flat set dressing (fields, fence runs, driftwood), after `Details` and before `ZoneMarkers`; not in `REQUIRED_CHILDREN`, no collision (BI-20) |
 | `ZoneMarkers/<zone_id>` | `ZoneMarker` (`scenes/levels/props/zone_marker.tscn`) | outline of a player-action zone; `z_index = -2`, after `Details` and before `Actors` |
 | `Actors` | `Node2D`, y-sorted | castaway (`Actors/Castaway`, `castaway_path`), animals, items, props |
 | `Markers/Spawn` | `Marker2D` | castaway start; its rotation is the start facing |
@@ -185,6 +186,12 @@ Props, zones, markers and entities are placed by editing the scene (see `tests/s
 - `scenes/levels/props/palm.tscn` (`PalmProp`): a top-down pirate-pack palm crown (`tile_70`, `tile_71` default, `tile_72`; set `texture`) of `palm_crown_px` width, lifted `palm_crown_lift_px` above its base, drawn above the actors (absolute z-index 1, not y-sorted) so the castaway walks under its edge. It turns around its centre (`sway.gdshader`, `pivot_mode` 1), casts its shadow at the trunk base and has a solid footprint of `palm_footprint_radius` there. The pack has no trunk art, so the shadow marks the trunk.
 - `scenes/levels/props/sway_prop.tscn` (`SwayProp`): side-view foliage from the foliage packs, bent from its base. Bushes (`footprint_radius = 0`, walk-through) and jungle trees (`foliagePack_008`, `foliagePack_010` …, `shadow_width_share` 0.7 and a footprint) – these deciduous trees are not palms.
 - `scenes/levels/props/boulder.tscn`: solid boulder.
+- `scenes/levels/props/decor_prop.tscn` (`DecorProp`, BI-20): standing set dressing without physics (texture, `sprite_scale`, `shadow_width_share`, `shadow_base_y`; optional `Flame` child). `SwayProp.tint` colours white tufts per instance.
+
+Set dressing per level (BI-20; gameplay positions, collision and layouts unchanged, guarded by `tests/levels/test_theme_decor.gd`):
+
+- Beach Camp: a ridge tent on the rock at (1600, 640), a crate stack and barrels on the rocks at (2368, 1536) and (2752, 1664), a campfire with a gentle flame on open sand at (1600, 832), three pieces of bleached driftwood on the southern beach and sand-green dune grass instead of hedges and flowers (`Prop10`–`Prop17`, same positions).
+- Farm Meadow: a fence around the pig pen with a 118 px gap above the pen gate (the corner hedges `Prop6`–`Prop9` stay), a ploughed field with crop rows on the grass west of the pen (2624–2944 × 704–1088, clear of zones, lanes and home points) and a barn as the sprite of `Boulder17`.
 
 ## Tests
 
