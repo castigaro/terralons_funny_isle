@@ -1,22 +1,24 @@
-# Backlog – Release 1.1.0
+# Backlog – Release 1.2.0
 
-Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 and BI-25; BI-15, BI-16 and BI-17 shipped in 1.1.0, BI-19 (merge failed on the hygiene check), BI-18 and BI-25 stay open and move on; BI-20 to BI-24 stay open (6-item cap). Items done in 1.0.0 follow below the new ones with their original priorities.
+Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23; BI-26 (export smoke check), QA-1, QA-2 and BI-27 (release preparation) ride along. Difficulty, timers, tasks, events and layout stay unchanged. BI-24 stays open and out of scope; BI-25 is superseded by BI-27. Items done in 1.1.0 and 1.0.0 follow with unchanged sections.
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
 | 1 | BI-15 | Readable display font with full EN/DE glyphs and one-line HUD task names | small | clear | no | yes | done in 1.1.0 |
 | 2 | BI-16 | Result screen with one headline and one star animation | small | clear | no | yes | done in 1.1.0 |
 | 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | done in 1.1.0 |
-| 4 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | open |
-| 5 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | open |
-| 6 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | open |
-| 7 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | open |
-| 8 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | open |
-| 9 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | open |
-| 10 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
-| 11 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | open |
-| 12 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | open |
-| 13 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | open |
+| 1 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | planned for 1.2.0 |
+| 2 | BI-26 | Export smoke check catches missing sprites and resources in the built exe | small | clear | no | no | planned for 1.2.0 |
+| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | planned for 1.2.0 |
+| 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | planned for 1.2.0 |
+| 5 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | planned for 1.2.0 |
+| 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | planned for 1.2.0 |
+| 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | planned for 1.2.0 |
+| 8 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | planned for 1.2.0 |
+| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | planned for 1.2.0 |
+| 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | planned for 1.2.0 |
+| 11 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
+| 12 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | superseded by BI-27 |
 | 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
 | 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
 | 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | done in 1.0.0 |
@@ -91,8 +93,8 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 
 ### BI-19 – Textured ground with edge tiles and no flat placeholder shapes in any level
 
-- Status: open
-- Priority: 4
+- Status: planned for 1.2.0
+- Priority: 1
 - Size: large
 - Clarity: clear
 - Novel: no
@@ -102,17 +104,38 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 
 **Acceptance criteria:**
 
-1. The flat green rectangles (L1 bottom right, L4 strip) and the flat orange sandcastle-zone square (L4) are replaced by tiles or sprites with textured fill and visible edges/transitions.
-2. Grass in all five levels uses a textured tile with grass-to-sand edge tiles (existing pirate-pack or pirate-pack-derived tiles, new derived tiles via a tool script if needed).
-3. Task zones (e.g. sandcastle zone, pens, drop-offs) use a sprite-based marker (border/decal from existing packs) that stays clearly recognisable as a zone.
-4. A validator (validate_levels.py or new) fails if any level scene or level_base draws a flat single-colour ColorRect/Polygon2D/draw_rect as ground or zone; it passes for all five levels.
-5. Gameplay positions, collision shapes and zone areas are unchanged (level layout/collision tests stay green; bot playthrough still wins every level).
-6. tools/playtest.py screenshots of all five levels show no flat single-colour rectangle; any derived asset is recorded in assets/SOURCES.md.
+1. The existing branch feature/BI-19 is reviewed and reused if sound (rebased or merged with current main, including the ResourceLoader.exists sprite fix); otherwise the item is redone on a fresh branch and the reason is recorded.
+2. The run_tests.py hygiene check ('the real user folder changed') is investigated: either a test that writes to the real Godot app_userdata folder is identified and redirected to D:\projects2\fdp-runs\terralons_funny_isle.testdata, or two clean consecutive full run_tests.py runs on the merged state show the check green and the finding (parallel play by the user) is recorded in the run report.
+3. The flat green rectangles (L1, L3, L4, L5) and the flat orange sandcastle-zone square (L4) are replaced by tiles or sprites with textured fill and visible edges/transitions.
+4. Grass in all five levels uses a textured tile with grass-to-sand edge tiles (existing pirate-pack or derived tiles, generated by a tool script if needed).
+5. Task zones (sandcastle zone, pens, drop-offs) use a sprite-based marker (border/decal) that stays clearly recognisable as a zone.
+6. A validator fails if any level scene or level_base draws a flat single-colour ColorRect/Polygon2D/draw_rect as ground or zone; it passes for all five levels.
+7. Gameplay positions, collision shapes and zone areas are unchanged: layout/collision tests green, bot playthrough wins every level.
+8. tools/playtest.py screenshots of all five levels show no flat single-colour rectangle; any derived asset is recorded in assets/SOURCES.md.
+
+### BI-26 – Export smoke check catches missing sprites and resources in the built exe
+
+- Status: planned for 1.2.0
+- Priority: 2
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: no
+
+**User story:** As the user I want the release export to fail when the built exe misses animals, items or other resources, so that a broken build like the 1.1.0 exe with invisible animals can never ship again.
+
+**Acceptance criteria:**
+
+1. tools/export.py runs the freshly built exe in a smoke mode that loads every level (L1–L5) and the menus once and then quits, with its data folder redirected below D:\projects2\fdp-runs\terralons_funny_isle.testdata.
+2. The smoke step fails (non-zero exit, clear message naming level and resource) on any 'unknown kind' warning, missing-resource/failed-load warning, script error, or a level whose spawned animal/item count with a valid texture is lower than the level data expects.
+3. A regression test proves the check: re-introducing the FileAccess.file_exists sprite lookup (or an equivalent forced missing sprite) in a test build makes the smoke step fail; the current main passes.
+4. The check uses only the Python standard library and the installed Godot; run_tests.py stays green.
+5. docs (README or docs/process) describe the smoke check and how to read its output.
 
 ### BI-18 – Live island scene behind title, level select and settings
 
-- Status: open
-- Priority: 5
+- Status: planned for 1.2.0
+- Priority: 3
 - Size: large
 - Clarity: clear
 - Novel: yes
@@ -122,16 +145,16 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 
 **Acceptance criteria:**
 
-1. Title, level select, settings and credits show an animated backdrop scene: animated water (existing water shader), beach and grass tiles, a few palms and at least three animals from the existing sprites that wander and idle.
-2. Menus stay readable: menu panels have a backing or the backdrop is dimmed/blurred so that text contrast is at least 4.5:1 against its immediate background in screenshots.
-3. The backdrop persists across menu screens without restarting or flickering, pauses or is removed while a level runs, and adds no errors or warnings in the headless and windowed smoke stages.
-4. The menu stays responsive (keyboard navigation unchanged) and the perf stage of run_tests.py --windowed still passes.
+1. Title, level select, settings and credits show an animated backdrop scene: animated water (existing water shader), beach and textured grass tiles from BI-19, a few palms and at least three animals from the existing sprites that wander and idle.
+2. Menus stay readable: menu panels have a backing or the backdrop is dimmed so that text contrast is at least 4.5:1 against its immediate background in screenshots.
+3. The backdrop persists across menu screens without restarting or flickering, is paused or removed while a level runs, and adds no errors or warnings in the headless and windowed smoke stages and the BI-26 export smoke.
+4. Keyboard navigation is unchanged and the perf stage of run_tests.py --windowed still passes.
 5. tools/playtest.py screenshots of title (EN/DE), level select, settings and credits at 1920x1080 and 1280x720 show the backdrop and readable menus.
 
 ### BI-20 – Themed Beach Camp and Farm Meadow
 
-- Status: open
-- Priority: 6
+- Status: planned for 1.2.0
+- Priority: 4
 - Size: large
 - Clarity: clear
 - Novel: no
@@ -142,15 +165,15 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 **Acceptance criteria:**
 
 1. Farm Meadow shows fences around pens or fields, a barn (composed/derived from existing CC0 sprites if no pack contains one), a ploughed or crop field area and textured meadow grass.
-2. Beach Camp shows camp decoration (e.g. tent/crates/campfire/driftwood from existing packs) distinct from the other levels.
-3. Decoration is non-blocking or only placed where layout already has obstacles: layout files, collision, task and spawn positions are unchanged (layout tests and bot playthrough green).
-4. Every used or derived asset lies in a folder listed in assets/SOURCES.md; validate_assets and validate_credits pass.
+2. Beach Camp shows camp decoration (e.g. tent, crates, campfire, driftwood from existing packs) distinct from the other levels.
+3. Decoration is non-blocking or only placed where the layout already has obstacles: layout files, collision, task and spawn positions are unchanged (layout tests and bot playthrough green).
+4. Every used or derived asset lies in a folder listed in assets/SOURCES.md and in the credits; validate_assets and validate_credits pass.
 5. tools/playtest.py screenshots of L1 and L2 next to each other show clearly different themes; animals and items stay at least 24 px and visible against the new ground.
 
 ### BI-21 – Themed Jungle with dense vegetation
 
-- Status: open
-- Priority: 7
+- Status: planned for 1.2.0
+- Priority: 5
 - Size: large
 - Clarity: clear
 - Novel: no
@@ -164,12 +187,12 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 2. Vegetation never hides the castaway, animals, items or task zones in play areas (foreground foliage is semi-transparent or outside play paths); verified by playtest screenshots and the bot playthrough still winning L3.
 3. Layout, collision, tasks and events are unchanged.
 4. All assets are from listed CC0 packs; asset and credit validators pass.
-5. tools/playtest.py L3 screenshots read as jungle at first sight compared with L1 and L2.
+5. tools/playtest.py L3 screenshots read as jungle at first sight and look clearly different from L2 (Farm Meadow) in a side-by-side comparison.
 
 ### BI-22 – Themed Lagoon with huts, boats and docks
 
-- Status: open
-- Priority: 8
+- Status: planned for 1.2.0
+- Priority: 6
 - Size: large
 - Clarity: clear
 - Novel: no
@@ -182,13 +205,13 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 1. L4 shows wooden docks/piers at the water edge, at least two boats (pirate-pack ships/boats) on the water and huts (composed/derived from existing sprites if needed).
 2. Water areas use the animated water shader with shore edge tiles; no flat colour areas remain.
 3. Layout, collision, tasks and events are unchanged; bot playthrough still wins L4.
-4. All assets are from listed CC0 packs or derived ones recorded in SOURCES.md; validators pass.
+4. All assets are from listed CC0 packs or derived ones recorded in SOURCES.md and credits; validators pass.
 5. tools/playtest.py L4 screenshots read as a lagoon village at first sight.
 
 ### BI-23 – Themed Volcano Cliffs with dark rock, cliff edges and lava glow
 
-- Status: open
-- Priority: 9
+- Status: planned for 1.2.0
+- Priority: 7
 - Size: large
 - Clarity: clear
 - Novel: no
@@ -199,15 +222,70 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 **Acceptance criteria:**
 
 1. L5 uses a dark rock ground (tinted or derived from existing tiles) with visible cliff edges around the island outline.
-2. Lava or glowing cracks are shown in non-play areas using existing particle/smoke sprites and a shader or tint (no new pack download); they are purely decorative and do not change gameplay.
-3. Layout, collision, tasks and events are unchanged; bot playthrough still wins L5; perf stage still passes with the added particles.
+2. Lava or glowing cracks are shown in non-play areas using existing particle/smoke sprites and a shader or tint (no new pack download); purely decorative, no gameplay change.
+3. Layout, collision, tasks and events are unchanged; bot playthrough still wins L5; the perf stage still passes with the added particles.
 4. All assets are from listed CC0 packs or derived ones recorded in SOURCES.md; validators pass.
 5. tools/playtest.py L5 screenshots read as a volcano at first sight; animals and items remain clearly visible against the dark ground.
+
+### QA-1 – One 'GO!' cue at level start instead of chip plus giant text
+
+- Status: planned for 1.2.0
+- Priority: 8
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the level start to show a single 'GO!' / 'LOS!' cue, so that the start looks clean like the result screen.
+
+**Acceptance criteria:**
+
+1. At level start in all five levels, EN and DE, exactly one start cue is visible (no dark chip with 'GO!' plus a giant outlined 'GO!' below it).
+2. The cue does not overlap HUD panels or context prompts at 1280x720 and 1920x1080.
+3. tools/playtest.py start screenshots of every level in EN and DE show one cue; run_tests.py stays green.
+4. May ride along in a themed-level branch or the release branch; the backlog notes where it landed.
+
+### QA-2 – No leftover popup behind the credits panel
+
+- Status: planned for 1.2.0
+- Priority: 9
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the credits to show only the credits panel, so that no stray bubble shows through its title.
+
+**Acceptance criteria:**
+
+1. Opening the credits right after leaving a level (won or lost) shows no popup, cue chip or bubble behind or through the panel, EN and DE.
+2. On the loss result screen, level popups (for example 'HA HA') are removed or hidden once the panel is shown, or documented as intended.
+3. tools/playtest.py credits shot in EN and DE shows only the panel on the (BI-18) backdrop.
+4. May ride along with BI-18 or the release branch; the backlog notes where it landed.
+
+### BI-27 – Release 1.2.0: full visual pass, tag and fresh verified export
+
+- Status: planned for 1.2.0
+- Priority: 10
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: no
+
+**User story:** As the user I want release 1.2.0 delivered as a fresh, verified Windows build with honest release notes, so that I can hand the finished-looking game to human players for feedback.
+
+**Acceptance criteria:**
+
+1. Version is 1.2.0 in project.godot and the game; CHANGELOG lists BI-18 to BI-23, BI-26, QA-1 and QA-2 and states that difficulty, timers, tasks, events and layout are unchanged.
+2. run_tests.py (default and --windowed stages) pass; tools/playtest.py runs over all screens and levels in EN and DE at 1920x1080 plus a 1280x720 pass, with no clipped or overlapping text and no flat placeholder shapes; L2 and L3 clearly look different.
+3. A fresh build/TerralonsFunnyIsle.exe is exported via tools/export.py and passes the extended BI-26 smoke check (all levels load, all animals and items present); the run report names its absolute path and build time.
+4. docs/process/backlog.md shows each item's status; the superseded BI-25 is closed formally; the release commit gets a local tag v1.2.0 (no push).
+5. The run report lists remaining open points (human playtest, listening pass, unsigned exe, BI-24, difficulty curve, EventActor conversion warning, BONUS tag spacing) as still open.
 
 ### BI-24 – Clean exit without leaked-instance warnings
 
 - Status: open
-- Priority: 10
+- Priority: 11
 - Size: small
 - Clarity: unclear
 - Novel: no
@@ -223,8 +301,8 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 
 ### BI-25 – Release 1.1.0: full visual pass, tag and fresh export
 
-- Status: open
-- Priority: 11
+- Status: superseded by BI-27 (closed, not delivered as 1.1.0 release item)
+- Priority: 12
 - Size: small
 - Clarity: clear
 - Novel: no
@@ -239,44 +317,6 @@ Release 1.1.0 "Finished-look release" planned BI-15, BI-16, BI-17, BI-19, BI-18 
 3. A fresh build/TerralonsFunnyIsle.exe is exported via tools/export.py and starts; the run report names its absolute path and build time.
 4. The backlog status in docs/process/backlog.md is updated per item as it merges, and the release commit is tagged v1.1.0 (local tag only, no push).
 5. The run report lists remaining open points (human playtest, listening pass, unsigned exe) as still open.
-
-### QA-1 – One 'GO!' cue at level start instead of chip plus giant text
-
-- Status: open
-- Priority: 12
-- Size: small
-- Clarity: clear
-- Novel: no
-- UX-relevant: yes
-
-**User story:** As a player I want the level start to show a single 'GO!' / 'LOS!' cue, so that the start looks clean like the result screen.
-
-**Acceptance criteria:**
-
-1. At level start in all five levels, EN and DE, exactly one start cue is visible (no dark chip with 'GO!' plus a giant outlined 'GO!' below it).
-2. The cue does not overlap HUD panels or context prompts at 1280x720 and 1920x1080.
-3. tools/playtest.py start screenshots (05, 11, 19, 27, 38 in EN and DE) show one cue; run_tests.py stays green.
-
-*Found in the 1.1.0 QA run (release/en/05_l1_beach_camp_start_en.png, release/de/27_l4_lagoon_start_de.png).*
-
-### QA-2 – No leftover popup behind the credits panel
-
-- Status: open
-- Priority: 13
-- Size: small
-- Clarity: clear
-- Novel: no
-- UX-relevant: yes
-
-**User story:** As a player I want the credits to show only the credits panel, so that no stray bubble shows through its title.
-
-**Acceptance criteria:**
-
-1. Opening the credits right after leaving a level (won or lost) shows no popup, cue chip or bubble behind or through the panel, EN and DE.
-2. On the loss result screen, popups from the level (for example 'HA HA') are removed or hidden once the panel is shown, or documented as intended.
-3. tools/playtest.py credits shot (49) in EN and DE shows only the panel on the backdrop.
-
-*Found in the 1.1.0 QA run (release/de/49_credits_de.png: a dark chip is visible behind 'MITWIRKENDE').*
 
 ### BI-1 – Project foundation, reused tooling and core autoloads
 
