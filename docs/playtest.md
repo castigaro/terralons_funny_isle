@@ -79,3 +79,16 @@ Each test writes its run to `<testdata>/run_tests/bot/<level>.json` (`TFI_BOT_RE
 - **Export:** `python tools/export.py` built `build/TerralonsFunnyIsle.exe` (136 MB, pack embedded, version 1.0.0.0), and its headless smoke start printed `SMOKE OK`. With `APPDATA` pointed at an empty folder it exits with 3 and `export templates for 4.7.2 missing at <path>`.
 
 The human first run (20–30 minutes, listening pass for the sounds) stays open: no human is available in this autonomous run.
+
+## Volcano Cliffs dressing (BI-23)
+
+- Visual check: `python tools/playtest.py --levels l5` at 1920x1080 and 1280x720 (progress with L1–L4 won seeded into the testdata folder so L5 is open). The in-level shots read as a volcano at first sight: dark textured basalt, scorched ash on the former grass, glowing lava fissures with soft halos on the rock clusters, cliff faces along the south coast and the inlet, warm grey boulders. Penguin, chicken, goat and pig keep their silhouette through the light halo, hat and bucket through the light outline; the shelter and mud pool markers stay readable. `tools/flat_area_check.py` finds no flat window in the L5 shots at either size (the ash field first measured 0.013–0.014, so the ash shade gained a wider luma spread).
+- Comparison: L1 and L4 played in the same check stay light sand with the dark item outlines, no animal halo and the teal shadows (the level overrides apply to L5 only); L5 is the only dark level.
+- Performance: `smoke.py` perf stage with `--perf-level=l5_volcano_cliffs` (42 particles, ground shader on four layers), 60 s bot run, frame times after 1 s:
+
+  | Size | Frames | Average | Maximum | Frames above 33 ms |
+  |---|---|---|---|---|
+  | 1920x1080 | 25793 | 2.29 ms | 9.14 ms | 0 |
+  | 1280x720 | 24579 | 2.40 ms | 12.51 ms | 0 |
+
+- Bot: L5 is still won with three stars in all six bot runs (plain, hold, inject), 187 s left in the plain runs as before.

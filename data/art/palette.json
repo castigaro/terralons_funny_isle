@@ -12,7 +12,24 @@
 		"ui_accent": "#ffc93c",
 		"ui_warning": "#ff6b4a",
 		"shadow": "#1e3b3f",
-		"zone_marker": "#fff4d6"
+		"zone_marker": "#fff4d6",
+		"volcano_rock_low": "#140f0d",
+		"volcano_rock_high": "#5a493e",
+		"volcano_rim": "#a8876f",
+		"volcano_ash": "#6e6860",
+		"volcano_stone": "#d2b8a6",
+		"volcano_cliff": "#1f1714",
+		"lava_hot": "#ff6a1a",
+		"lava_core": "#ffd23f",
+		"volcano_outline": "#f3e3cc",
+		"volcano_shadow_tint": "#4d4040"
+	},
+	"level_overrides": {
+		"l5_volcano_cliffs": {
+			"outline_color_key": "volcano_outline",
+			"halo_color_key": "volcano_outline",
+			"shadow_tint_key": "volcano_shadow_tint"
+		}
 	},
 	"water_tint": "water",
 	"highlight": "#ffffff",

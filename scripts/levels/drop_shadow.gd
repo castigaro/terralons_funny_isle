@@ -1,11 +1,13 @@
 class_name DropShadow
 extends Sprite2D
 ## Soft drop shadow ellipse under an actor or prop; alpha, size and offset follow the palette shadow block, the
-## colour comes from the gradient of scenes/castaway/soft_shadow.tres (palette colour shadow at full core alpha).
+## colour comes from the gradient of scenes/castaway/soft_shadow.tres (palette colour shadow at full core alpha),
+## multiplied by the level's shadow tint override (palette level_overrides, darker on the volcanic ground).
 
 
 func _ready() -> void:
-	modulate.a = ArtPalette.shadow()["alpha"]
+	var tint := ArtPalette.level_color(self, "shadow_tint_key", Color.WHITE)
+	modulate = Color(tint.r, tint.g, tint.b, ArtPalette.shadow()["alpha"])
 
 
 ## Sizes the ellipse for an object of the given visible width (local pixels of the parent); base_y is where the

@@ -191,6 +191,7 @@ Props, zones, markers and entities are placed by editing the scene (see `tests/s
 Set dressing per level (BI-20; gameplay positions, collision and layouts unchanged, guarded by `tests/levels/test_theme_decor.gd`):
 
 - Beach Camp: a ridge tent on the rock at (1600, 640), a crate stack and barrels on the rocks at (2368, 1536) and (2752, 1664), a campfire with a gentle flame on open sand at (1600, 832), three pieces of bleached driftwood on the southern beach and sand-green dune grass instead of hedges and flowers (`Prop10`–`Prop17`, same positions).
+- Volcano Cliffs (BI-23, guarded by `tests/levels/test_l5_volcano_theme.gd`): volcanic ground shader on the tile layers, cliff faces on all 102 coast cells, 27 lava fissures and three vents (cells 5,7; 25,3; 29,17) under `GroundDecor/VolcanoDecor`, ash-tinted foliage and warm grey boulders. Regenerate the decor with `python tools/place_volcano_decor.py` (`--check` in the tests), the art with `tools/derive_volcano_art.gd`.
 - Farm Meadow: a fence around the pig pen with a 118 px gap above the pen gate (the corner hedges `Prop6`–`Prop9` stay), a ploughed field with crop rows on the grass west of the pen (2624–2944 × 704–1088, clear of zones, lanes and home points) and a barn as the sprite of `Boulder17`.
 
 ## Tests
