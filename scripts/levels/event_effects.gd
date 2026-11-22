@@ -386,11 +386,12 @@ func _present_volley(entry: Dictionary) -> void:
 		_track(event_id, nut)
 		var aim := target + Vector2((float(i) - float(throws - 1) / 2.0) * float(_cfg.get("coconut_spread_px", 0.0)), 0.0)
 		var t := get_tree().create_timer(gap * i, true, true)
-		t.timeout.connect(_launch_nut.bind(nut, from, aim))
+		t.timeout.connect(_launch_nut.bind(nut.get_instance_id(), from, aim))
 
 
-func _launch_nut(nut: EventActor, from: Vector2, aim: Vector2) -> void:
-	if not is_instance_valid(nut):
+func _launch_nut(nut_id: int, from: Vector2, aim: Vector2) -> void:
+	var nut := _live_actor(nut_id)
+	if nut == null:
 		return
 	nut.visible = true
 	nut.fly_path([from, aim], float(_cfg.get("actor_impact_seconds", 1.0)), float(_cfg.get("coconut_arc_height", 0.0)))
@@ -529,7 +530,7 @@ func _present_stampede(entry: Dictionary) -> void:
 		goat.global_position = start + shift
 		goat.reset_physics_interpolation()
 		var t := get_tree().create_timer(lead + gap * i, true, true)
-		t.timeout.connect(_launch_goat.bind(goat, start + shift, finish + shift))
+		t.timeout.connect(_launch_goat.bind(goat.get_instance_id(), start + shift, finish + shift))
 	var dust := _particles("Dust_%s" % event_id, DUST_TEXTURE, "stampede_dust_amount", "stampede_dust_reduced_amount")
 	dust.lifetime = float(_cfg.get("stampede_run_seconds", 1.0)) * 0.5
 	dust.emission_rect_extents = rect.size * 0.5
@@ -542,10 +543,19 @@ func _present_stampede(entry: Dictionary) -> void:
 	dust.emitting = true
 
 
-func _launch_goat(goat: EventActor, from: Vector2, to: Vector2) -> void:
-	if not is_instance_valid(goat) or goat.is_queued_for_deletion():
+func _launch_goat(goat_id: int, from: Vector2, to: Vector2) -> void:
+	var goat := _live_actor(goat_id)
+	if goat == null:
 		return
 	goat.fly_path([from, to], float(_cfg.get("stampede_run_seconds", 1.0)), 0.0)
+
+
+## The actor behind an instance id, or null once it is freed or queued for deletion (timers outlive actors).
+func _live_actor(id: int) -> EventActor:
+	var obj := instance_from_id(id)
+	if obj == null or not is_instance_valid(obj) or obj.is_queued_for_deletion():
+		return null
+	return obj as EventActor
 
 
 ## Rectangle-emitting particles with the full or the reduced amount of the balance (reduce effects toggle).

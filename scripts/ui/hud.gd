@@ -5,7 +5,7 @@ extends CanvasLayer
 ## LevelSession every frame, reacts to EventBus signals and never changes the session. The layout uses logical
 ## 1920x1080 coordinates at the screen edges; panels fade when the castaway walks under them. See docs/hud.md.
 
-const FONT_PATH := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+const FONT_PATH := MenuTheme.FONT
 const STAR_FULL := "res://assets/ui/ui-pack/PNG/Yellow/Default/star.png"
 const STAR_EMPTY := "res://assets/ui/ui-pack/PNG/Yellow/Default/star_outline.png"
 const ICON_DONE := "res://assets/ui/ui-pack/PNG/Blue/Default/icon_checkmark.png"
@@ -283,9 +283,12 @@ func _build_rows(tasks: Array) -> void:
 				ArtPalette.color("ui_accent" if bool(task.get("required", false)) else "ui_text"))
 		box.add_child(tag)
 		var name_label := _label("NameLabel", int(_cfg.get("task_font_size", font_size)))
-		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# One line; _relabel_all sizes the column to the widest title, the ellipsis is only a safety net.
+		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		name_label.max_lines_visible = int(_cfg.get("task_name_max_lines", 1))
-		name_label.custom_minimum_size = Vector2(float(_cfg.get("task_name_width_px", 1)), 0.0)
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_label.clip_text = true
+		name_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		box.add_child(name_label)
 		var progress := _label("ProgressLabel", font_size)
 		progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -602,11 +605,15 @@ func _relabel_all() -> void:
 	var tag_width := 0.0
 	for key in [REQUIRED_KEY, OPTIONAL_KEY]:
 		tag_width = maxf(tag_width, _text_width(I18n.t(key), int(_cfg.get("tag_font_size", 1))))
+	tag_width += float(_cfg.get("tag_gap_px", 0))
 	for row in _rows:
 		(row["name"] as Label).text = _text(row["title_key"])
 		var tag := row["tag"] as Label
 		tag.text = I18n.t(REQUIRED_KEY if row["required"] else OPTIONAL_KEY)
 		tag.custom_minimum_size = Vector2(tag_width, 0.0)
+	var name_width := _name_column_width()
+	for row in _rows:
+		(row["name"] as Label).custom_minimum_size = Vector2(name_width, 0.0)
 	if _hint_key != "":
 		_hint_label.text = _text(_hint_key)
 	if _cue_key != "":
@@ -615,6 +622,15 @@ func _relabel_all() -> void:
 	if verbs.has(_verb):
 		_verb_label.text = _text(String(verbs[_verb]))
 	force_layout()
+
+
+## Width of the task-name column: the widest current title, capped at task_name_width_px.
+func _name_column_width() -> float:
+	var widest := 0.0
+	var font_size := int(_cfg.get("task_font_size", 1))
+	for row in _rows:
+		widest = maxf(widest, _text_width((row["name"] as Label).text, font_size))
+	return minf(float(_cfg.get("task_name_width_px", 1)), widest)
 
 
 func _on_locale_changed(_code: String) -> void:
@@ -745,14 +761,30 @@ func castaway_screen_rect() -> Rect2:
 	if _castaway == null or not is_instance_valid(_castaway) or not _castaway.is_inside_tree():
 		return Rect2()
 	var body := _castaway.get_node_or_null("Visual/Body") as Sprite2D
-	var rect := Rect2(_castaway.get_global_transform_with_canvas().origin, Vector2.ZERO)
 	if body != null and body.texture != null:
-		rect = body.get_global_transform_with_canvas() * body.get_rect()
+		return screen_rect_of(body, body.get_rect())
+	return screen_rect_of(_castaway, Rect2())
+
+
+## Rect of a world or canvas item (local_rect in its own space) in HUD coordinates, scaled like the layout.
+func screen_rect_of(item: CanvasItem, local_rect: Rect2) -> Rect2:
+	var rect := item.get_global_transform_with_canvas() * local_rect
 	var real := get_viewport().get_visible_rect().size
 	if _layout_size != Vector2.ZERO and real.x > 0.0 and real.y > 0.0:
 		var k := _layout_size / real
 		rect = Rect2(rect.position * k, rect.size * k)
 	return rect
+
+
+## True when rect (HUD coordinates) grown by gap logical px touches a visible panel or leaves the top edge.
+func blocks_rect(rect: Rect2, gap: float) -> bool:
+	if rect.position.y < 0.0:
+		return true
+	var grown := rect.grow(gap * _root.scale.x)
+	for r in visible_panel_rects():
+		if grown.intersects(r):
+			return true
+	return false
 
 
 ## Castaway rect grown by the safe margin (scaled like the HUD).

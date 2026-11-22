@@ -10,7 +10,7 @@ extends Node
 
 const FEEDBACK_PATH := "res://data/feedback.json"
 const EVENT_BUS_SCRIPT := "res://scripts/autoload/event_bus.gd"
-const FONT := preload("res://assets/ui/ui-pack/Font/Kenney Future.ttf")
+const FONT := preload(MenuTheme.FONT)
 const CAMERA_GROUP := "game_camera"
 const CASTAWAY_GROUP := "castaway"
 const EVENT_ANCHOR_GROUP := "event_anchor"

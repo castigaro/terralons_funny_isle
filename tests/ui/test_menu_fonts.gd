@@ -1,12 +1,15 @@
 extends TestCase
-## Menu theme: fonts cover umlauts and sharp s, sizes and button height come from Balance flow, a visible focus
-## outline exists, and no menu text uses the en dash the fonts lack.
+## Menu theme: one UI font for headings and body that covers umlauts and sharp s, sizes and button height come from
+## Balance flow, and a visible focus outline exists. Full glyph coverage is in test_ui_font_glyphs.gd.
 
 
-func test_fonts_cover_german() -> void:
-	for font in [MenuTheme.heading_font(), MenuTheme.body_font()]:
-		for ch in "äöüÄÖÜß":
-			check_true(font.has_char(ch.unicode_at(0)), "%s has %s" % [font.resource_path.get_file(), ch])
+func test_one_font_covers_german() -> void:
+	check_eq(MenuTheme.heading_font(), MenuTheme.font(), "headings use the UI font")
+	check_eq(MenuTheme.body_font(), MenuTheme.font(), "body uses the UI font")
+	var font := MenuTheme.font()
+	check_eq(font.resource_path, MenuTheme.FONT, "UI font path")
+	for ch in "äöüÄÖÜß":
+		check_true(font.has_char(ch.unicode_at(0)), "%s has %s" % [font.resource_path.get_file(), ch])
 
 
 func test_theme_matches_balance() -> void:
@@ -22,8 +25,9 @@ func test_theme_matches_balance() -> void:
 	check_ne(focus, null, "focus style")
 	check_eq(focus.border_width_left, int(cfg["focus_outline_px"]), "outline width")
 	check_false(focus.draw_center, "outline only")
-	check_eq(theme.get_font("font", "Button").resource_path, MenuTheme.FONT_HEADING, "button font")
-	check_eq(theme.get_font("font", "Label").resource_path, MenuTheme.FONT_BODY, "body font")
+	check_eq(theme.get_font("font", "Button").resource_path, MenuTheme.FONT, "button font")
+	check_eq(theme.get_font("font", "Label").resource_path, MenuTheme.FONT, "body font")
+	check_eq(theme.default_font.resource_path, MenuTheme.FONT, "default font")
 
 
 func test_buttons_use_min_height() -> void:
@@ -34,13 +38,6 @@ func test_buttons_use_min_height() -> void:
 	check_eq(play.custom_minimum_size.y, Balance.get_float("flow", "button_min_height"), "min height")
 	check_ne(play.icon, null, "play icon from the UI pack")
 	check_true(play.icon.resource_path.begins_with("res://assets/ui/ui-pack/"), "UI pack icon")
-
-
-func test_menu_texts_have_no_en_dash() -> void:
-	for key in I18n.keys():
-		if String(key).begins_with("menu."):
-			for loc in I18n.LOCALES:
-				check_false(I18n.text_in(key, loc).contains("–"), "%s (%s) has an en dash" % [key, loc])
 
 
 func test_slider_focus_cue_in_theme() -> void:

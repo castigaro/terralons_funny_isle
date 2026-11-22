@@ -5,7 +5,7 @@ extends PanelContainer
 
 const KEY_PREFIX := "hud.key."
 const TEXTURE_PATH := "res://assets/ui/ui-pack/PNG/Extra/Default/input_square.png"
-const FONT_PATH := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+const FONT_PATH := MenuTheme.FONT
 const PATCH_MARGIN := 12
 
 var _actions: Array = []

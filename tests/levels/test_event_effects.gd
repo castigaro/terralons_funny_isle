@@ -5,6 +5,7 @@ extends "res://tests/support/level_case.gd"
 
 const L1 := "res://scenes/levels/l1_beach_camp.tscn"
 const L2 := "res://scenes/levels/l2_farm_meadow.tscn"
+const L3 := "res://scenes/levels/l3_jungle.tscn"
 
 
 func _impact_ticks() -> int:
@@ -194,6 +195,21 @@ func test_restart_clears_overrides_actors_and_overlays() -> void:
 	check_eq(level.surface_override_keys(), [], "no override after restart")
 	check(_effects().overlay_nodes().is_empty() and _effects().actor_nodes().is_empty(), "nodes gone")
 	check_eq(_effects().pending_effects(), 0, "nothing pending")
+
+
+func test_delayed_throws_skip_actors_freed_by_a_restart() -> void:
+	# Coconut and goat timers outlive their actors; a restart before they fire must not raise an engine error.
+	await open_level(L3)
+	EventBus.event_triggered.emit("coconut_volley")
+	EventBus.event_triggered.emit("goat_rush")
+	await physics_frames(2)
+	check_false(_effects().actor_nodes().is_empty(), "volley and stampede actors spawned")
+	level.restart_level()
+	await physics_frames(2)
+	check(_effects().actor_nodes().is_empty(), "actors gone after restart")
+	var wait := Balance.get_float("events", "coconut_throw_gap_seconds") * 3.0 			+ Balance.get_float("events", "stampede_lead_seconds") 			+ Balance.get_float("events", "stampede_goat_gap_seconds") * 4.0
+	await physics_frames(int(ceil(wait * 60.0)) + 10)
+	check(_effects().actor_nodes().is_empty(), "no actor launched after restart")
 
 
 func test_effects_never_change_done_tasks() -> void:
