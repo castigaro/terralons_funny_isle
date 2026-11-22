@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official
+ERROR: Condition "p_node == nullptr" is true.
+SCRIPT ERROR: Invalid call. Nonexistent function.

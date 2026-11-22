@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official
+WARNING: WASAPI: Could not activate audio client, falling back to dummy driver.
+     at: init (drivers/wasapi/audio_driver_wasapi.cpp:400)

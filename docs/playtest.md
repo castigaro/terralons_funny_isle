@@ -59,3 +59,23 @@ Results of the BI-12 run (elapsed game seconds until the win, 3-star limit in br
 L4 latest is the tightest case: the big wave ends at 178 s, the staged hold wins at 178.4 s, 16.6 s inside the 3-star limit. L1 and L5 finish their plain runs before or between the events, so their seeds give the same times. All runs end with 3 stars, the injection runs included.
 
 Each test writes its run to `<testdata>/run_tests/bot/<level>.json` (`TFI_BOT_REPORT_DIR`, set by `tools/common.py`): `{level, runs: [...]}`, one entry per (variant, mode, seed) with result, reason, state, tasks done/total, done ids, time left, elapsed, three-star time, stars, triggered, ended and scheduled event ids, respawns, throws, inject errors and skips, stuck task, last goal, carried kind, `wall_seconds` and `written_at`. `python tools/run_tests.py` prints the fresh runs as a table in its `bot` stage and fails on a missing level or a failed run; a failing test prints `BOT FAIL level=… mode=… seed=… variant=… reason=… stuck_task=… goal=… carried=… elapsed=… tasks=… time_left=…`. `TFI_BOT_TRACE=1` prints goals, throws, losses and respawns of every run.
+
+## Windowed smoke and performance (BI-14)
+
+`python tools/smoke.py` (also the opt-in stages of `python tools/run_tests.py --windowed`, see the README) ran the real game flow in a borderless window at 1920x1080 and 1280x720 on the development machine, which is the reference machine (Windows 11, NVIDIA GeForce RTX 3060 Laptop GPU, OpenGL 3.3 compatibility renderer, vsync on as in the project default).
+
+- **Smoke:** title and all five levels at both sizes, three screenshots each plus one bonk frame per level; the music matched every screen (`title`, `level_1`–`level_3` as mapped in the level data), every level played a shake and a puff for `object_bonked`, and the picture outside the HUD changed by 2.0–7.6 % between the first and the third shot (animated water and foliage, castaway idle). No engine error and no audio or rendering warning in stdout or the log file.
+- **Performance:** 60 s bot run (`hold`) on `l4_lagoon` with its first event window at 20 s, frame times taken from the first frame after the intro card:
+
+  | Size | Frames after 1 s | Average | Maximum | Frames above 33 ms |
+  |---|---|---|---|---|
+  | 1920x1080 | 22089 | 2.67 ms | 12.51 ms | 0 |
+  | 1280x720 | 34970 | 1.69 ms | 10.32 ms | 0 |
+
+  Physics ran at 60 ticks per second throughout. The driver presents faster than the display refresh in the borderless window although vsync is reported on; the 33 ms limit holds with a wide margin either way, so no warm-up or other product change was needed.
+- **German clip check:** title, level select (stars, open and locked tiles), settings, credits, the intro card of `l4_lagoon` (four tasks, the most of any level), HUD with four prompts, the "Neustart!" level cue and the "Kokosnüsse im Anflug!" HUD cue at once, pause, result win and result loss with every task missing: 0 problems at both sizes. The overlong German fixture text on the Play button was found (6 problems), so the check is live.
+- **Castaway size:** 98 px at 1080p in every level (`l1_beach_camp` to `l5_volcano_cliffs`), minimum 64 px.
+- **Observation, not changed:** in L1 the world prompt of the use target near the top edge can sit under the task panel, and right after a restart the "Neustart!" cue and the announcer caption ("Los!") stand on top of each other for about a second. Neither clips a text; both are left for a later layout round.
+- **Export:** `python tools/export.py` built `build/TerralonsFunnyIsle.exe` (136 MB, pack embedded, version 1.0.0.0), and its headless smoke start printed `SMOKE OK`. With `APPDATA` pointed at an empty folder it exits with 3 and `export templates for 4.7.2 missing at <path>`.
+
+The human first run (20–30 minutes, listening pass for the sounds) stays open: no human is available in this autonomous run.

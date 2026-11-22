@@ -1,0 +1,30 @@
+# Content review (R-57, BI-14)
+
+Release 1.0.0 is a family-friendly slapstick game: no violence, no weapons, no scary images or sounds, no animal harm. This checklist checks each rule against the assets the game actually uses, every player-facing text in English and German and the screenshots of the windowed smoke run.
+
+## Evidence sources
+
+- **Assets:** `assets/SOURCES.md` (20 CC0 packs, all by Kenney except the music by Juhani Junkala), the files the product references (every `res://assets/...` path in `scripts/`, `scenes/` and `data/`, also checked by `tools/validate_assets.py`) and `data/assets/deny_list.json` (44 name tokens such as gun, knife, blood, skull, zombie; `validate_assets.py` fails if a used file name contains one).
+- **Texts:** all 163 keys of `i18n/*.csv` in `en` and `de`, searched word by word for the deny tokens plus kill, die, dead, hurt, blood, scary, monster, weapon, gun, knife, attack, fight, shoot, hit, stun, fear and töten, tot, Blut, verletzt, Waffe, Monster, gruselig, Angst, Angriff, Kampf, schießen, Schlag, erschrecken, benommen.
+- **Screenshots:** `python tools/smoke.py` at 1920x1080 and 1280x720, below `<testdata>/smoke/<WxH>/`: `title_1..3.png`, `<level>_1..3.png` and `<level>_fx.png` (a bonk effect) for all five levels, and from the German clip stage `de_title`, `de_level_select`, `de_settings`, `de_credits`, `de_intro`, `de_hud` (prompts, level cue and HUD cue at once), `de_pause`, `de_result_win` and `de_result_loss`. All were viewed.
+- **Rules and effects:** `data/feedback.json` (effects per signal, materials mud, water and sand), `docs/entities.md`, `docs/rules.md` and `docs/feedback.md`.
+
+## Checklist
+
+| Rule | Assets | Texts | Screenshots | Result |
+|---|---|---|---|---|
+| No violence | Used graphics are tiles, foliage, items, round cartoon animals, emotes, smoke puffs, star and dirt particles and mud splats; no deny token in any used file name (`validate_assets.py` green). The effects of `data/feedback.json` are popup words (BONK!, SPLASH!, POOF!, BOING!), squash, recoil, a short shake and hit-stop, puffs, stars and splats – cartoon reactions without damage. | Hits: "BONK! You're dizzy!" (`hud.cue.dizzy_hit`) – the castaway is dizzy for a moment, slapstick. No other hit. | `<level>_fx.png`: a white puff and the word BONK! over the castaway; no damage or health display anywhere. | pass |
+| No weapons | The castaway uses only `survivor1_stand.png` and `survivor1_hold.png` of the topdown-shooter pack (the two poses without a gun); the gun, machine gun, reload and silencer poses are not referenced. Throwables are coconuts, hats, food and animals. | No hit for weapon, gun, knife, Waffe. | Castaway in every level screenshot holds nothing or a carried item; no weapon visible. | pass |
+| No scary images | Animals come from the "Round (outline)" set of animal-pack-redux (chicken, duck, frog, goat, monkey, parrot, penguin, pig); emotes are anger, exclamation, sad face, heart, laugh, question, stars and swirl in the cartoon style; no skulls, ghosts, graves or dark scenes (deny tokens). The volcano level uses rock tiles and orange trees, no lava or fire. | No hit for scary, monster, gruselig, Monster, Angst. | Bright beach, meadow, jungle, lagoon and cliff scenes; menus on blue/dark panels; nothing dark or threatening. | pass |
+| No scary sounds | Sounds are UI clicks and interface sounds (`sfx-interface`, `sfx-ui`), cloth, footsteps, metal pots, a creak and a door from `sfx-rpg`, NES jingles, four voice lines (go, hurry up, mission completed, time over) and five chiptune tracks. The weapon-like `sfx-digital` pack (lasers, phasers) is not used (decision D-7). Assumption A-4: judged by file names, pack descriptions and the SFX map in `data/audio.json`; nothing was listened to in this autonomous run. | Captions of the voice lines: "Go!", "Hurry up!", "Level complete!", "Time's up!" (German "Los!", "Beeil dich!", "Level geschafft!", "Zeit ist um!") – no scary line. | The smoke run checked that music and effects start (music id per screen, no audio warning in the log); it cannot judge the sound itself. | pass (by metadata, A-4) |
+| No animal harm | Animals are carried, thrown, lured, fed, caught into pens and briefly stunned (squash, stars) and flee or panic; a non-swimmer thrown into water is "lost" and respawns at a home point (`docs/entities.md`, `docs/rules.md`) – no wound, no death, no blood. `animal_bonked` plays a popup, squash, recoil and stars only, no splat. | Hits: "Die Herde war schneller – die Ziege ist weg!" (the goat has left the area, a failure text, not harm); "Die Welle hat die Sandburg platt gemacht" (the sandcastle, not an animal). | Animals stand, walk and sit in pens in every level screenshot; no hurt state is shown. | pass |
+| Slapstick only | Effect vocabulary in `data/feedback.json`: BONK!, SPLASH!, squash and stretch, recoil, dizzy swirl, fart and white puffs, stars, mud splats – all exaggerated cartoon reactions. | Task and event texts are funny chores (hat on the goat, ducks into the pond, sandcastle before the wave); events are a parrot stealing hats, a goat stampede, coconut volleys, rain panic, a wave and a mud trail. | `de_hud_1.png` shows "Kokosnüsse im Anflug!" as cue, the result screens "Level geschafft!" and "Die Zeit ist um!". | pass |
+| No blood | Splats come only from the materials mud, water and sand (`data/feedback.json` `materials`); the splat sprites are tinted brown (#7a5230), blue (#5ec8f0) or beige (#e6cd8a); "blood" and "bloody" are deny tokens. | No hit for blood, Blut. | `<level>_fx.png` and level screenshots: no red splats. | pass |
+
+## False positives of the text search
+
+The German article "die" (for example "Hut auf die Ziege") and the past tense "war" ("Der Regen war schneller!") match the English tokens die and war; both were judged harmless. Every other text produced no hit.
+
+## Result
+
+All seven rules pass; no asset, text or layout had to change for the content review. Sound remains reviewed by metadata only (A-4); a human listening pass is part of the open human first run in `docs/playtest.md`.

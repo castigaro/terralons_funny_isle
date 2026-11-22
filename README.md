@@ -11,13 +11,25 @@ Godot 4.7.2 is found in the WinGet folder or via the environment variable `GODOT
 
 ## Check (build, lint, tests)
 
-    python tools/run_tests.py [-k <substring>]
+    python tools/run_tests.py [-k <substring>] [--windowed]
 
 Stages: syntax (Python), headless Godot import, GDScript tests (`tests/**/test_*.gd` through `tests/runner.gd`), Python tests (`tests/**/test_*.py`), headless smoke start (`-- --smoke` must print `SMOKE OK`), all `tools/validate_*.py`, and hygiene (git status and the real user folder must be unchanged). Exit code 0 means all green, 1 any failure, 2 Godot missing.
 
 Test data never goes to user folders: every Godot process of a test run gets `APPDATA`, `LOCALAPPDATA`, `TFI_DATA_DIR` and `TFI_BOT_REPORT_DIR` (bot playthrough summaries, see `docs/playtest.md`) redirected below the testdata root – `<repo>.testdata/run_tests` for the main checkout, `<main>.testdata/<worktree>/run_tests` for a worktree, or `$TFI_TESTDATA/run_tests`. Folders below `tests/fixtures/` and `tests/support/` are not collected as tests; `tests/fixtures/runner/` holds deliberately failing files for the runner self-test.
 
 GDScript tests run with `--fixed-fps 60` (deterministic physics ticks; a file whose first lines contain `## run-fps: 60,144` runs once per listed frame rate, and `TestCase.run_fps()` tells it which) and extend `TestCase` (`check`, `check_eq`, `check_has`, `fail`, `add_node`, `frames`, `physics_frames`); `before_each`/`after_each` hooks and coroutine tests are supported. Between tests `tests/support/test_env.gd` unpauses the tree, releases the castaway input actions, clears Balance overrides, switches I18n back to English and resets the Settings and Progress autoloads in memory. `tests/support/signal_recorder.gd` records the signals of any object.
+
+## Windowed checks and export
+
+    python tools/run_tests.py --windowed      # default stages plus smoke-windowed, perf, clip and export
+    python tools/smoke.py [--stage smoke|perf|clip|all] [--sizes 1920x1080,1280x720]
+    python tools/export.py [--out <path>]
+
+The default `run_tests.py` run opens no window. `--windowed` adds four opt-in stages after the headless smoke stage (they ignore `-k` and take about 6–8 minutes): `smoke-windowed`, `perf` and `clip` run `tools/smoke.py` in-process, `export` runs `tools/export.py`.
+
+`tools/smoke.py` starts the windowed Godot binary borderless at (0, 0) on `res://tests/scenes/smoke_probe.tscn`, which instances the real `scenes/main.tscn` (the display must be at least 1920x1080). Per size: `smoke` shows the title and every level through the real flow (intro card dismissed with `ui_accept`), takes three screenshots 0.6 s apart, checks the music of each screen, fires `object_bonked` and expects a shake plus a puff or splat, and checks that the picture moves outside the HUD (animated water, castaway idle); `perf` runs the bot (`hold`) on `l4_lagoon` for 60 real seconds and fails on any frame above 33 ms after the first second (`PERF size=… frames=… avg_ms=… max_ms=… over_33=…`); `clip` switches to German, seeds the progress (L1–L3 with 3/2/1 stars, L4 open, L5 locked) and runs `tests/support/clip_check.gd` over title, level select, settings, credits, the intro card with the most tasks, HUD with prompts, level cue and HUD cue at once, pause and both result screens; an overlong German fixture text must be found, and at 1920x1080 the castaway must be at least 64 px tall in every level (`tests/support/castaway_measure.gd`). Every run fails on an engine `ERROR` line and on any `WARNING` that names audio or rendering (WASAPI, OpenGL, shader, texture, …). Output below `<testdata>/smoke`: `<WxH>/<screen>_<n>.png` (`de_*` from the clip stage, `<level>_fx.png`), `perf_<WxH>.json` and `perf_<WxH>_frames.json`, `logs/<stage>_<WxH>.log` and `.stdout.txt`. Exit codes: 0 ok, 1 failure, 2 windowed Godot missing.
+
+`tools/export.py` exports the preset `Windows Desktop` of `export_presets.cfg` (version 1.0.0.0, pack embedded) to `build/TerralonsFunnyIsle.exe` (git-ignored) and starts the exe headless with `-- --smoke` in `<testdata>/export`. The Godot 4.7.2 export templates are read from the real `%APPDATA%/Godot/export_templates/4.7.2.stable`. Exit codes: 0 built and smoke OK, 1 export or smoke failed, 2 Godot missing, 3 export templates missing (message `export templates for 4.7.2 missing at <path>`).
 
 ## Autoloads
 
