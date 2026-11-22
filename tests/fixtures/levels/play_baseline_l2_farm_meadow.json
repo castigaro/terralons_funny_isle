@@ -1,0 +1,80 @@
+{
+	"collisions": {
+		"Actors/Boulder16/CollisionShape2D": "Circle 44.00 @1694.00,1252.00",
+		"Actors/Boulder17/CollisionShape2D": "Circle 44.00 @3776.00,1600.00",
+		"Actors/Prop1/Footprint/@CollisionShape2D": "Circle 30.00 @320.00,612.00",
+		"Actors/Prop2/Footprint/@CollisionShape2D": "Circle 30.00 @1600.00,484.00",
+		"Actors/Prop3/Footprint/@CollisionShape2D": "Circle 30.00 @3776.00,612.00",
+		"Actors/Prop4/Footprint/@CollisionShape2D": "Circle 30.00 @2752.00,2020.00",
+		"Actors/Prop5/Footprint/@CollisionShape2D": "Circle 30.00 @192.00,2020.00",
+		"Bounds/Side0": "Rect 4352.00,256.00 @2048.00,0.00",
+		"Bounds/Side1": "Rect 4352.00,256.00 @2048.00,2304.00",
+		"Bounds/Side2": "Rect 256.00,2048.00 @0.00,1152.00",
+		"Bounds/Side3": "Rect 256.00,2048.00 @4096.00,1152.00",
+		"Zones/mud_lane/CollisionShape2D": "Rect 512.00,384.00 @2560.00,1536.00",
+		"Zones/pig_pen/CollisionShape2D": "Rect 384.00,384.00 @3264.00,960.00",
+		"Zones/pond/CollisionShape2D": "Rect 512.00,512.00 @2048.00,1024.00",
+		"Zones/trough/CollisionShape2D": "Rect 256.00,256.00 @1216.00,448.00"
+	},
+	"entities": {
+		"bucket_1": "2368.00,1856.00",
+		"castaway": "448.00,1216.00",
+		"chicken_1": "2368.00,448.00",
+		"chicken_2": "1728.00,1856.00",
+		"chicken_3": "3520.00,1344.00",
+		"duck_1": "960.00,1344.00",
+		"duck_2": "1216.00,1728.00",
+		"duck_3": "704.00,1728.00",
+		"pig_1": "3264.00,1728.00"
+	},
+	"json_sha": "d3aa09e74cd30132f53fc06d8363b34aac52bf3e025f011c2eb4c83e13662285",
+	"layout_sha": "e1179900ddf972eeed8e8106f4de599eaec256a278046044dc596da83c1bf0b8",
+	"level_id": "l2_farm_meadow",
+	"markers": {
+		"EventAnchors/pig_mud": "2496.00,1600.00",
+		"EventAnchors/rain_shower": "1984.00,1472.00",
+		"HomePoints/bucket_1": "2368.00,1856.00",
+		"HomePoints/chicken_1": "2368.00,448.00",
+		"HomePoints/chicken_2": "1728.00,1856.00",
+		"HomePoints/chicken_3": "3520.00,1344.00",
+		"HomePoints/duck_1": "960.00,1344.00",
+		"HomePoints/duck_2": "1216.00,1728.00",
+		"HomePoints/duck_3": "704.00,1728.00",
+		"HomePoints/pig_1": "3264.00,1728.00",
+		"Markers/Spawn": "448.00,1216.00",
+		"Zones/mud_lane": "2496.00,1472.00 Rect 512.00,384.00 @64.00,64.00",
+		"Zones/pig_pen": "3264.00,960.00 Rect 384.00,384.00 @0.00,0.00",
+		"Zones/pond": "1984.00,1216.00 Rect 512.00,512.00 @64.00,-192.00",
+		"Zones/trough": "1216.00,448.00 Rect 256.00,256.00 @0.00,0.00"
+	},
+	"props": {
+		"Boulder16": "1694.00,1252.00",
+		"Boulder17": "3776.00,1600.00",
+		"Prop1": "320.00,612.00 r30.00",
+		"Prop10": "1064.00,376.00 r0.00",
+		"Prop11": "1370.00,376.00 r0.00",
+		"Prop12": "832.00,832.00 r0.00",
+		"Prop13": "1344.00,1472.00 r0.00",
+		"Prop14": "3392.00,1472.00 r0.00",
+		"Prop15": "2240.00,1856.00 r0.00",
+		"Prop2": "1600.00,484.00 r30.00",
+		"Prop3": "3776.00,612.00 r30.00",
+		"Prop4": "2752.00,2020.00 r30.00",
+		"Prop5": "192.00,2020.00 r30.00",
+		"Prop6": "3044.00,740.00 r0.00",
+		"Prop7": "3486.00,740.00 r0.00",
+		"Prop8": "3044.00,1134.00 r0.00",
+		"Prop9": "3486.00,1134.00 r0.00"
+	},
+	"targets": {
+		"PenGate": "3264.00,1256.00 | Slot1 0.00,-296.00, Slot2 -128.00,-296.00, Slot3 128.00,-296.00",
+		"PondJetty": "2048.00,1236.00 | Slot1 -192.00,-276.00, Slot2 -64.00,-276.00, Slot3 64.00,-276.00, Slot4 192.00,-276.00, Slot5 -64.00,-404.00, Slot6 64.00,-404.00",
+		"Trough": "1216.00,448.00 | "
+	},
+	"tiles": {
+		"Details": "be3c4f2a4f4ee9a233d911ffc08ab8e62273d9fad36115ab8b27c0701af3a192",
+		"Grass": "b817819b13d09bef01818803c6c7170f9856afe0cec50061600dc49cb6fdc108",
+		"Sand": "7502b922ea6d20769c0620559699db963e04a0df5cbadbbff13bda29e3a8149f",
+		"Shore": "1bd34c5ab988dd8ce35ccf8ca51069a75c349076b5a0e7ab7c451ae4dc5a5e89"
+	}
+}
