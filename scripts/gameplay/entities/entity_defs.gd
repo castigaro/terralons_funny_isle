@@ -185,7 +185,7 @@ static func _check_entry(entry: Variant, fields: Dictionary, path: String, item_
 			"sprite":
 				if not value is String or not value.begins_with("res://assets/"):
 					errors.append("%s: must be a res://assets/ path" % fpath)
-				elif ctx.get("check_files", true) and not FileAccess.file_exists(value):
+				elif ctx.get("check_files", true) and not ResourceLoader.exists(value):
 					errors.append("%s: sprite not found: %s" % [fpath, value])
 			"key":
 				if not value is String or value == "":
