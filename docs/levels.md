@@ -146,7 +146,7 @@ A target may carry an `Art` sprite (gate, jetty, feed bowl, boat, sandcastle sta
 - No built-in `position_smoothing` and no `limit_*`. `offset` is never written: it is reserved for screen shake (BI-8).
 - Physics interpolation is on for the camera (Godot 4.7 forces cameras into physics processing when interpolation is on); `snap()` resets it.
 
-Balance (`data/balance/level.json`, namespace `level`): `camera_follow_speed` 7, `camera_max_step_px` 40, `camera_max_lag_px` 4, `camera_jitter_max_px` 0.5, `camera_lead_px` 60, `camera_edge_margin_px` 96, `bounds_thickness` 256, `backdrop_margin_viewports` 1, `walkable_probe_radius` 20, `restart_cue_seconds` 1, `palm_crown_px` 200, `palm_crown_lift_px` 80, `palm_footprint_radius` 18. The dash (about 1440 px/s, 24 px per tick) stays below the step cap.
+Balance (`data/balance/level.json`, namespace `level`): `camera_follow_speed` 7, `camera_max_step_px` 40, `camera_max_lag_px` 4, `camera_jitter_max_px` 0.5, `camera_lead_px` 60, `camera_edge_margin_px` 96, `bounds_thickness` 256, `backdrop_margin_viewports` 1, `walkable_probe_radius` 20, `restart_cue_seconds` 1, `palm_crown_px` 200, `palm_crown_lift_px` 80, `palm_footprint_radius` 18, `boat_bob_px` 3, `boat_bob_speed` 0.9 (rad/s), `boat_bob_tilt_deg` 1.5, `water_shadow_alpha_share` 0.6, `water_shadow_widen` 1.15. The dash (about 1440 px/s, 24 px per tick) stays below the step cap.
 
 ## Physics interpolation policy
 
@@ -186,11 +186,12 @@ Props, zones, markers and entities are placed by editing the scene (see `tests/s
 - `scenes/levels/props/palm.tscn` (`PalmProp`): a top-down pirate-pack palm crown (`tile_70`, `tile_71` default, `tile_72`; set `texture`) of `palm_crown_px` width, lifted `palm_crown_lift_px` above its base, drawn above the actors (absolute z-index 1, not y-sorted) so the castaway walks under its edge. It turns around its centre (`sway.gdshader`, `pivot_mode` 1), casts its shadow at the trunk base and has a solid footprint of `palm_footprint_radius` there. The pack has no trunk art, so the shadow marks the trunk.
 - `scenes/levels/props/sway_prop.tscn` (`SwayProp`): side-view foliage from the foliage packs, bent from its base. Bushes (`footprint_radius = 0`, walk-through) and jungle trees (`foliagePack_008`, `foliagePack_010` …, `shadow_width_share` 0.7 and a footprint) – these deciduous trees are not palms.
 - `scenes/levels/props/boulder.tscn`: solid boulder.
-- `scenes/levels/props/decor_prop.tscn` (`DecorProp`, BI-20): standing set dressing without physics (texture, `sprite_scale`, `shadow_width_share`, `shadow_base_y`; optional `Flame` child). `SwayProp.tint` colours white tufts per instance.
+- `scenes/levels/props/decor_prop.tscn` (`DecorProp`, BI-20): standing set dressing without physics (texture, `sprite_scale`, `shadow_width_share`, `shadow_base_y`; optional `Flame` child). BI-22 adds `shadow_style` (ground, water, none) and `bob` for props on the water. `SwayProp.tint` colours white tufts per instance.
 
 Set dressing per level (BI-20; gameplay positions, collision and layouts unchanged, guarded by `tests/levels/test_theme_decor.gd`):
 
 - Beach Camp: a ridge tent on the rock at (1600, 640), a crate stack and barrels on the rocks at (2368, 1536) and (2752, 1664), a campfire with a gentle flame on open sand at (1600, 832), three pieces of bleached driftwood on the southern beach and sand-green dune grass instead of hedges and flowers (`Prop10`–`Prop17`, same positions).
+- Lagoon (BI-22, guarded by `tests/levels/test_l4_lagoon_theme.gd` and the baseline `play_baseline_l4_lagoon.json`): stilt huts `HutWest` (1240, 1344), `HutEast` (3112, 1344, the mirrored hut) and `HutNorth` (1664, 1100) on the lagoon water; docks under `GroundDecor` from the shore to each hut – `DockB1`/`DockB2` (y 1290, x 896–1152), `DockC1`/`DockC2` (y 1290, x 3200–3456), `DockD1`/`DockD2` (x 1664, y 640–896) – and `DockA1`/`DockA2` (x 1480, y 1856–2112) near the spawn and the `LagoonJetty`; boats in group `boat`: `Boat1` (small, 1300, 2010), `Boat2` (large, 2950, 1850) and the dinghy `Boat3` (260, 2650) in the south-west sea notch. All decor stays outside the zones and at least 192 px from home points, slots, event anchors and the spawn; the `LagoonJetty` and `BeachFlag` art is unchanged.
 - Farm Meadow: a fence around the pig pen with a 118 px gap above the pen gate (the corner hedges `Prop6`–`Prop9` stay), a ploughed field with crop rows on the grass west of the pen (2624–2944 × 704–1088, clear of zones, lanes and home points) and a barn as the sprite of `Boulder17`.
 
 ## Tests

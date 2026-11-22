@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=3]
+[gd_scene load_steps=45 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_base.tscn" id="1_base"]
 [ext_resource type="PackedScene" path="res://scenes/castaway/castaway.tscn" id="2_castaway"]
@@ -31,6 +31,14 @@
 [ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack-derived/sandcastle_3@2.png" id="t_castle3"]
 [ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack-derived/sandcastle_flat@2.png" id="t_flat"]
 [ext_resource type="PackedScene" path="res://scenes/levels/props/zone_marker.tscn" id="zm_marker"]
+[ext_resource type="PackedScene" path="res://scenes/levels/props/decor_prop.tscn" id="16_decor"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_dock_h@2.png" id="td_dock_h"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_dock_v@2.png" id="td_dock_v"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_hut_stilt@2.png" id="td_hut_stilt"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_hut_stilt_b@2.png" id="td_hut_stilt_b"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_boat_small@2.png" id="td_boat_small"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_boat_large@2.png" id="td_boat_large"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/lagoon_dinghy@2.png" id="td_dinghy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_beach"]
 size = Vector2(640, 384)
@@ -246,6 +254,42 @@ flattened_frame = ExtResource("t_flat")
 [node name="Art" type="Sprite2D" parent="Actors/Sandcastle"]
 texture = ExtResource("t_castle0")
 
+[node name="HutWest" parent="Actors" instance=ExtResource("16_decor")]
+position = Vector2(1240, 1344)
+texture = ExtResource("td_hut_stilt")
+shadow_style = 1
+
+[node name="HutEast" parent="Actors" instance=ExtResource("16_decor")]
+position = Vector2(3112, 1344)
+texture = ExtResource("td_hut_stilt_b")
+shadow_style = 1
+
+[node name="HutNorth" parent="Actors" instance=ExtResource("16_decor")]
+position = Vector2(1664, 1100)
+texture = ExtResource("td_hut_stilt")
+shadow_style = 1
+
+[node name="Boat1" parent="Actors" groups=["boat"] instance=ExtResource("16_decor")]
+position = Vector2(1300, 2010)
+texture = ExtResource("td_boat_small")
+shadow_base_y = -58.0
+shadow_style = 1
+bob = true
+
+[node name="Boat2" parent="Actors" groups=["boat"] instance=ExtResource("16_decor")]
+position = Vector2(2950, 1850)
+texture = ExtResource("td_boat_large")
+shadow_base_y = -72.0
+shadow_style = 1
+bob = true
+
+[node name="Boat3" parent="Actors" groups=["boat"] instance=ExtResource("16_decor")]
+position = Vector2(260, 2650)
+texture = ExtResource("td_dinghy")
+shadow_base_y = -49.0
+shadow_style = 1
+bob = true
+
 [node name="Spawn" parent="Markers"]
 position = Vector2(1600, 2368)
 
@@ -339,6 +383,38 @@ event_id = "big_wave"
 
 [node name="EventEffects" type="Node2D" parent="."]
 script = ExtResource("10_effects")
+
+[node name="DockA1" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(1480, 1920)
+texture = ExtResource("td_dock_v")
+
+[node name="DockA2" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(1480, 2048)
+texture = ExtResource("td_dock_v")
+
+[node name="DockB1" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(960, 1290)
+texture = ExtResource("td_dock_h")
+
+[node name="DockB2" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(1088, 1290)
+texture = ExtResource("td_dock_h")
+
+[node name="DockC1" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(3264, 1290)
+texture = ExtResource("td_dock_h")
+
+[node name="DockC2" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(3392, 1290)
+texture = ExtResource("td_dock_h")
+
+[node name="DockD1" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(1664, 704)
+texture = ExtResource("td_dock_v")
+
+[node name="DockD2" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(1664, 832)
+texture = ExtResource("td_dock_v")
 
 [node name="sandcastle" parent="ZoneMarkers" instance=ExtResource("zm_marker")]
 zone_id = "sandcastle"

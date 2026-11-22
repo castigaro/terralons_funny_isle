@@ -11,5 +11,10 @@
 	"restart_cue_seconds": 1.0,
 	"palm_crown_px": 200,
 	"palm_crown_lift_px": 80,
-	"palm_footprint_radius": 18
+	"palm_footprint_radius": 18,
+	"boat_bob_px": 3,
+	"boat_bob_speed": 0.9,
+	"boat_bob_tilt_deg": 1.5,
+	"water_shadow_alpha_share": 0.6,
+	"water_shadow_widen": 1.15
 }
