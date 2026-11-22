@@ -28,13 +28,13 @@ fixture.chicken_a_hint,Carry the chicken to zone A.,Trag das Huhn zu Zone A.
 fixture.chicken_a_fail,The chicken never reached zone A!,Das Huhn war nie in Zone A!
 fixture.hens_in_coop_title,Chickens into the coop,Hühner in den Stall
 fixture.hat_on_goat_title,A hat for the goat,Ein Hut für die Ziege
-fixture.coconut_run_title,Coconuts for the monkey,Kokosnüsse für den Affen
+fixture.coconut_run_title,Coconuts to the monkey,Kokosnüsse zum Affen
 fixture.quick_pig_title,Catch the speedy pig,Fang das flinke Schwein
 fixture.reach_a_title,Visit zone A,Besuche Zone A
 fixture.reach_b_title,Visit zone B,Besuche Zone B
 fixture.grab_coconut_title,Grab the coconut,Schnapp die Kokosnuss
-fixture.chicken_a_title,Bring the runaway chicken to zone A,Bring das ausgebüxte Huhn zur Zone A
-fixture.long_title,Bring the lost penguin to the beach,Bring den verirrten Pinguin zurück an den Strand
+fixture.chicken_a_title,Chicken to zone A,Huhn zur Zone A
+fixture.long_title,Bring the penguin home,Pinguin heim zum Strand
 fixture.prompt_move,Run!,Lauf!
 fixture.prompt_dash,Dash!,Sprinte!
 fixture.prompt_grab,Grab the chicken,Schnapp dir das Huhn

@@ -1,9 +1,11 @@
 extends "res://tests/support/level_case.gd"
 ## HUD layout at 1280x720 and 1920x1080: every panel inside the screen, no two visible panels overlap with all
-## panels shown, the hint button is at least 44 px, and panels under the castaway fade out and back in.
+## panels shown, the hint button is at least 44 px, task titles fit on one line without ellipsis, the task panel
+## keeps a gap to the timer, and panels under the castaway fade out and back in.
 
 const SIZES := [Vector2(1280, 720), Vector2(1920, 1080)]
 const MIN_TOUCH_PX := 44.0
+const MIN_TIMER_GAP_PX := 16.0
 
 
 static func check_layout(t: TestCase, hud: Hud, view: Vector2, tag: String) -> void:
@@ -20,6 +22,21 @@ static func check_layout(t: TestCase, hud: Hud, view: Vector2, tag: String) -> v
 			t.check(not a.grow(-0.5).intersects(b.grow(-0.5)), "%s %s overlaps %s" % [tag, names[i], names[j]])
 
 
+## Every task title is one line whose text fits the label (no ellipsis) and the task panel ends left of the timer.
+static func check_task_titles(t: TestCase, hud: Hud, tag: String) -> void:
+	var labels := hud.panel("TaskPanel").find_children("NameLabel", "Label", true, false)
+	t.check(labels.size() > 0, "%s task titles found" % tag)
+	for node in labels:
+		var label := node as Label
+		t.check_eq(label.get_line_count(), 1, "%s '%s' on one line" % [tag, label.text])
+		var width := label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
+				label.get_theme_font_size("font_size")).x
+		t.check(width <= label.size.x, "%s '%s' fits without ellipsis: %.0f <= %.0f" % [tag, label.text, width,
+				label.size.x])
+	var gap := hud.panel("TimerPanel").get_global_rect().position.x - hud.panel("TaskPanel").get_global_rect().end.x
+	t.check(gap >= MIN_TIMER_GAP_PX, "%s task panel %.0f px left of the timer" % [tag, gap])
+
+
 func test_panels_inside_and_apart_at_both_sizes() -> void:
 	await open_level()
 	var hud := level.hud()
@@ -34,6 +51,7 @@ func test_panels_inside_and_apart_at_both_sizes() -> void:
 		check_layout(self, hud, view, tag)
 		var hb := hud.hint_button().get_global_rect().size
 		check(hb.x >= MIN_TOUCH_PX and hb.y >= MIN_TOUCH_PX, "%s hint button %s >= 44 px" % [tag, str(hb)])
+		check_task_titles(self, hud, tag)
 	for view in SIZES:
 		hud.set_layout_size(view)
 		hud.overflow_sample()

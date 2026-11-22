@@ -3,7 +3,7 @@ extends Node2D
 ## World-space key prompt bubble from level data ({id, anchor, action, text_key}): follows its anchor node and
 ## frees itself for good once the player has used its action (PromptMemory), also after restarts.
 
-const FONT_PATH := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+const FONT_PATH := MenuTheme.FONT
 const KEY_CAP_SCENE := preload("res://scenes/ui/key_cap.tscn")
 ## Prompt action -> input actions whose first keys the key cap shows.
 const ACTION_KEYS := {

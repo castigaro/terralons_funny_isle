@@ -19,7 +19,7 @@ The in-level HUD always shows what to do, how much time is left and why somethin
 
 Logical 1920x1080 coordinates, scaled uniformly to the visible area: task panel and hint row top-left, timer with the 3-star time top-right, failure cue below the timer, "Finish!" banner and interact prompt bottom-centre. The `LevelCue` ("Go!", "Restarted!") stays top-centre on its own layer. Panels the castaway walks under fade to `occlude_alpha` within `occlude_fade_seconds`. The HUD layer (80) lies between the feedback screen layer and the `LevelCue` layer. No survival stats.
 
-- Task rows: required/optional star, translated tag (`hud.required`/`hud.optional`), title (`title_key`, else `hint_key`, up to `task_name_max_lines`), `cur/target`, check or cross once done or missed.
+- Task rows: required/optional star, translated tag (`hud.required`/`hud.optional`), title (`title_key`, else `hint_key`) on one line at `task_name_width_px` (480 logical px, `task_name_max_lines` 1; an ellipsis is only a safety net – `tests/ui/test_hud_task_title_width.gd` measures every EN and DE title, so titles that do not fit are shortened in `i18n/level.csv`), `cur/target`, check or cross once done or missed.
 - Timer: `m:ss`, rounded up; in the last `rules.timer_warning_seconds` it turns `ui_warning` and pulses; the reduce flashes setting keeps the colour without pulse.
 - 3-star time: the countdown value down to which 3 stars are still reachable (`LevelSession.three_star_time()`); the star turns to an outline once missed.
 

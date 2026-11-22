@@ -5,7 +5,7 @@ extends CanvasLayer
 ## LevelSession every frame, reacts to EventBus signals and never changes the session. The layout uses logical
 ## 1920x1080 coordinates at the screen edges; panels fade when the castaway walks under them. See docs/hud.md.
 
-const FONT_PATH := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+const FONT_PATH := MenuTheme.FONT
 const STAR_FULL := "res://assets/ui/ui-pack/PNG/Yellow/Default/star.png"
 const STAR_EMPTY := "res://assets/ui/ui-pack/PNG/Yellow/Default/star_outline.png"
 const ICON_DONE := "res://assets/ui/ui-pack/PNG/Blue/Default/icon_checkmark.png"
@@ -283,8 +283,12 @@ func _build_rows(tasks: Array) -> void:
 				ArtPalette.color("ui_accent" if bool(task.get("required", false)) else "ui_text"))
 		box.add_child(tag)
 		var name_label := _label("NameLabel", int(_cfg.get("task_font_size", font_size)))
-		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		# One line at a fixed width; the ellipsis is only a safety net, the titles are measured to fit.
+		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 		name_label.max_lines_visible = int(_cfg.get("task_name_max_lines", 1))
+		name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_label.clip_text = true
+		name_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		name_label.custom_minimum_size = Vector2(float(_cfg.get("task_name_width_px", 1)), 0.0)
 		box.add_child(name_label)
 		var progress := _label("ProgressLabel", font_size)

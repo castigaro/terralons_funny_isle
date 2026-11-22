@@ -1,11 +1,11 @@
 class_name MenuTheme
 extends RefCounted
-## Builds the shared menu theme from data/balance/flow.json and the art palette: Kenney Future for headings and
-## buttons, Kenney Future Narrow for body text, the blue depth buttons, slider and checkbox textures of the UI pack
-## and a high-contrast focus outline (shape, not colour only).
+## Builds the shared menu theme from data/balance/flow.json and the art palette: one display font for every text
+## (headings and body differ only by size and colour), the blue depth buttons, slider and checkbox textures of the UI
+## pack and a high-contrast focus outline (shape, not colour only).
 
-const FONT_HEADING := "res://assets/ui/ui-pack/Font/Kenney Future.ttf"
-const FONT_BODY := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+## The only UI font: Kenney Future with fixed X, x, %, sharp s and en dash glyphs (tools/derive_font.py).
+const FONT := "res://assets/ui/fonts-derived/Kenney Future Fixed.ttf"
 const BUTTON_TEX := "res://assets/ui/ui-pack/PNG/Blue/Default/button_rectangle_depth_gradient.png"
 const TILE_TEX := "res://assets/ui/ui-pack/PNG/Blue/Default/button_square_depth_gradient.png"
 const SLIDER_TRACK := "res://assets/ui/ui-pack/PNG/Blue/Default/slide_horizontal_grey.png"
@@ -29,12 +29,17 @@ static func get_theme() -> Theme:
 	return _cached
 
 
+## The shared UI font (MenuTheme.FONT).
+static func font() -> FontFile:
+	return load(FONT) as FontFile
+
+
 static func heading_font() -> FontFile:
-	return load(FONT_HEADING) as FontFile
+	return font()
 
 
 static func body_font() -> FontFile:
-	return load(FONT_BODY) as FontFile
+	return font()
 
 
 ## The high-contrast focus outline of buttons, checkboxes and the slider focus ring (MenuScreen.add_focus_ring).

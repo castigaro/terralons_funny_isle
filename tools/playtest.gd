@@ -1,6 +1,7 @@
 extends SceneTree
 ## Visual playtest: menus, then the bot plays every level through the real flow; screenshots, audio peaks, a summary.
-## Started by tools/playtest.py; arguments after "--": --out=<dir> [--levels=l1,l3] [--every=<seconds>]
+## Started by tools/playtest.py; arguments after "--": --out=<dir> [--levels=l1,l3] [--every=<seconds>] [--locale=en|de]
+## Shots carry the locale suffix; every level adds a pause menu shot, the first played level a lost result at the end.
 
 var bot_plans: Script
 var bot_planner: Script
@@ -10,6 +11,7 @@ var action_input: Script
 var out := ""
 var only: Array = []
 var every_ms := 9000
+var locale := "en"
 var main: Node
 var bus: Node
 var shot_n := 0
@@ -25,6 +27,8 @@ func _initialize() -> void:
 			only = Array(arg.substr(9).split(","))
 		elif arg.begins_with("--every="):
 			every_ms = int(float(arg.substr(8)) * 1000.0)
+		elif arg.begins_with("--locale="):
+			locale = arg.substr(9)
 	if out == "":
 		push_error("playtest: --out=<dir> is required")
 		quit(1)
@@ -67,7 +71,7 @@ func _shot(name: String) -> void:
 	await _frames(3)
 	await RenderingServer.frame_post_draw
 	shot_n += 1
-	var file := "%02d_%s.png" % [shot_n, name]
+	var file := "%02d_%s_%s.png" % [shot_n, name, locale]
 	root.get_texture().get_image().save_png(out.path_join(file))
 	_l("SHOT %s" % file)
 
@@ -79,12 +83,14 @@ func _audio(where: String) -> void:
 
 
 func _run() -> void:
-	await _shot("title_en")
+	var i18n := root.get_node("I18n")
+	for i in 2:
+		if i18n.call("get_locale") != locale:
+			main.call("toggle_language")
+			await _frames(10)
+	_l("LOCALE %s" % i18n.call("get_locale"))
+	await _shot("title")
 	_audio("title")
-	main.call("toggle_language")
-	await _frames(10)
-	await _shot("title_de")
-	main.call("toggle_language")
 	main.call("show_screen", 2, 1)  # level select, coming from the title
 	await _frames(10)
 	await _shot("level_select")
@@ -92,9 +98,13 @@ func _run() -> void:
 	await _frames(10)
 	await _shot("settings")
 	var levels: Array = root.get_node("Progress").call("campaign").call("ids")
+	var played: Array = []
 	for id in levels:
 		if only.is_empty() or only.any(func(o): return id.begins_with(o)):
 			await _play(id)
+			played.append(id)
+	if not played.is_empty():
+		await _lose(played[0])
 	main.call("show_screen", 4, 2)  # credits
 	await _frames(20)
 	await _shot("credits")
@@ -128,6 +138,7 @@ func _play(id: String) -> void:
 	root.add_child(input)
 	await _shot("%s_start" % id)
 	_audio("%s start" % id)
+	await _pause_shot(id)
 	var t0 := Time.get_ticks_msec()
 	var next_shot := every_ms / 2
 	while main.call("current_screen") == 6 and Time.get_ticks_msec() - t0 < 320000:  # 6 = PLAYING
@@ -148,6 +159,36 @@ func _play(id: String) -> void:
 	_l("PLAYTEST level=%s won=%s stars=%s bot_s=%.1f timer_s=%.0f time_left_s=%.1f used=%d%%" % [
 		id, str(result.get("won")), str(result.get("stars")), bot_s, timer, float(result.get("time_left", 0.0)),
 		int(round(100.0 * bot_s / timer)) if timer > 0.0 else 0])
+
+
+## Opens the pause menu through the real pause key, takes a shot and resumes.
+func _pause_shot(id: String) -> void:
+	for pressed in [true, false]:
+		var key := InputEventKey.new()
+		key.physical_keycode = KEY_ESCAPE
+		key.keycode = KEY_ESCAPE
+		key.pressed = pressed
+		Input.parse_input_event(key)
+		await _frames(2)
+	await _frames(10)
+	await _shot("%s_pause" % id)
+	main.call("resume_game")
+	await _frames(2)
+
+
+## Replays a level without the bot and runs its whole timer down in one tick (as tests/support/flow_case.gd does).
+func _lose(id: String) -> void:
+	if not main.call("start_level_flow", id, false):
+		_l("CANNOT START %s" % id)
+		return
+	await _frames(15)
+	var lvl: Node = main.call("level")
+	var def: Variant = lvl.call("level_def")
+	lvl.call("level_session").call("tick", float(def.get("timer_seconds")) + 1.0, lvl.call("build_snapshot"))
+	await _frames(30)
+	await _shot("%s_result_loss" % id)
+	var result: Dictionary = main.call("last_result")
+	_l("PLAYTEST loss level=%s won=%s stars=%s" % [id, str(result.get("won")), str(result.get("stars"))])
 
 
 func _finish(why: String, code: int) -> void:

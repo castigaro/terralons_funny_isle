@@ -1,7 +1,7 @@
 extends CanvasLayer
 ## On-screen caption of the announcer line: centred panel near the top, at most two lines, translated live.
 
-const FONT_PATH := "res://assets/ui/ui-pack/Font/Kenney Future Narrow.ttf"
+const FONT_PATH := MenuTheme.FONT
 
 var _tuning: AudioTuning = AudioTuning.new()
 var _root: Control
