@@ -1,0 +1,335 @@
+{
+	"event_anchors": {
+		"coconut_volley": [
+			2752.0,
+			320.0
+		],
+		"goat_rush": [
+			256.0,
+			1792.0
+		]
+	},
+	"home_points": {
+		"frog_1": [
+			1216.0,
+			2240.0
+		],
+		"frog_2": [
+			2880.0,
+			2112.0
+		],
+		"frog_3": [
+			576.0,
+			1472.0
+		],
+		"goat_1": [
+			3712.0,
+			2240.0
+		],
+		"parrot_1": [
+			2752.0,
+			1152.0
+		]
+	},
+	"layout_sha256": "985efe9b9b92bf5cb7b4b16a3c7d75b08f6bfba7777633a3395a876b23cad0b7",
+	"legacy_props": {
+		"Boulder21": {
+			"footprint_radius": -1.0,
+			"position": [
+				3904.0,
+				1792.0
+			]
+		},
+		"Prop1": {
+			"footprint_radius": 30.0,
+			"position": [
+				1408.0,
+				548.0
+			]
+		},
+		"Prop10": {
+			"footprint_radius": 0.0,
+			"position": [
+				1088.0,
+				448.0
+			]
+		},
+		"Prop11": {
+			"footprint_radius": 0.0,
+			"position": [
+				576.0,
+				832.0
+			]
+		},
+		"Prop12": {
+			"footprint_radius": 0.0,
+			"position": [
+				1088.0,
+				832.0
+			]
+		},
+		"Prop13": {
+			"footprint_radius": 0.0,
+			"position": [
+				3136.0,
+				448.0
+			]
+		},
+		"Prop14": {
+			"footprint_radius": 0.0,
+			"position": [
+				3648.0,
+				448.0
+			]
+		},
+		"Prop15": {
+			"footprint_radius": 0.0,
+			"position": [
+				3136.0,
+				832.0
+			]
+		},
+		"Prop16": {
+			"footprint_radius": 0.0,
+			"position": [
+				3648.0,
+				832.0
+			]
+		},
+		"Prop17": {
+			"footprint_radius": 0.0,
+			"position": [
+				1856.0,
+				2240.0
+			]
+		},
+		"Prop18": {
+			"footprint_radius": 0.0,
+			"position": [
+				3456.0,
+				1536.0
+			]
+		},
+		"Prop19": {
+			"footprint_radius": 0.0,
+			"position": [
+				2240.0,
+				1216.0
+			]
+		},
+		"Prop2": {
+			"footprint_radius": 30.0,
+			"position": [
+				2560.0,
+				868.0
+			]
+		},
+		"Prop20": {
+			"footprint_radius": 0.0,
+			"position": [
+				832.0,
+				2048.0
+			]
+		},
+		"Prop3": {
+			"footprint_radius": 30.0,
+			"position": [
+				3840.0,
+				1380.0
+			]
+		},
+		"Prop4": {
+			"footprint_radius": 30.0,
+			"position": [
+				448.0,
+				2404.0
+			]
+		},
+		"Prop5": {
+			"footprint_radius": 30.0,
+			"position": [
+				2304.0,
+				2404.0
+			]
+		},
+		"Prop6": {
+			"footprint_radius": 30.0,
+			"position": [
+				1664.0,
+				1508.0
+			]
+		},
+		"Prop7": {
+			"footprint_radius": 30.0,
+			"position": [
+				3008.0,
+				2404.0
+			]
+		},
+		"Prop8": {
+			"footprint_radius": 30.0,
+			"position": [
+				1216.0,
+				1124.0
+			]
+		},
+		"Prop9": {
+			"footprint_radius": 0.0,
+			"position": [
+				576.0,
+				448.0
+			]
+		}
+	},
+	"level_json_sha256": "90a33a08576b7167ac0cab45fd9ca51355c471b26554c1d74296d5551c099d54",
+	"markers": {
+		"Spawn": [
+			448.0,
+			1216.0
+		]
+	},
+	"solids": [
+		"[1,1216.0,1124.0,\"circle\",30.0]",
+		"[1,1408.0,548.0,\"circle\",30.0]",
+		"[1,1664.0,1508.0,\"circle\",30.0]",
+		"[1,2304.0,2404.0,\"circle\",30.0]",
+		"[1,2560.0,868.0,\"circle\",30.0]",
+		"[1,3008.0,2404.0,\"circle\",30.0]",
+		"[1,3840.0,1380.0,\"circle\",30.0]",
+		"[1,3904.0,1792.0,\"circle\",44.0]",
+		"[1,448.0,2404.0,\"circle\",30.0]"
+	],
+	"targets": {
+		"Actors/PenGate": {
+			"kind": "pen",
+			"position": [
+				3392.0,
+				1000.0
+			],
+			"slots": [
+				[
+					3264.0,
+					704.0
+				],
+				[
+					3520.0,
+					704.0
+				],
+				[
+					3392.0,
+					576.0
+				],
+				[
+					3392.0,
+					832.0
+				]
+			]
+		},
+		"Actors/PerchGate": {
+			"kind": "perch",
+			"position": [
+				832.0,
+				936.0
+			],
+			"slots": [
+				[
+					704.0,
+					640.0
+				],
+				[
+					960.0,
+					640.0
+				],
+				[
+					832.0,
+					512.0
+				],
+				[
+					832.0,
+					768.0
+				]
+			]
+		},
+		"Actors/PondJetty": {
+			"kind": "pond",
+			"position": [
+				2048.0,
+				1236.0
+			],
+			"slots": [
+				[
+					1856.0,
+					960.0
+				],
+				[
+					1984.0,
+					960.0
+				],
+				[
+					2112.0,
+					960.0
+				],
+				[
+					2240.0,
+					960.0
+				],
+				[
+					1984.0,
+					832.0
+				],
+				[
+					2112.0,
+					832.0
+				]
+			]
+		}
+	},
+	"tiles": {
+		"Details": "empty",
+		"Grass": "eaa7c552a7d11ff3e5323fb170ea70f86e8d0da418100f1c0b447020ce085279",
+		"Sand": "cc323294d9479f2054a3e8238673d6fc8778d66779149cf1412953a6cc6b9497",
+		"Shore": "f4137d9a3848751cb6a6fc6459e5c4574fdb0a44652260eebbb2099e9861cb1a"
+	},
+	"zones": {
+		"goat_lane": [
+			[
+				384.0,
+				1664.0,
+				3584.0,
+				256.0
+			]
+		],
+		"goat_pen": [
+			[
+				3200.0,
+				512.0,
+				384.0,
+				384.0
+			]
+		],
+		"monkey_perch": [
+			[
+				2560.0,
+				320.0,
+				384.0,
+				256.0
+			]
+		],
+		"perch": [
+			[
+				640.0,
+				448.0,
+				384.0,
+				384.0
+			]
+		],
+		"pond": [
+			[
+				1792.0,
+				768.0,
+				512.0,
+				512.0
+			]
+		]
+	}
+}

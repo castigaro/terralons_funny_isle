@@ -12,7 +12,11 @@
 		"ui_accent": "#ffc93c",
 		"ui_warning": "#ff6b4a",
 		"shadow": "#1e3b3f",
-		"zone_marker": "#fff4d6"
+		"zone_marker": "#fff4d6",
+		"jungle_leaf": "#3f8f4a",
+		"jungle_leaf_deep": "#2b6b3a",
+		"jungle_fern": "#5aa84f",
+		"jungle_canopy": "#8fbf96"
 	},
 	"water_tint": "water",
 	"highlight": "#ffffff",

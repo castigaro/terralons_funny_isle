@@ -34,6 +34,10 @@ Rules for the polished top-down look (GDQuest demos, Kenney top-down games). Eve
 | `ui_text` | `#f7f3e8` | text on `ui_panel` (contrast at least 4.5:1) |
 | `ui_accent` | `#ffc93c` | highlights, stars |
 | `shadow` | `#1e3b3f` | drop shadow colour (gradient of `soft_shadow.tres`) |
+| `jungle_canopy` | `#8fbf96` | L3 tint of the lime foliage-pack trees and bushes (multiplied, deeper green) |
+| `jungle_leaf` | `#3f8f4a` | L3 tint of the white large-leaf sprites |
+| `jungle_leaf_deep` | `#2b6b3a` | L3 tint of the white creepers and tall leafy plants |
+| `jungle_fern` | `#5aa84f` | L3 tint of the white fern and grass tufts |
 
 The water highlight bands are white with alpha 0.2 (`highlight`, `highlight_alpha`).
 
@@ -49,7 +53,7 @@ Bottom to top in every level (`scenes/levels/level_base.tscn`):
 6. `ZoneMarkers` – one `ZoneMarker` per player-action zone (pens, ponds, perches, the trough, the sandcastle site, the shelter and the mud pool): a nine-patch outline on the zone bounds, `z_index = -2`, drawn after the ground and below the actors.
 7. `Actors` – castaway, animals, items and props, `y_sort_enabled`.
 
-- The ground layers (1–5) and `ZoneMarkers` have `z_index = -2`, shadows `-1`, everything else 0 or more. No other node uses a negative z-index.
+- The ground layers (1–5) and `ZoneMarkers` have `z_index = -2`, shadows `-1`, use target art (gates, jetties) `-1`, everything else 0 or more. The only other negative z-index is the L3 ground cover (`-2`, drawn after the ground layers by tree order, below every actor and shadow).
 - Everything in `Actors` is y-sorted at its base: props have their origin at the bottom of the sprite, actors at their feet or centre.
 - UI is drawn on `CanvasLayer`s above the level (cue layer 90, error panel layer 100).
 
@@ -60,6 +64,13 @@ Bottom to top in every level (`scenes/levels/level_base.tscn`):
 - Zone markers: `assets/graphics/pirate-pack-derived/zone_marker@2.png`, a 64 px nine-patch (margins 24, transparent centre) with a dark outer line in palette `outline` (3 px, at least 3:1 on grass and on sand) and a light inner line in palette `zone_marker` (2.5 px), scaled ×2 in the world. Shape and the zone props are the non-colour cue; there is no fill and no animation. Area zones (the L4 beach and lagoon) and helper zones (lanes, flee areas, event perches) stay unmarked.
 - Sandcastle frames: `tools/derive_sandcastle.gd` recolours the pack's tower tiles onto a ramp of palette sand (site ring, small tower, tower, keep) and draws the flattened frame as a wide low mound; every frame is transparent around its silhouette.
 - Opt-in screenshot check: `python tools/flat_area_check.py <playtest dir>` reports 96 px windows with a luma standard deviation below 0.015 outside the HUD bands, water and sand.
+
+## Jungle look (BI-21)
+
+- Grass tint: the L3 `Grass` layer draws through `scenes/levels/art/grass_tint.gdshader` with `grass_tint` Color(0.62, 0.78, 0.62). The shader multiplies only green pixels (weight `smoothstep(0.04, 0.12, g - max(r, b))`), so the sand strip baked into the derived edge, corner and inner-corner tiles keeps its colour and the edges stay seamless against the `Sand` layer; the tile data is unchanged. `scripts/levels/grass_tint.gd` (`GrassTint`) mirrors the constants for tests (fill luma drop at least 15 %, sand change below 1 %). Other levels may reuse the shader with their own tint.
+- Decoration layers (`scenes/levels/decor/l3_jungle_decor.tscn`, generated, instanced once under `Actors`): ground cover (`Ground…`, `z_index` -2, `cast_shadow = false`, so a small tuft never gets the 48 px minimum shadow), bushes (`Bush…`) and canopy (`Canopy…`: trees, creepers, palms), both y-sorted with the actors. Every decoration prop is walk-through (`footprint_radius` 0, palms `solid = false`).
+- Canopy fade: a `SwayProp` with `occlusion_fade = true` polls the `actor` group (castaway, animals, items) every physics tick and fades only its sprite (`modulate.a`) to `canopy_fade_alpha` 0.45 within `canopy_fade_seconds` 0.2 while an actor stands behind its crown: inside the upper `canopy_crown_share` 0.75 of a side-view sprite grown by `canopy_fade_margin_px` 24 and above its base line, or anywhere under a palm crown drawn above all actors. It stays faded until the actor leaves the crown plus `canopy_fade_hysteresis_px` 16, fade-in and fade-out run at the same rate, the shadow and the palette tint (`self_modulate`) never change. The L3 trees and bushes of 1.1.0 fade as well.
+- Clearance: no decoration sprite touches a zone rectangle grown by 32 px; bushes and canopy keep more than 96 px from every home point, the spawn, event anchors, use targets and their drop slots (`tests/levels/test_l3_jungle_theme.gd`).
 
 ## Motion
 
