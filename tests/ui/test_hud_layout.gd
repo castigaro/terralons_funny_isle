@@ -145,3 +145,47 @@ func _castaway_clear_of_panels(hud: Hud, rect: Rect2) -> bool:
 		if (r as Rect2).intersects(hud.castaway_safe_rect()):
 			return false
 	return rect.size != Vector2.ZERO
+
+
+func test_star_goal_tick_fits_when_paused() -> void:
+	await open_level(L1)
+	var hud := level.hud()
+	var gap_px := float(Balance.get_value("hud", "star_goal_gap_px"))
+	for loc in ["en", "de"]:
+		for view in SIZES:
+			var tag := "L1 %s %dx%d secured" % [loc, view.x, view.y]
+			level.restart_level()
+			await frames(2)
+			I18n.set_locale(loc)
+			hud.set_layout_size(view)
+			hud.set_process(false)
+			await _win_with_all_tasks(tag)
+			check_eq(hud.star_goal_state(), HudModel.StarGoal.SECURED, "%s state" % tag)
+			var tick := hud.panel("StarGoalState")
+			check(tick.visible, "%s tick visible" % tag)
+			check(hud.panel("TimerPanel").get_global_rect().grow(0.5).encloses(tick.get_global_rect()),
+					"%s tick inside the timer panel" % tag)
+			var last_star := hud.panel(Hud.STAR_GOAL_ICONS[-1]).get_global_rect()
+			var gap := hud.panel("StarGoalLabel").get_global_rect().position.x - last_star.end.x
+			check(gap >= gap_px * hud.root_control().scale.x - 0.5, "%s label %.1f px after the stars" % [tag, gap])
+			check_layout(self, hud, view, tag)
+			hud.set_process(true)
+	I18n.set_locale("en")
+	hud.set_layout_size(Vector2.ZERO)
+
+
+## Marks every task done and finishes the level, so the session wins with 3 stars.
+func _win_with_all_tasks(tag: String) -> void:
+	var session := level.level_session()
+	for st in session.get("_tasks"):
+		st["done"] = true
+	await physics_frames(2)
+	await frames(1)
+	if session.get_state() != LevelSession.State.WON:
+		var ev := InputEventAction.new()
+		ev.action = &"finish"
+		ev.pressed = true
+		root().push_input(ev)
+		await frames(2)
+	check_eq(session.get_state(), LevelSession.State.WON, "%s won" % tag)
+	check_eq(int(session.result().get("stars", 0)), 3, "%s three stars" % tag)

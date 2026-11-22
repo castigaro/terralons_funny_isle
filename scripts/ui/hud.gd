@@ -177,6 +177,11 @@ func _build() -> void:
 		star.custom_minimum_size = Vector2(star_px, star_px)
 		stars_box.add_child(star)
 		_star_icons.append(star)
+	var star_gap := Control.new()
+	star_gap.name = "StarGoalGap"
+	star_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	star_gap.custom_minimum_size = Vector2(float(_cfg.get("star_goal_gap_px", 0)), 0.0)
+	timer_box.add_child(star_gap)
 	_star_label = _label("StarGoalLabel", int(_cfg.get("star_goal_font_size", 1)))
 	timer_box.add_child(_star_label)
 	_star_state = _icon("StarGoalState", ICON_DONE)
@@ -396,7 +401,11 @@ func _apply_star_goal(goal_state: int) -> void:
 		star.modulate.a = alpha
 	_star_label.modulate.a = alpha
 	_star_state.texture = load(ICON_DONE)
-	_star_state.visible = goal_state == HudModel.StarGoal.SECURED
+	var tick := goal_state == HudModel.StarGoal.SECURED
+	if _star_state.visible != tick:
+		_star_state.visible = tick
+		# The result screen pauses the tree, so _process no longer refits the timer panel for the tick.
+		force_layout()
 
 
 ## Current HudModel.StarGoal state, -1 before the first refresh or in sample mode.
@@ -411,6 +420,7 @@ func _star_goal_args() -> Dictionary:
 func _relabel_star_goal() -> void:
 	_star_label.text = I18n.t(STAR_GOAL_KEY, _star_goal_args())
 	_timer_panel.tooltip_text = I18n.t(STAR_GOAL_TIP_KEY, _star_goal_args())
+	force_layout()
 
 
 func _set_warning(on: bool) -> void:

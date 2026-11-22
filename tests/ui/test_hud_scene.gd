@@ -132,6 +132,8 @@ func test_star_goal_secured_after_win() -> void:
 	var st: Array = session.get("_tasks")
 	for i in range(1, st.size()):
 		st[i]["done"] = true
+	# The result screen pauses the tree, so the HUD must refit the timer panel without _process.
+	hud.set_process(false)
 	var ev := InputEventAction.new()
 	ev.action = &"finish"
 	ev.pressed = true
@@ -143,6 +145,26 @@ func test_star_goal_secured_after_win() -> void:
 	check(hud.panel("StarGoalState").visible, "tick shown")
 	check_eq((hud.panel("StarGoalState") as TextureRect).texture.resource_path, Hud.ICON_DONE, "tick icon")
 	_check_stars(hud, STAR_FULL, "secured")
+	var view := hud.get_viewport().get_visible_rect().size
+	var m := float(Balance.get_value("hud", "margin_px")) * hud.root_control().scale.x
+	var timer_rect := hud.panel("TimerPanel").get_global_rect()
+	check(timer_rect.end.x <= view.x - m + 0.5, "timer panel keeps the right margin: %.1f > %.1f" % [timer_rect.end.x,
+			view.x - m])
+	check(timer_rect.position.y >= m - 0.5, "timer panel keeps the top margin: %.1f" % timer_rect.position.y)
+	check(timer_rect.grow(0.5).encloses(hud.panel("StarGoalState").get_global_rect()), "tick inside the timer panel")
+	hud.set_process(true)
+
+
+func test_star_goal_gap_between_stars_and_label() -> void:
+	await open_level()
+	var hud := level.hud()
+	await frames(2)
+	check(hud.panel("StarGoalGap") != null, "gap spacer exists")
+	var gap_px := float(Balance.get_value("hud", "star_goal_gap_px")) * hud.root_control().scale.x
+	var last_star := hud.panel(Hud.STAR_GOAL_ICONS[-1]).get_global_rect()
+	var label_x := hud.panel("StarGoalLabel").get_global_rect().position.x
+	check(label_x - last_star.end.x >= gap_px - 0.5, "label %.1f px after the stars (>= %.1f)" % [label_x - last_star.end.x,
+			gap_px])
 
 
 func test_warning_colour_and_pulse() -> void:

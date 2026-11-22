@@ -24,8 +24,8 @@ Logical 1920x1080 coordinates, scaled uniformly to the visible area: task panel 
 - 3-star goal: three stars plus `hud.star_goal` ("needs m:ss left" / "braucht m:ss Rest") right of the timer, one line. The value is `LevelSession.three_star_time()` and follows the level's `three_star_share` override; the timer panel tooltip (`hud.star_goal_tip`) holds the long explanation. `HudModel.star_goal_state()` picks one of three states:
   - REACHABLE: time left at or above the threshold (inclusive, same EPSILON as `Stars.compute`), no task missed, not lost – full stars, normal colour, no tick.
   - MISSED: time left below the threshold, any task missed (optional ones too) or the level lost – outline stars and the label at `star_goal_missed_alpha` (0.6, still about 5:1 contrast on the panel); one-way, since time only goes down and missed and lost are final.
-  - SECURED: only when the level is won with 3 stars – full stars plus a tick. The tick never shows while running or after the required tasks are done.
-  Layout keys in `data/balance/hud.json`: `star_goal_font_size` (28), `star_goal_icon_px` (28), `star_goal_missed_alpha` (0.6).
+  - SECURED: only when the level is won with 3 stars – full stars plus a tick. The tick never shows while running or after the required tasks are done. When the tick appears or the label text changes, the HUD re-lays out the timer panel at once, so it stays inside the screen margin on the result screen, where the paused tree no longer runs `_process`.
+  Layout keys in `data/balance/hud.json`: `star_goal_font_size` (28), `star_goal_icon_px` (28), `star_goal_gap_px` (8, space between the stars and the label), `star_goal_missed_alpha` (0.6).
 
 ## Hints
 
