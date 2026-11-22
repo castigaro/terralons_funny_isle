@@ -17,8 +17,16 @@ func _tasks() -> Array:
 	return out
 
 
+const BUDGET_PX := 440.0
+
+
 func test_task_name_is_one_line() -> void:
 	check_eq(int(Balance.get_value("hud", "task_name_max_lines")), 1, "task_name_max_lines")
+
+
+func test_task_name_cap_stays_within_budget() -> void:
+	var cap := float(Balance.get_value("hud", "task_name_width_px"))
+	check(cap <= BUDGET_PX, "task_name_width_px %.0f <= %.0f" % [cap, BUDGET_PX])
 
 
 func test_every_task_title_fits_one_line() -> void:

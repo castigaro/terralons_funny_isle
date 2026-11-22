@@ -153,3 +153,22 @@ static func _has_text(node: Node) -> bool:
 		if _has_text(child):
 			return true
 	return false
+
+
+## Visible world prompt bubbles (ContextPrompt) must not sit under a visible HUD panel.
+static func check_hud_prompts(hud: Hud, prompts: Array, label: String) -> Array[String]:
+	var errors: Array[String] = []
+	var panels := hud.panel_rects()
+	for p in prompts:
+		if not is_instance_valid(p) or not (p as Node2D).is_visible_in_tree():
+			continue
+		var bubble := (p as ContextPrompt).bubble()
+		if bubble == null:
+			continue
+		var rect := hud.screen_rect_of(bubble, Rect2(Vector2.ZERO, bubble.size))
+		for panel_name: String in panels:
+			var prect: Rect2 = panels[panel_name]
+			if rect.grow(-WIDTH_SLACK).intersects(prect.grow(-WIDTH_SLACK)):
+				errors.append("%s: prompt %s %s overlaps HUD panel %s %s" % [label, (p as ContextPrompt).prompt_id,
+						rect, panel_name, prect])
+	return errors

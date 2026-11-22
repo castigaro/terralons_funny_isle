@@ -19,6 +19,9 @@ var action := ""
 var text_key := ""
 var _anchor: Node2D
 var _offset := Vector2.ZERO
+var _below_offset := Vector2.ZERO
+var _hud_gap := 0.0
+var _below := false
 var _level: Node
 var _panel: PanelContainer
 var _key_cap: KeyCap
@@ -41,6 +44,8 @@ func _ready() -> void:
 		return
 	var cfg := Balance.get_section("hud")
 	_offset = Vector2(0.0, -float(cfg.get("prompt_offset_px", 0)))
+	_below_offset = Vector2(0.0, float(cfg.get("prompt_below_offset_px", 0)))
+	_hud_gap = float(cfg.get("prompt_hud_gap_px", 0))
 	_panel = PanelContainer.new()
 	_panel.name = "Bubble"
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -92,9 +97,43 @@ func _follow() -> void:
 		visible = false
 		return
 	visible = true
-	global_position = _anchor.global_position + _offset
 	_panel.size = _panel.get_combined_minimum_size()
-	_panel.position = Vector2(-_panel.size.x / 2.0, -_panel.size.y)
+	_place(false)
+	_below = false
+	var hud := _hud()
+	if hud == null or not _blocked(hud):
+		return
+	_place(true)
+	if _blocked(hud):
+		_place(false)
+	else:
+		_below = true
+
+
+## Puts the bubble above the anchor, or below it when below is true.
+func _place(below: bool) -> void:
+	if below:
+		global_position = _anchor.global_position + _below_offset
+		_panel.position = Vector2(-_panel.size.x / 2.0, 0.0)
+	else:
+		global_position = _anchor.global_position + _offset
+		_panel.position = Vector2(-_panel.size.x / 2.0, -_panel.size.y)
+
+
+func _hud() -> Hud:
+	if _level == null or not is_instance_valid(_level) or not _level.has_method("hud"):
+		return null
+	var hud := _level.call("hud") as Hud
+	return hud if hud != null and hud.visible and hud.root_control() != null else null
+
+
+func _blocked(hud: Hud) -> bool:
+	return hud.blocks_rect(hud.screen_rect_of(_panel, Rect2(Vector2.ZERO, _panel.size)), _hud_gap)
+
+
+## True while the bubble is flipped below its anchor to stay clear of a HUD panel.
+func placed_below() -> bool:
+	return _below
 
 
 func _on_dismiss_signal(signal_name: String) -> void:

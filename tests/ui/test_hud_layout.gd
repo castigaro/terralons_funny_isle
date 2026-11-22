@@ -6,6 +6,7 @@ extends "res://tests/support/level_case.gd"
 const SIZES := [Vector2(1280, 720), Vector2(1920, 1080)]
 const MIN_TOUCH_PX := 44.0
 const MIN_TIMER_GAP_PX := 16.0
+const L1 := "res://scenes/levels/l1_beach_camp.tscn"
 
 
 static func check_layout(t: TestCase, hud: Hud, view: Vector2, tag: String) -> void:
@@ -33,8 +34,31 @@ static func check_task_titles(t: TestCase, hud: Hud, tag: String) -> void:
 				label.get_theme_font_size("font_size")).x
 		t.check(width <= label.size.x, "%s '%s' fits without ellipsis: %.0f <= %.0f" % [tag, label.text, width,
 				label.size.x])
+	_check_columns(t, labels, tag)
 	var gap := hud.panel("TimerPanel").get_global_rect().position.x - hud.panel("TaskPanel").get_global_rect().end.x
 	t.check(gap >= MIN_TIMER_GAP_PX, "%s task panel %.0f px left of the timer" % [tag, gap])
+
+
+## The name column is as wide as the widest title (capped) and every title keeps tag_gap_px from its tag.
+static func _check_columns(t: TestCase, labels: Array, tag: String) -> void:
+	var cap := float(Balance.get_value("hud", "task_name_width_px"))
+	var tag_gap := float(Balance.get_value("hud", "tag_gap_px"))
+	var widest := 0.0
+	for node in labels:
+		var label := node as Label
+		var w := label.get_theme_font("font").get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
+				label.get_theme_font_size("font_size")).x
+		widest = maxf(widest, ceilf(w) + 2.0)
+	var expected := minf(cap, widest)
+	for node in labels:
+		var label := node as Label
+		t.check(absf(label.size.x - expected) <= 1.0, "%s '%s' column width %.0f == %.0f" % [tag, label.text,
+				label.size.x, expected])
+		var tag_label := label.get_parent().get_node("TagLabel") as Label
+		var tag_w := tag_label.get_theme_font("font").get_string_size(tag_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1,
+				tag_label.get_theme_font_size("font_size")).x
+		var gap := label.position.x - (tag_label.position.x + tag_w)
+		t.check(gap >= tag_gap - 0.5, "%s '%s' starts %.1f px after its tag (>= %.0f)" % [tag, label.text, gap, tag_gap])
 
 
 func test_panels_inside_and_apart_at_both_sizes() -> void:
@@ -60,6 +84,18 @@ func test_panels_inside_and_apart_at_both_sizes() -> void:
 		for name in ["TaskPanel", "HintPanel", "TimerPanel", "CueSlot", "FinishBanner", "InteractPrompt"]:
 			check(hud.panel_rects().has(name), "%s %s visible" % [tag, name])
 		check_layout(self, hud, view, tag)
+
+
+func test_task_columns_in_both_locales_on_l1() -> void:
+	await open_level(L1)
+	var hud := level.hud()
+	for loc in ["en", "de"]:
+		I18n.set_locale(loc)
+		for view in SIZES:
+			hud.set_layout_size(view)
+			await frames(1)
+			check_task_titles(self, hud, "L1 %s %dx%d" % [loc, view.x, view.y])
+	I18n.set_locale("en")
 
 
 func test_panel_fades_under_the_castaway() -> void:

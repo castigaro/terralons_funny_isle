@@ -409,6 +409,7 @@ func _clip_level(level_id: String) -> void:
 	if not all_shown:
 		_fail("HUD, prompt, level cue and HUD cue are not visible together")
 	var errors := _clip(hud.root_control(), "hud")
+	errors.append_array(ClipCheck.check_hud_prompts(hud, prompts, "hud@%s [de]" % _size_name()))
 	errors.append_array(_clip(cue, "level_cue"))
 	var world := get_viewport().get_canvas_transform().affine_inverse() * get_viewport().get_visible_rect()
 	for p: Node2D in prompts:
