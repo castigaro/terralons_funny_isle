@@ -49,6 +49,7 @@ var _built := false
 var _shaking := false
 var _camera_ref: WeakRef = null
 var _splat_seq := 0
+var _text_suppressed := false
 
 
 func _init() -> void:
@@ -374,6 +375,8 @@ func _recoil_dir(target: Node2D) -> Vector2:
 
 
 func _play_visual(effect: String, entry: Dictionary, key: String, at: Dictionary, sig_name: String) -> void:
+	if effect == "popup" and _text_suppressed:
+		return
 	if effect == "flash":
 		var now := float(clock.call())
 		var alpha := strengths.flash_alpha(key)
@@ -681,6 +684,19 @@ func reset_all() -> void:
 	_pending = {}
 	_event_types.clear()
 	_last_flash_ms = -INF
+	_text_suppressed = false
+
+
+## Suppresses popup words (the result screen is open): releases the active popups and skips new ones, while
+## particles, puffs, splats and flashes keep playing.
+func set_text_suppressed(on: bool) -> void:
+	_text_suppressed = on
+	if on and _pools.has("popup"):
+		(_pools["popup"] as FxPool).release_all()
+
+
+func text_suppressed() -> bool:
+	return _text_suppressed
 
 
 func active_count(type: String) -> int:

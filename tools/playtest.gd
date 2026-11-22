@@ -2,6 +2,9 @@ extends SceneTree
 ## Visual playtest: menus, then the bot plays every level through the real flow; screenshots, audio peaks, a summary.
 ## Started by tools/playtest.py; arguments after "--": --out=<dir> [--levels=l1,l3] [--every=<seconds>] [--locale=en|de]
 ## Shots carry the locale suffix; every level adds a pause menu shot, the first played level a lost result at the end.
+## Result shots wait until the result screen accepts input and its star animation has finished.
+
+const RESULT_WAIT_FRAMES := 1200
 
 var bot_plans: Script
 var bot_planner: Script
@@ -155,13 +158,26 @@ func _play(id: String) -> void:
 	input.call("release_all")
 	input.queue_free()
 	_audio("%s play" % id)
-	await _frames(30)
+	await _wait_result()
 	await _shot("%s_result" % id)
 	var result: Dictionary = main.call("last_result")
 	var timer := _timer_seconds(id)
 	_l("PLAYTEST level=%s won=%s stars=%s bot_s=%.1f timer_s=%.0f time_left_s=%.1f used=%d%%" % [
 		id, str(result.get("won")), str(result.get("stars")), bot_s, timer, float(result.get("time_left", 0.0)),
 		int(round(100.0 * bot_s / timer)) if timer > 0.0 else 0])
+
+
+## Waits until the result screen accepts input and its star animation has finished (real time, so a fast frame
+## rate cannot shoot too early), at most RESULT_WAIT_FRAMES frames, then a few frames for the last draw.
+func _wait_result() -> void:
+	for i in RESULT_WAIT_FRAMES:
+		var node: Node = main.call("current_screen_node")
+		if node == null or not node.has_method("stars_animating"):
+			break
+		if not node.call("stars_animating") and node.call("accepts_input"):
+			break
+		await _frames(1)
+	await _frames(5)
 
 
 ## Opens the pause menu through the real pause key, takes a shot and resumes.
@@ -188,7 +204,7 @@ func _lose(id: String) -> void:
 	var lvl: Node = main.call("level")
 	var def: Variant = lvl.call("level_def")
 	lvl.call("level_session").call("tick", float(def.get("timer_seconds")) + 1.0, lvl.call("build_snapshot"))
-	await _frames(30)
+	await _wait_result()
 	await _shot("%s_result_loss" % id)
 	var result: Dictionary = main.call("last_result")
 	_l("PLAYTEST loss level=%s won=%s stars=%s" % [id, str(result.get("won")), str(result.get("stars"))])

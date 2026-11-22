@@ -12,6 +12,7 @@ var _key := ""
 var _remaining := 0.0
 var _fade_left := 0.0
 var _layout_size := Vector2.ZERO
+var _suppressed := false
 
 
 func _ready() -> void:
@@ -79,6 +80,8 @@ func _process(delta: float) -> void:
 
 ## Shows the translated caption key for seconds, replacing any caption on screen.
 func show_line(caption_key: String, seconds: float) -> void:
+	if _suppressed:
+		return
 	_key = caption_key
 	_remaining = maxf(seconds, 0.0)
 	_fade_left = _tuning.caption_fade
@@ -95,6 +98,17 @@ func hide_now() -> void:
 	if _root != null:
 		_root.visible = false
 		_label.text = ""
+
+
+## Suppressed captions are not shown (the result screen is open); the voice line itself still plays.
+func set_suppressed(on: bool) -> void:
+	_suppressed = on
+	if on:
+		hide_now()
+
+
+func is_suppressed() -> bool:
+	return _suppressed
 
 
 func _on_announcer_line(_line_id: String, caption_key: String, seconds: float) -> void:

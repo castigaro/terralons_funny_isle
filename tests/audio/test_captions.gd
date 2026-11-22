@@ -94,3 +94,22 @@ func test_caption_never_takes_input() -> void:
 	check_eq(_caption().layer, (_audio().call("tuning") as AudioTuning).caption_layer, "layer from balance")
 	check_eq(_label().get_theme_font_size("font_size"), (_audio().call("tuning") as AudioTuning).caption_font_size,
 			"font size from balance")
+
+
+func test_suppressed_caption_stays_hidden() -> void:
+	_i18n().call("set_locale", "en")
+	_bus().announcer_line.emit("go", "audio.announcer_go", 2.0)
+	check_true(_caption().call("is_showing"), "caption shown before")
+	_caption().call("set_suppressed", true)
+	check_true(_caption().call("is_suppressed"), "suppressed")
+	check_false(_caption().call("is_showing"), "suppressing hides the caption")
+	_bus().announcer_line.emit("level_complete", "audio.announcer_level_complete", 3.0)
+	check_false(_caption().call("is_showing"), "line ignored while suppressed")
+	_i18n().call("set_locale", "de")
+	check_false(_caption().call("is_showing"), "locale change shows nothing")
+	check_eq(_label().text, "", "no text kept")
+	_caption().call("set_suppressed", false)
+	_bus().announcer_line.emit("go", "audio.announcer_go", 2.0)
+	check_true(_caption().call("is_showing"), "next line shows again")
+	_caption().call("hide_now")
+	_i18n().call("set_locale", "en")

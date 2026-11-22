@@ -2,6 +2,8 @@ extends MenuScreen
 ## Short result screen: stars, time left, "New best!" and on a loss the missing required tasks. Input is accepted
 ## after result_input_delay_s (at most 2 s); then Retry (R), Next (Enter) and Level select (Esc) are one key or one
 ## click. Next is disabled when it would only retry (loss with the next level still locked); Retry gets the focus.
+## One headline and one star row: earned stars pop in once, one after another (result_star_interval_s apart), and
+## then stay; reduce motion, a second setup() or pressing a button snaps them to their final look.
 
 signal retry_pressed
 signal next_pressed
@@ -23,6 +25,12 @@ var next_button: Button
 var level_select_button: Button
 var _data := {}
 var _open := false
+var _anim_from := -1.0
+var _earned := 0
+var _stars_played := false
+var _star_interval := 0.0
+var _star_pop_s := 0.0
+var _star_pop_scale := 1.0
 
 
 func _build() -> void:
@@ -34,6 +42,9 @@ func _build() -> void:
 	row.name = "Stars"
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	var px := float(cfg.get("result_star_px", 0))
+	_star_interval = float(cfg.get("result_star_interval_s", 0))
+	_star_pop_s = float(cfg.get("result_star_pop_s", 0))
+	_star_pop_scale = float(cfg.get("result_star_pop_scale", 1))
 	for i in Stars.MAX_STARS:
 		var star := TextureRect.new()
 		star.name = "Star%d" % i
@@ -64,7 +75,9 @@ func _build() -> void:
 
 
 func _add(box: Control, button: Button, sig: Signal) -> Button:
-	button.pressed.connect(sig.emit)
+	button.pressed.connect(func() -> void:
+		_finish_stars()
+		sig.emit())
 	box.add_child(button)
 	return button
 
@@ -77,6 +90,7 @@ func setup(data: Dictionary) -> void:
 	var count := int(data.get("stars", 0))
 	for i in stars.size():
 		(stars[i] as TextureRect).texture = load(STAR_FULL if i < count else STAR_EMPTY)
+	_start_stars(count)
 	bind_text(time_label, "menu.result.time_left",
 			{"time": FlowRules.format_time(float(data.get("time_left", 0.0)), true)})
 	best_label.visible = won and bool(data.get("new_best", false))
@@ -102,11 +116,58 @@ func accepts_input() -> bool:
 	return _open
 
 
+## Starts the one-time pop of the earned stars; no stars, reduce motion or an earlier run snap to the final look.
+func _start_stars(count: int) -> void:
+	_earned = clampi(count, 0, stars.size())
+	var reduce := FxSettings.read_reduce(DataDir.file(FxSettings.FILE))
+	if _earned == 0 or reduce or _stars_played:
+		_finish_stars()
+		return
+	_stars_played = true
+	_anim_from = age()
+	for i in stars.size():
+		var star := stars[i] as TextureRect
+		star.scale = Vector2.ZERO if i < _earned else Vector2.ONE
+		star.modulate.a = 0.0 if i < _earned else 1.0
+	_update_stars()
+
+
+func _update_stars() -> void:
+	if _anim_from < 0.0:
+		return
+	var elapsed := age() - _anim_from
+	if elapsed >= star_anim_total():
+		_finish_stars()
+		return
+	for i in _earned:
+		var star := stars[i] as TextureRect
+		var v := FlowRules.star_pop(elapsed - float(i) * _star_interval, _star_pop_s, _star_pop_scale)
+		star.pivot_offset = star.size / 2.0
+		star.scale = Vector2.ONE * v.x
+		star.modulate.a = v.y
+
+
+func _finish_stars() -> void:
+	_anim_from = -1.0
+	for star in stars:
+		(star as TextureRect).scale = Vector2.ONE
+		(star as TextureRect).modulate.a = 1.0
+
+
+func stars_animating() -> bool:
+	return _anim_from >= 0.0
+
+
+func star_anim_total() -> float:
+	return FlowRules.star_anim_seconds(_earned, _star_interval, _star_pop_s)
+
+
 func _tick(_delta: float) -> void:
 	if not _open and guard_passed():
 		_open = true
 		_set_buttons_enabled(true)
 		focus_first()
+	_update_stars()
 
 
 func _set_buttons_enabled(on: bool) -> void:
@@ -122,12 +183,15 @@ func handle_input(event: InputEvent) -> bool:
 	if not _open:
 		return true
 	if event.is_action_pressed("restart"):
+		_finish_stars()
 		retry_pressed.emit()
 		return true
 	if is_back(event):
+		_finish_stars()
 		level_select_pressed.emit()
 		return true
 	if event.is_action_pressed("ui_accept"):
+		_finish_stars()
 		if next_button.disabled:
 			retry_pressed.emit()
 		else:

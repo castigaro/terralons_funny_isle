@@ -172,3 +172,41 @@ static func check_hud_prompts(hud: Hud, prompts: Array, label: String) -> Array[
 				errors.append("%s: prompt %s %s overlaps HUD panel %s %s" % [label, (p as ContextPrompt).prompt_id,
 						rect, panel_name, prect])
 	return errors
+
+
+## Every visible text node (Label, Button, RichTextLabel with text) below root must stay inside the viewport and must
+## not overlap any other visible text node, except its own ancestors or descendants (a label inside a button).
+static func text_overlaps(root: Node, viewport: Rect2) -> Array[String]:
+	var errors: Array[String] = []
+	var nodes: Array = []
+	_collect_text(root, nodes)
+	for c: Control in nodes:
+		if not viewport.grow(WIDTH_SLACK).encloses(c.get_global_rect()):
+			errors.append("%s: rect %s leaves the viewport %s" % [c.get_path(), c.get_global_rect(), viewport])
+	for i in nodes.size():
+		for j in range(i + 1, nodes.size()):
+			var a: Control = nodes[i]
+			var b: Control = nodes[j]
+			if a.is_ancestor_of(b) or b.is_ancestor_of(a):
+				continue
+			if a.get_global_rect().grow(-WIDTH_SLACK).intersects(b.get_global_rect().grow(-WIDTH_SLACK)):
+				errors.append("%s overlaps %s" % [a.get_path(), b.get_path()])
+	return errors
+
+
+static func _collect_text(node: Node, out: Array) -> void:
+	if node is CanvasItem and not (node as CanvasItem).visible:
+		return
+	if node is CanvasLayer and not (node as CanvasLayer).visible:
+		return
+	if (node is Label or node is Button or node is RichTextLabel) and String(node.get("text")) != "":
+		out.append(node)
+	for child in node.get_children():
+		_collect_text(child, out)
+
+
+## Visible text nodes (Label, Button, RichTextLabel with text) below root; hidden CanvasItems and CanvasLayers prune.
+static func visible_texts(root: Node) -> Array:
+	var out: Array = []
+	_collect_text(root, out)
+	return out
