@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.official
+MUSIC screen=title expected=title actual=title errors=0
+SCREEN name=title shots=3 ok=true reason=-
+MUSIC screen=l1_beach_camp expected=level_1 actual=level_1 errors=0
+ANIM level=l1_beach_camp changed=0.0584 threshold=0.0020 ok=true
+FX level=l1_beach_camp shake=1 puff=1 splat=0
+SCREEN name=l1_beach_camp shots=3 ok=true reason=-
+CLIP screen=title size=1920x1080 locale=de errors=0
+CLIP screen=hud size=1920x1080 locale=de errors=1
+  clip: hud@1920x1080 [de] /root/Hud/Label: text 'x' needs width 10.0, has 5.0
+HUD_STATE prompts=4 level_cue=true hud_cue=hud.cue.warn.coconut_throw together=true
+CLIP_FIXTURE detected=6
+CASTAWAY level=l1_beach_camp px=98 px_1080=98.0
+CASTAWAY level=l2_farm_meadow px=63 px_1080=63.9
+PERF_FRAMES file=D:/x/perf_1920x1080_frames.json frames=3600 events=2
+PROBE DONE ok=true

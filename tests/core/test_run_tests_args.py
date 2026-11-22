@@ -115,5 +115,53 @@ class RunTestsArgsTest(unittest.TestCase):
         self.assertIn("--smoke", self.calls[0])
 
 
+class WindowedFlagTest(unittest.TestCase):
+    def test_default_stages_have_no_windowed_stage(self):
+        names = run_tests.stage_names(False)
+        for name in ("smoke-windowed", "perf", "clip", "export"):
+            self.assertNotIn(name, names)
+        self.assertEqual(names[-1], "hygiene")
+
+    def test_windowed_stages_sit_after_smoke_and_before_validators(self):
+        names = run_tests.stage_names(True)
+        smoke_at = names.index("smoke")
+        self.assertEqual(names[smoke_at + 1:smoke_at + 5], ["smoke-windowed", "perf", "clip", "export"])
+        self.assertLess(names.index("export"), names.index("validators"))
+        self.assertEqual(names[-1], "hygiene")
+
+    def test_default_main_starts_no_windowed_stage(self):
+        called = []
+        patched = {
+            "stage_syntax": lambda stage: stage.ok(),
+            "find_godot": lambda console=True: Path("godot.exe"),
+            "godot_env": lambda base: {},
+            "stage_import": lambda stage, *a: stage.ok(),
+            "stage_gdscript": lambda stage, *a: stage.ok(),
+            "stage_bot": lambda stage, *a: stage.ok(),
+            "stage_python": lambda stage, *a: stage.ok(),
+            "stage_smoke": lambda stage, *a: stage.ok(),
+            "stage_validators": lambda stage: stage.ok(),
+            "stage_hygiene": lambda stage, *a: stage.ok(),
+            "stage_windowed": lambda stage, mode: called.append(mode),
+            "stage_export": lambda stage: called.append("export"),
+        }
+        originals = {name: getattr(run_tests, name) for name in patched}
+        try:
+            for name, fn in patched.items():
+                setattr(run_tests, name, fn)
+            modules_before = set(sys.modules)
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = run_tests.main(["-k", "x"])
+            self.assertEqual(code, 0)
+            self.assertEqual(called, [])
+            self.assertNotIn("smoke", set(sys.modules) - modules_before)
+            with contextlib.redirect_stdout(io.StringIO()):
+                run_tests.main(["-k", "x", "--windowed"])
+            self.assertEqual(called, ["smoke", "perf", "clip", "export"])
+        finally:
+            for name, fn in originals.items():
+                setattr(run_tests, name, fn)
+
+
 if __name__ == "__main__":
     unittest.main()

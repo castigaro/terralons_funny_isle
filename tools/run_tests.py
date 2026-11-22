@@ -1,7 +1,10 @@
 """Check command: syntax, Godot import, GDScript tests, bot summary, Python tests, smoke run, validators, hygiene.
 
-Usage: python tools/run_tests.py [-k <substring>]
+Usage: python tools/run_tests.py [-k <substring>] [--windowed]
 Exit codes: 0 all green, 1 any failure, 2 Godot binary missing.
+
+The default run starts no window. --windowed adds the opt-in stages smoke-windowed, perf and clip (tools/smoke.py,
+windowed Godot binary) and export (tools/export.py) after the headless smoke stage; they ignore -k.
 
 The bot stage reads the per-level summaries that the bot playthrough tests (tests/bot/test_bot_<level>.gd) write to
 <testdata>/run_tests/bot/<level>.json, prints one table row per run of this test run and fails when a selected level
@@ -39,6 +42,8 @@ WATCHDOG_RE = re.compile(r"^##\s*watchdog:\s*([0-9]+)\s*$")
 WATCHDOG_MARGIN = 30
 # Bot playthrough test files per level; their level id names the summary file.
 BOT_TEST_RE = re.compile(r"^res://tests/bot/test_bot_(l\d+_[a-z0-9_]+)\.gd$")
+DEFAULT_STAGES = ("syntax", "import", "gdscript", "bot", "python", "smoke", "validators", "hygiene")
+WINDOWED_STAGES = ("smoke-windowed", "perf", "clip", "export")
 BOT_TABLE_COLUMNS = ("level", "variant", "mode", "seed", "tasks", "time_left", "stars", "result")
 
 
@@ -332,6 +337,41 @@ def stage_smoke(stage, godot, base, allowlist):
         stage.fail("smoke (rc=%s)" % code, "\n".join(hits) or out[-3000:])
 
 
+def stage_names(windowed: bool) -> list:
+    """Stage order: the default headless stages, with the windowed stages after smoke when windowed is set."""
+    names = list(DEFAULT_STAGES)
+    if windowed:
+        at = names.index("smoke") + 1
+        names[at:at] = list(WINDOWED_STAGES)
+    return names
+
+
+def _record_checks(stage, checks):
+    for name, ok, detail in checks:
+        if ok:
+            stage.ok()
+        else:
+            stage.fail(name, detail)
+
+
+def stage_windowed(stage, mode):
+    """Run one tools/smoke.py stage (smoke, perf or clip) in-process and count its checks."""
+    import smoke  # noqa: PLC0415 – only loaded for the opt-in windowed run
+    _record_checks(stage, smoke.run_stage(mode))
+
+
+def stage_export(stage):
+    """Build the Windows exe with tools/export.py and smoke-run it; missing templates fail with a clear message."""
+    import export  # noqa: PLC0415 – only loaded for the opt-in windowed run
+    code = export.build(export.DEFAULT_OUT)
+    if code == export.EXIT_OK:
+        stage.ok()
+    elif code == export.EXIT_NO_TEMPLATES:
+        stage.fail(export.check_templates())
+    else:
+        stage.fail("export.py exit code %d" % code)
+
+
 def stage_validators(stage):
     for val in sorted((REPO / "tools").glob("validate_*.py")):
         proc = subprocess.run(
@@ -368,6 +408,8 @@ def stage_hygiene(stage, before_git, before_userdata, userdata_dir):
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("-k", dest="filter", default="", help="only run test files whose path contains this text")
+    parser.add_argument("--windowed", action="store_true",
+                        help="also run the windowed smoke, perf and clip stages and the export (opens windows)")
     opts = parser.parse_args(argv)
     os.environ.setdefault("PYTHONIOENCODING", "utf-8")
     run_start = time.time()
@@ -377,61 +419,52 @@ def main(argv=None) -> int:
     userdata_dir = real_app_userdata()
     before_userdata = folder_snapshot(userdata_dir)
 
-    stage = Stage("syntax")
-    stages.append(stage)
-    stage_syntax(stage)
-    stage.report()
-
-    godot = find_godot()
-    if godot is None:
-        print("Godot binary not found (set GODOT_BIN)", file=sys.stderr)
-        return 2
+    godot = None
     base = TESTDATA / "run_tests"
-    env = godot_env(base)
-    allowlist = load_allowlist()
-
-    stage = Stage("import")
-    stages.append(stage)
-    stage_import(stage, godot, env, allowlist)
-    stage.report()
-
-    gd_files = gd_test_files(opts.filter)
-    stage = Stage("gdscript")
-    stages.append(stage)
-    start = time.time()
-    stage_gdscript(stage, godot, env, allowlist, gd_files)
-    stage.report()
-    print("   (%.0f s)" % (time.time() - start))
-
-    stage = Stage("bot")
-    stages.append(stage)
-    stage_bot(stage, gd_files, base / BOT_REPORT_SUBDIR, run_start)
-    stage.report()
-
-    stage = Stage("python")
-    stages.append(stage)
-    stage_python(stage, py_test_files(opts.filter))
-    stage.report()
-
-    stage = Stage("smoke")
-    stages.append(stage)
-    stage_smoke(stage, godot, base / "smoke", allowlist)
-    stage.report()
-
-    stage = Stage("validators")
-    stages.append(stage)
-    stage_validators(stage)
-    stage.report()
-
-    stage = Stage("hygiene")
-    stages.append(stage)
-    stage_hygiene(stage, before_git, before_userdata, userdata_dir)
-    stage.report()
+    env = None
+    allowlist = None
+    gd_files = []
+    for name in stage_names(opts.windowed):
+        stage = Stage(name)
+        stages.append(stage)
+        start = time.time()
+        if name == "syntax":
+            stage_syntax(stage)
+        elif name == "import":
+            godot = find_godot()
+            if godot is None:
+                print("Godot binary not found (set GODOT_BIN)", file=sys.stderr)
+                return 2
+            env = godot_env(base)
+            allowlist = load_allowlist()
+            stage_import(stage, godot, env, allowlist)
+        elif name == "gdscript":
+            gd_files = gd_test_files(opts.filter)
+            stage_gdscript(stage, godot, env, allowlist, gd_files)
+        elif name == "bot":
+            stage_bot(stage, gd_files, base / BOT_REPORT_SUBDIR, run_start)
+        elif name == "python":
+            stage_python(stage, py_test_files(opts.filter))
+        elif name == "smoke":
+            stage_smoke(stage, godot, base / "smoke", allowlist)
+        elif name == "smoke-windowed":
+            stage_windowed(stage, "smoke")
+        elif name in ("perf", "clip"):
+            stage_windowed(stage, name)
+        elif name == "export":
+            stage_export(stage)
+        elif name == "validators":
+            stage_validators(stage)
+        elif name == "hygiene":
+            stage_hygiene(stage, before_git, before_userdata, userdata_dir)
+        stage.report()
+        if name in ("gdscript",) + WINDOWED_STAGES:
+            print("   (%.0f s)" % (time.time() - start))
 
     failures = [(s.name, f) for s in stages for f in s.failures]
     print("")
     for s in stages:
-        print("%-11s pass=%-4d fail=%d" % (s.name, s.passed, s.failed))
+        print("%-14s pass=%-4d fail=%d" % (s.name, s.passed, s.failed))
     if failures:
         print("FAILED:\n  " + "\n  ".join("[%s] %s" % f for f in failures))
         return 1

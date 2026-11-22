@@ -4,6 +4,8 @@ extends Node
 ## Usage: Godot_v4.7.2-stable_win64.exe --path . res://tests/scenes/capture_probe.tscn -- --level=<tscn>
 ##        --out=<png> [--size=1920x1080] [--frames=30] [--focus=x,y]
 
+const CastawayMeasure := preload("res://tests/support/castaway_measure.gd")
+
 var _level: Node
 var _out := ""
 var _frames := 30
@@ -42,30 +44,13 @@ func _run() -> void:
 		level.camera().reset_physics_interpolation()
 	for i in _frames:
 		await get_tree().process_frame
-	await RenderingServer.frame_post_draw
-	var with_body := get_viewport().get_texture().get_image()
 	if _out != "":
-		with_body.save_png(_out)
+		await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png(_out)
 	var castaway: Node2D = _level.get_node("Actors/Castaway")
-	var body: Sprite2D = castaway.get_node("Visual/Body")
-	var screen := get_viewport().get_canvas_transform() * castaway.global_position
-	var stretch := float(with_body.get_height()) / float(get_viewport().get_visible_rect().size.y)
-	body.visible = false
-	await get_tree().process_frame
-	await RenderingServer.frame_post_draw
-	var without := get_viewport().get_texture().get_image()
-	var centre := Vector2i(screen * stretch)
-	var reach := int(160 * stretch)
-	var box := Rect2i()
-	for y in range(maxi(0, centre.y - reach), mini(with_body.get_height(), centre.y + reach)):
-		for x in range(maxi(0, centre.x - reach), mini(with_body.get_width(), centre.x + reach)):
-			var a := with_body.get_pixel(x, y)
-			var b := without.get_pixel(x, y)
-			if absf(a.r - b.r) + absf(a.g - b.g) + absf(a.b - b.b) > 0.15:
-				var p := Rect2i(x, y, 1, 1)
-				box = p if box.size == Vector2i.ZERO else box.merge(p)
-	var px := box.size.y
-	var at_1080 := float(px) * 1080.0 / float(with_body.get_height())
-	print("CAPTURE image=%dx%d castaway_px=%d castaway_px_1080=%.1f" % [with_body.get_width(), with_body.get_height(),
-			px, at_1080])
+	var m: Dictionary = await CastawayMeasure.measure(self, castaway)
+	var size: Vector2i = m["image_size"]
+	var px := int(m["px"])
+	var at_1080 := float(m["px_1080"])
+	print("CAPTURE image=%dx%d castaway_px=%d castaway_px_1080=%.1f" % [size.x, size.y, px, at_1080])
 	get_tree().quit(0)

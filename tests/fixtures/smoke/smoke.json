@@ -1,0 +1,10 @@
+{
+	"pixel_delta": 0.06,
+	"min_changed_share": 0.002,
+	"shots_per_screen": 3,
+	"shot_gap_s": 0.6,
+	"settle_s": 1.0,
+	"perf_level": "l4_lagoon",
+	"perf_seconds": 60.0,
+	"fx_signal": {"name": "object_bonked", "args": ["coconut", "throw"]}
+}
