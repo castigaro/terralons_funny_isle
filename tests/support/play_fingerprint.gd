@@ -8,7 +8,7 @@ const LAYOUT_DIR := "res://scenes/levels/layouts/"
 const BASELINE_DIR := "res://tests/fixtures/levels/"
 const TILE_LAYERS := ["Sand", "Grass", "Shore", "Details"]
 const MARKER_PARENTS := ["Zones", "HomePoints", "Markers", "EventAnchors"]
-const TARGETS := ["PenGate", "PondJetty", "Trough", "CageGate"]
+const TARGETS := ["PenGate", "PondJetty", "Trough", "CageGate", "LagoonJetty", "BeachFlag", "Sandcastle"]
 const ENTITY_GROUP := "level_entity"
 
 
@@ -142,5 +142,6 @@ static func _file_sha(path: String) -> String:
 static func _bytes_sha(data: PackedByteArray) -> String:
 	var ctx := HashingContext.new()
 	ctx.start(HashingContext.HASH_SHA256)
-	ctx.update(data)
+	if not data.is_empty():
+		ctx.update(data)
 	return ctx.finish().hex_encode()
