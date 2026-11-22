@@ -1,10 +1,11 @@
 extends Node
 ## Windowed smoke probe (opt-in, tools/smoke.py): runs the real game flow (scenes/main.tscn) in a window and prints
 ## result lines that the tool parses. Modes: smoke (title and every level with screenshots, music, effects and an
-## animation check), perf (60 s bot run on one level with raw frame times) and clip (German clip check of every screen,
+## animation check), perf (60 s bot run on one level with raw frame times; with --perf-screen=title instead
+## perf_menu_seconds on the title with the live menu backdrop) and clip (German clip check of every screen,
 ## overlong fixture, castaway height per level at 1920x1080).
 ## Usage: Godot_v4.7.2-stable_win64.exe --path . --resolution 1920x1080 res://tests/scenes/smoke_probe.tscn --
-##        --mode=smoke|perf|clip --size=1920x1080 --out=<dir> --data-dir=<dir> [--seed=12345]
+##        --mode=smoke|perf|clip --size=1920x1080 --out=<dir> --data-dir=<dir> [--seed=12345] [--perf-screen=title]
 
 const ClipCheck := preload("res://tests/support/clip_check.gd")
 const CastawayMeasure := preload("res://tests/support/castaway_measure.gd")
@@ -259,6 +260,9 @@ func _smoke_level(level_id: String) -> void:
 # --- Perf mode -------------------------------------------------------------------------------------------
 
 func _run_perf() -> void:
+	if String(CliArgs.current().get("perf-screen", "")) == "title":
+		await _run_perf_title()
+		return
 	_unlock_all()
 	var level_id := String(CliArgs.current().get("perf-level", _cfg.get("perf_level", "l4_lagoon")))
 	if not await _start_level(level_id, true):
@@ -281,6 +285,25 @@ func _run_perf() -> void:
 	file.store_string(JSON.stringify({"size": _size_name(), "level": level_id, "frame_ms": recorder.frame_ms,
 			"physics_per_s": recorder.physics_per_s, "events_triggered": recorder.events,
 			"vsync_mode": DisplayServer.window_get_vsync_mode(), "state": level.level_session().get_state()}))
+	file.close()
+	print("PERF_FRAMES file=%s frames=%d events=%d" % [path, recorder.frame_ms.size(), recorder.events])
+
+
+## Records the real frame times on the title (live menu backdrop) for perf_menu_seconds.
+func _run_perf_title() -> void:
+	if int(_main.call("current_screen")) != FlowRules.Screen.TITLE or _main.call("backdrop") == null:
+		_fail("perf title: no title with backdrop")
+		return
+	var recorder := FrameRecorder.new()
+	recorder.seconds = float(_cfg.get("perf_menu_seconds", 10.0))
+	add_child(recorder)
+	await recorder.done
+	var path := _out.path_join("perf_title_%s_frames.json" % _size_name())
+	DirAccess.make_dir_recursive_absolute(_out)
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(JSON.stringify({"size": _size_name(), "level": "title", "frame_ms": recorder.frame_ms,
+			"physics_per_s": recorder.physics_per_s, "events_triggered": recorder.events,
+			"vsync_mode": DisplayServer.window_get_vsync_mode()}))
 	file.close()
 	print("PERF_FRAMES file=%s frames=%d events=%d" % [path, recorder.frame_ms.size(), recorder.events])
 

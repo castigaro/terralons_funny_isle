@@ -47,5 +47,11 @@
 	"pressed_tint": "#b4c3d7",
 	"slider_highlight_tint": "#d6e6ff",
 	"locked_alpha": 0.55,
-	"ui_layer": 110
+	"ui_layer": 110,
+	"backdrop_layer": -10,
+	"backdrop_scale": 0.5,
+	"backdrop_critter_scale": 1.5,
+	"backdrop_hop_hz": 2.0,
+	"backdrop_hop_px": 6,
+	"backdrop_walk_min_speed": 1.0
 }

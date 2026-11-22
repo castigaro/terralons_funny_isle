@@ -161,7 +161,7 @@ Tile data cannot be edited by hand, so layouts are ASCII files painted offline:
 godot --headless --path . --script res://tools/build_level_layout.gd -- --layout=<txt> --scene=<tscn>
 ```
 
-Legend: `~` water, `.` sand, `,` grass on sand, `#` rock on sand (solid). Cells outside the text are water, so give the island a water border. The builder writes the `tile_map_data` of the `Sand`, `Grass`, `Shore` and `Details` override sections of the scene (they must exist, for example `[node name="Sand" parent="."]`); the committed `.tscn` is the result and nothing is generated at runtime.
+Legend: `~` water, `.` sand, `,` grass on sand, `#` rock on sand (solid). Cells outside the text are water, so give the island a water border. The builder writes the `tile_map_data` of the `Sand`, `Grass`, `Shore` and `Details` override sections of the scene (they must exist, for example `[node name="Sand" parent="."]`) or of typed `TileMapLayer` nodes directly below the root of a non-inherited scene (`[node name="Sand" type="TileMapLayer" parent="."]`, used by the menu backdrop `scenes/ui/backdrop/menu_island.tscn`); the committed `.tscn` is the result and nothing is generated at runtime.
 
 Shore rules (keep the water collision closed):
 
@@ -185,6 +185,7 @@ Props, zones, markers and entities are placed by editing the scene (see `tests/s
 - `scenes/levels/props/palm.tscn` (`PalmProp`): a top-down pirate-pack palm crown (`tile_70`, `tile_71` default, `tile_72`; set `texture`) of `palm_crown_px` width, lifted `palm_crown_lift_px` above its base, drawn above the actors (absolute z-index 1, not y-sorted) so the castaway walks under its edge. It turns around its centre (`sway.gdshader`, `pivot_mode` 1), casts its shadow at the trunk base and has a solid footprint of `palm_footprint_radius` there. The pack has no trunk art, so the shadow marks the trunk.
 - `scenes/levels/props/sway_prop.tscn` (`SwayProp`): side-view foliage from the foliage packs, bent from its base. Bushes (`footprint_radius = 0`, walk-through) and jungle trees (`foliagePack_008`, `foliagePack_010` …, `shadow_width_share` 0.7 and a footprint) – these deciduous trees are not palms.
 - `scenes/levels/props/boulder.tscn`: solid boulder.
+- `SwayProp.decorative` (default false): a decorative prop joins no `prop` group and builds no footprint (menu backdrop palms, BI-18); level props keep the default.
 
 ## Tests
 

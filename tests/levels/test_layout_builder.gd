@@ -74,3 +74,39 @@ func test_water_notch_gets_the_shore_inner_corner_with_collision() -> void:
 		centre += p / float(points.size())
 	check(centre.x > 32.0 and centre.y < -32.0, "polygon in the north-east corner: %s" % centre)
 	check_eq(String(data.get_custom_data("surface")), "sand", "sand surface")
+
+
+## A scratch copy below the redirected test data folder (TFI_DATA_DIR, set by run_tests.py).
+func _scratch(name: String, text: String) -> String:
+	var base := OS.get_environment("TFI_DATA_DIR")
+	check_ne(base, "", "run_tests sets TFI_DATA_DIR")
+	var dir := base.path_join("layout_builder")
+	DirAccess.make_dir_recursive_absolute(dir)
+	var path := dir.path_join(name)
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+	return path
+
+
+func test_write_scene_handles_typed_layer_nodes() -> void:
+	var text := "[gd_scene format=3]\n\n[node name=\"Root\" type=\"CanvasLayer\"]\n\n"
+	for layer_name in Builder.LAYERS:
+		text += "[node name=\"%s\" type=\"TileMapLayer\" parent=\".\"]\ntile_map_data = PackedByteArray()\n\n" \
+				% layer_name
+	var path := _scratch("typed_layers.tscn", text)
+	var res := Builder.build("~~~~~~~\n" + "~.....~\n".repeat(5) + "~~~~~~~\n")
+	check_eq(Builder.write_scene(path, res["data"]), "", "typed TileMapLayer sections found")
+	var written := FileAccess.get_file_as_string(path)
+	check_eq(written.count("tile_map_data = "), Builder.LAYERS.size(), "one tile_map_data per layer")
+	check_eq(written.count("tile_map_data = PackedByteArray()\n"), 2, "Grass and Details empty, Sand and Shore painted")
+
+
+func test_menu_island_matches_its_layout() -> void:
+	var scene := "res://scenes/ui/backdrop/menu_island.tscn"
+	var res := Builder.build(FileAccess.get_file_as_string("res://scenes/ui/backdrop/menu_island.layout.txt"))
+	check_eq(res["errors"], [], "menu island layout valid")
+	var path := _scratch("menu_island.tscn", FileAccess.get_file_as_string(scene))
+	check_eq(Builder.write_scene(path, res["data"]), "", "rebuild")
+	check_eq(FileAccess.get_file_as_string(path), FileAccess.get_file_as_string(scene),
+			"committed menu_island.tscn equals a rebuild from its layout")

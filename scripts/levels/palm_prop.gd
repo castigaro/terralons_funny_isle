@@ -9,7 +9,7 @@ extends SwayProp
 
 
 func _ready() -> void:
-	add_to_group(GROUP)
+	_join_group()
 	var cfg := Balance.get_section("level")
 	if texture != null:
 		sprite.texture = texture

@@ -11,13 +11,15 @@ const GROUP := "prop"
 @export var footprint_radius := 0.0
 ## Width share of the sprite that casts the shadow (trees cast a smaller base shadow than their crown).
 @export var shadow_width_share := 1.0
+## Pure decoration (menu backdrop): joins no prop group and builds no solid footprint.
+@export var decorative := false
 
 @onready var shadow: DropShadow = $Shadow
 @onready var sprite: Sprite2D = $Sprite
 
 
 func _ready() -> void:
-	add_to_group(GROUP)
+	_join_group()
 	if texture != null:
 		sprite.texture = texture
 	sprite.centered = false
@@ -30,7 +32,18 @@ func _ready() -> void:
 		_build_footprint()
 
 
+## Joins the prop group, or leaves it when decorative (scenes such as palm.tscn declare the group statically).
+func _join_group() -> void:
+	if decorative:
+		if is_in_group(GROUP):
+			remove_from_group(GROUP)
+	else:
+		add_to_group(GROUP)
+
+
 func _build_footprint() -> void:
+	if decorative:
+		return
 	var body := StaticBody2D.new()
 	body.name = "Footprint"
 	body.collision_layer = PhysicsLayers.WORLD_SOLID

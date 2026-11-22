@@ -130,6 +130,45 @@ class ProbeCmdTest(unittest.TestCase):
             self.assertTrue(path.startswith(root), path)
 
 
+class PerfTitleTest(unittest.TestCase):
+    """BI-18: the perf stage adds one title run with the live menu backdrop."""
+
+    def _parsed(self, name, frame_ms):
+        base = common.TESTDATA / "unit_smoke" / "perf_title"
+        base.mkdir(parents=True, exist_ok=True)
+        path = base / name
+        path.write_text(json.dumps({"size": "1920x1080", "level": "title", "frame_ms": frame_ms}), encoding="utf-8")
+        text = "PERF_FRAMES file=%s frames=%d events=0\nPROBE DONE ok=true\n" % (path.as_posix(), len(frame_ms))
+        return smoke.parse_probe(text), base
+
+    def test_title_run_passes_and_writes_its_report(self):
+        parsed, base = self._parsed("ok_frames.json", [16.0] * 700)
+        checks = smoke.perf_checks("1920x1080", parsed, base, tag="title", min_seconds=9.0)
+        named = {name: ok for name, ok, _ in checks}
+        self.assertEqual(named, {"perf title 1920x1080 frame time": True, "perf title 1920x1080 covers 10 s": True})
+        report = json.loads((base / "perf_title_1920x1080.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["over_33"], 0)
+        self.assertEqual(report["level"], "title")
+
+    def test_slow_title_frame_fails(self):
+        parsed, base = self._parsed("slow_frames.json", [16.0] * 100 + [40.0] + [16.0] * 600)
+        checks = smoke.perf_checks("1920x1080", parsed, base, tag="title", min_seconds=9.0)
+        named = {name: ok for name, ok, _ in checks}
+        self.assertFalse(named["perf title 1920x1080 frame time"])
+
+    def test_title_probe_arguments(self):
+        base = common.TESTDATA / "unit_smoke"
+        cmd = smoke.probe_cmd(Path("godot.exe"), "perf", "1920x1080", base, base / "data", base / "logs" / "x.log",
+                              smoke.PERF_TITLE_ARGS)
+        self.assertEqual(cmd[-1], "--perf-screen=title")
+        self.assertEqual(smoke.perf_menu_seconds(), json.loads(fixture("smoke.json"))["perf_menu_seconds"])
+
+    def test_level_checks_keep_their_names(self):
+        parsed, base = self._parsed("level_frames.json", [16.0] * 3800)
+        named = [name for name, _ok, _ in smoke.perf_checks("1280x720", parsed, base)]
+        self.assertEqual(named, ["perf 1280x720 frame time", "perf 1280x720 covers 60 s"])
+
+
 class FixtureDataTest(unittest.TestCase):
     def test_fx_signal_has_shake_and_puff_or_splat(self):
         cfg = json.loads(fixture("smoke.json"))

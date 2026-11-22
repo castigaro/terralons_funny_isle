@@ -2,6 +2,16 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Live island behind the title, level select, settings and credits: animated water, a textured beach with grass patches, palms and a chicken, pig, goat and parrot that wander and idle; the menus stay on their dark panels, the island is hidden and frozen while a level runs, and the critter hop stops with "Reduce screen shake and flashes" (BI-18).
+
+### Fixed
+
+- No leftover announcer caption over the level select or the credits after leaving a level: leaving a level now clears the queued announcer lines (QA-2).
+
 ## [1.1.0] – 2026-11-22
 
 Readability pass: font, result screen and HUD 3-star target. Gameplay, tasks, timers and difficulty are unchanged.

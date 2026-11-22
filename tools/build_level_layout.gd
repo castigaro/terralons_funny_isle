@@ -3,6 +3,8 @@ extends SceneTree
 ## layout and writes their tile_map_data into the .tscn (the committed scene is the result; nothing is generated
 ## at runtime).
 ## Usage: godot --headless --path . --script res://tools/build_level_layout.gd -- --layout=<txt> --scene=<tscn>
+## The scene is an inherited level scene (layer override sections) or a scene that declares the four layers as
+## typed TileMapLayer nodes directly below its root (scenes/ui/backdrop/menu_island.tscn).
 ## Legend: "~" water, "." sand, "," grass on sand, "#" rock on sand (solid). Cells outside the text are water.
 ## Land cells next to water (4-neighbours) become shore edge or outer corner tiles and must be "."; a land cell
 ## with water only on a diagonal becomes a shore inner corner (derived tile with a water collision square). A land
@@ -187,7 +189,8 @@ static func fill_variant(cell: Vector2i) -> Vector2i:
 	return GRASS_FILL[pair + ((absi(h) >> 4) & 1)]
 
 
-## Replaces the tile_map_data line of the four layer override sections in a level .tscn; returns "" or an error.
+## Replaces the tile_map_data line of the four layer sections in a .tscn: the override sections of an inherited
+## level scene or the typed TileMapLayer nodes directly below the root (menu backdrop); returns "" or an error.
 static func write_scene(scene_path: String, data: Dictionary) -> String:
 	var text := FileAccess.get_file_as_string(scene_path)
 	if text == "":
@@ -195,9 +198,10 @@ static func write_scene(scene_path: String, data: Dictionary) -> String:
 	var lines := text.split("\n")
 	for layer_name in LAYERS:
 		var header := '[node name="%s" parent="."' % layer_name
+		var typed := '[node name="%s" type=' % layer_name
 		var start := -1
 		for i in lines.size():
-			if lines[i].begins_with(header):
+			if lines[i].begins_with(header) or (lines[i].begins_with(typed) and lines[i].contains(' parent="."')):
 				start = i
 				break
 		if start < 0:

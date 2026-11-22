@@ -2,7 +2,8 @@
 
 Opens the game window with the windowed Godot binary and runs res://tests/scenes/smoke_probe.tscn on the real game
 flow. smoke: title and every level with music, effects, an animation check and a screenshot sequence; perf: a 60 s
-bot run on one level with the frame times (fails on any frame above 33 ms after the first second); clip: German clip
+bot run on one level with the frame times (fails on any frame above 33 ms after the first second) per size plus one
+run of perf_menu_seconds on the title with the live menu backdrop at 1920x1080 (perf_title_1920x1080.json); clip: German clip
 check of every screen, the overlong fixture and the castaway height at 1920x1080. Fails on any engine error line and
 on any warning about audio or rendering. Output: <testdata>/smoke/<WxH>/*.png, perf_<WxH>.json, logs/*.log.
 Exit codes: 0 ok, 1 failure, 2 windowed Godot binary missing.
@@ -21,6 +22,9 @@ PROBE_SCENE = "res://tests/scenes/smoke_probe.tscn"
 DEFAULT_SIZES = ("1920x1080", "1280x720")
 STAGES = ("smoke", "perf", "clip")
 TIMEOUTS = {"smoke": 180, "perf": 150, "clip": 240}
+PERF_TITLE_SIZE = "1920x1080"
+PERF_TITLE_ARGS = ("--perf-screen=title",)
+PROBE_CONFIG = REPO / "tests" / "fixtures" / "smoke" / "smoke.json"
 SEED = 12345
 WARN_KEYWORDS = ("Audio", "WASAPI", "Vulkan", "D3D12", "RenderingDevice", "RenderingServer", "OpenGL", "GLES",
                  "shader", "texture")
@@ -95,28 +99,29 @@ def parse_probe(text: str) -> dict:
     return out
 
 
-def probe_cmd(godot, mode: str, size: str, out: Path, data_dir: Path, log_file: Path) -> list:
-    """Command line of one windowed probe run (no --headless, no --fixed-fps)."""
+def probe_cmd(godot, mode: str, size: str, out: Path, data_dir: Path, log_file: Path, extra=()) -> list:
+    """Command line of one windowed probe run (no --headless, no --fixed-fps); extra adds user arguments."""
     return [str(godot), "--path", str(REPO), "--resolution", size, "--log-file", Path(log_file).as_posix(),
             PROBE_SCENE, "--", "--mode=%s" % mode, "--size=%s" % size, "--out=%s" % Path(out).as_posix(),
-            "--data-dir=%s" % Path(data_dir).as_posix(), "--seed=%d" % SEED]
+            "--data-dir=%s" % Path(data_dir).as_posix(), "--seed=%d" % SEED] + list(extra)
 
 
 def castaway_ok(px_1080: float) -> bool:
     return float(px_1080) >= MIN_CASTAWAY_PX
 
 
-def run_probe(godot, mode: str, size: str, base: Path, allowlist=None):
-    """Run one probe; return (parsed result lines, scan_log result, rc, combined text)."""
+def run_probe(godot, mode: str, size: str, base: Path, allowlist=None, extra=(), tag: str = ""):
+    """Run one probe; return (parsed result lines, scan_log result, rc, combined text). tag names extra runs."""
     base = Path(base)
     allowlist = load_allowlist() if allowlist is None else allowlist
     log_dir = base / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / ("%s_%s.log" % (mode, size))
+    name = "%s%s_%s" % (mode, ("_" + tag) if tag else "", size)
+    log_file = log_dir / ("%s.log" % name)
     if log_file.exists():
         log_file.unlink()
     env = godot_env(base / "env")
-    cmd = probe_cmd(godot, mode, size, base, base / "data" / ("%s_%s" % (mode, size)), log_file)
+    cmd = probe_cmd(godot, mode, size, base, base / "data" / name, log_file, extra)
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
                               timeout=TIMEOUTS[mode])
@@ -126,7 +131,7 @@ def run_probe(godot, mode: str, size: str, base: Path, allowlist=None):
         text = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
         text += "\nTIMEOUT after %d s" % TIMEOUTS[mode]
     log_text = log_file.read_text(encoding="utf-8", errors="replace") if log_file.is_file() else ""
-    (log_dir / ("%s_%s.stdout.txt" % (mode, size))).write_text(text, encoding="utf-8")
+    (log_dir / ("%s.stdout.txt" % name)).write_text(text, encoding="utf-8")
     scan = scan_log(text + "\n" + log_text, allowlist)
     scan = {k: sorted(set(v)) for k, v in scan.items()}
     return parse_probe(text), scan, rc, text
@@ -188,24 +193,33 @@ def clip_checks(size: str, parsed: dict, measure_castaway: bool) -> list:
     return checks
 
 
-def perf_checks(size: str, parsed: dict, base: Path) -> list:
-    """Reads the probe's frame file, writes perf_<WxH>.json and checks that no frame after 1 s exceeds 33 ms."""
+def perf_checks(size: str, parsed: dict, base: Path, tag: str = "", min_seconds: float = 59.0) -> list:
+    """Reads the probe's frame file, writes perf_[<tag>_]<WxH>.json and checks that no frame after 1 s exceeds
+    33 ms and that at least min_seconds were recorded (tag "title": the menu run)."""
+    name = "perf %s%s" % ((tag + " ") if tag else "", size)
     if not parsed["perf_frames"]:
-        return [("perf %s" % size, False, "no PERF_FRAMES line")]
+        return [(name, False, "no PERF_FRAMES line")]
     path = Path(parsed["perf_frames"][-1][0])
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        return [("perf %s" % size, False, "cannot read %s: %s" % (path, exc))]
+        return [(name, False, "cannot read %s: %s" % (path, exc))]
     summary = perf_summary(data.get("frame_ms", []))
     line = format_perf(size, summary)
-    print("  " + line)
+    print("  %s%s" % ((tag + " ") if tag else "", line))
     report = dict(summary, size=size, level=data.get("level"), events_triggered=data.get("events_triggered"),
                   physics_per_s=data.get("physics_per_s"), vsync_mode=data.get("vsync_mode"), line=line)
-    (Path(base) / ("perf_%s.json" % size)).write_text(json.dumps(report, indent=1), encoding="utf-8")
+    out_name = "perf_%s%s.json" % ((tag + "_") if tag else "", size)
+    (Path(base) / out_name).write_text(json.dumps(report, indent=1), encoding="utf-8")
     seconds = sum(float(ms) for ms in data.get("frame_ms", [])) / 1000.0
-    return [("perf %s frame time" % size, summary["over_33"] == 0 and summary["frames"] > 0, line),
-            ("perf %s covers 60 s" % size, seconds >= 59.0, "%.1f s recorded" % seconds)]
+    return [("%s frame time" % name, summary["over_33"] == 0 and summary["frames"] > 0, line),
+            ("%s covers %d s" % (name, round(min_seconds + 1)), seconds >= min_seconds, "%.1f s recorded" % seconds)]
+
+
+def perf_menu_seconds() -> float:
+    """Seconds of the title perf run (perf_menu_seconds of the probe config, default 10)."""
+    cfg = json.loads(PROBE_CONFIG.read_text(encoding="utf-8"))
+    return float(cfg.get("perf_menu_seconds", 10.0))
 
 
 def campaign_ids() -> list:
@@ -230,6 +244,11 @@ def run_stage(stage: str, base: Path = None, sizes=DEFAULT_SIZES, godot=None) ->
             checks += perf_checks(size, parsed, base)
         else:
             checks += clip_checks(size, parsed, size == "1920x1080")
+    if stage == "perf" and PERF_TITLE_SIZE in sizes:
+        print("  perf title %s ..." % PERF_TITLE_SIZE)
+        parsed, scan, rc, text = run_probe(godot, stage, PERF_TITLE_SIZE, base, extra=PERF_TITLE_ARGS, tag="title")
+        checks += _common_checks("perf title %s" % PERF_TITLE_SIZE, parsed, scan, rc, text)
+        checks += perf_checks(PERF_TITLE_SIZE, parsed, base, tag="title", min_seconds=perf_menu_seconds() - 1.0)
     return checks
 
 

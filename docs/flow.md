@@ -51,3 +51,35 @@ Unlocks are derived from wins (the first level is always open, level N+1 opens w
 The theme is built in code (`MenuTheme`) from `data/balance/flow.json` and the art palette: one display font for every text (`MenuTheme.FONT`, Kenney Future with fixed X, %, ß and en dash glyphs; headings and body differ only by size and colour), blue depth buttons, a 4 px high-contrast focus outline, buttons at least 64 px high; hovering a button focuses it. Vertical button stacks (title, pause) sit in one `MenuScreen.make_button_column()`, so every button takes the width of the widest one in the current language. Sliders draw no focus box of their own: `MenuScreen.add_focus_ring()` adds a `FocusRing` panel with the same outline that is visible while the slider has focus, and the hovered or focused grabber turns yellow as a second cue. Every menu text is an `i18n/menu.csv` key rendered with `I18n.t()` and re-rendered on `locale_changed`; an en dash renders as a hyphen. Pack and author names on the credits come from `data/credits.json`, generated from `assets/SOURCES.md` by `python tools/build_credits.py` (checked by `tools/validate_credits.py`, which also checks the flow balance limits).
 
 `tests/support/clip_check.gd` is the reusable clip check (text width with stylebox margins and icon, wrapped height, trimming, viewport, clip ancestors, panel and enclosing button, sibling overlap); `tests/ui/test_menu_overflow.gd` runs it for every menu in English and German at 1280x720 and 1920x1080. Flow tests extend `tests/support/flow_case.gd` (per-test data folder below the test data root, fixture campaign, synthetic keys and clicks).
+
+## Menu backdrop (BI-18)
+
+Title, level select, settings and credits sit on a live island instead of the plain clear colour: `scenes/ui/backdrop/menu_island.tscn` (`MenuIsland`, `scripts/levels/menu_island.gd`) with the animated water (`water.gdshader` on `tile_73`, sized to cover the viewport in whole tiles), the textured beach and grass tiles of the levels (`island_tileset.tres`), decorative palms and four critters (chicken, pig, goat, parrot).
+
+Ownership and lifecycle (`scripts/main.gd`):
+
+| Moment | Backdrop |
+|---|---|
+| First menu screen without a level (`show_screen`) | created once (`_ensure_backdrop()`), child of the GameFlow root |
+| Screen switch, Back, language toggle | untouched: same instance, critters keep walking, water time keeps running |
+| `start_level_flow` (intro, play, pause, settings from pause, result) | hidden and `PROCESS_MODE_DISABLED` (frozen, never freed) |
+| `_free_level` (level select, title, credits after the campaign) | visible and processing again |
+| `-- --smoke` | never created |
+| `-- --level=<id>` | not created while the CLI level runs; leaving it to the level select shows it like any menu |
+
+`backdrop()` returns the instance (null before the first menu screen); tests set `cli_override` instead of real command-line arguments.
+
+- Layers: `flow.backdrop_layer` (-10) is below the level canvas (0), the HUD, the announcer caption, the level error panel and the menus (`flow.ui_layer`). The menus keep their own transparent `Backdrop` panel when no level runs, so the island shows around the panel; the panel itself (`ui_panel` at `panel_alpha` 0.92) keeps ui_text and ui_accent above 4.5:1 even over white (`tests/ui/test_menu_contrast.gd`).
+- Scale: the CanvasLayer is scaled by `flow.backdrop_scale` (0.5), so a 128 px tile shows as a 64 px cell and the 30 × 17 cell layout covers 1920 × 1080. Critter sprites are scaled by `flow.backdrop_critter_scale` on top of their kind's `sprite_scale` so they read at that size.
+- Composition rule: the screen band x 420–1500 (the widest panel, the level select tiles) holds only water and plain sand; grass patches, palms and the critters' land rects stay in the left and right thirds (`tests/scenes/test_menu_island.gd`). Nothing takes input: the scene has no Control node, so clicks reach the menu buttons.
+- Critters (`BackdropCritter`, `scripts/levels/backdrop_critter.gd`) tick the shared `AnimalBrain` with their position only (no castaway, no confine, so they wander and idle but never settle) and are clamped into their `land` rect by `LandRect`. They join no group, have no body, emit no EventBus signal and request no sound. Walking makes them hop (`backdrop_hop_hz`, `backdrop_hop_px`, above `backdrop_walk_min_speed`).
+- Reduce motion: with "Reduce screen shake and flashes" (`reduce_shake_flashes`) on, the critter hop height is 0; walking and the slow water stay. The critters follow the setting live (`EventBus.settings_changed`).
+- Palms are `palm.tscn` instances with `decorative = true`: they leave the `prop` group (declared statically in `palm.tscn`) and build no footprint, so tree-wide prop queries in flow tests never see them.
+- Rebuild the tiles after editing `scenes/ui/backdrop/menu_island.layout.txt`:
+
+```
+godot --headless --path . --script res://tools/build_level_layout.gd -- --layout=res://scenes/ui/backdrop/menu_island.layout.txt --scene=res://scenes/ui/backdrop/menu_island.tscn
+```
+
+- Leaving a level clears the announcer queue (`Audio.clear_announcer()` in `_free_level`), so a line the level queued (for example the loss taunt behind the result screen) can no longer show its caption over the level select or the credits (QA-2).
+- Perf: the windowed perf stage also records `perf_menu_seconds` on the title at 1920 × 1080 (`perf_title_1920x1080.json`, no frame above 33 ms after the first second). Visual check of menu shots: `python tools/flat_area_check.py <dir> --glob "*_title_*.png" --mask-x 0.21,0.79 --no-hud`.

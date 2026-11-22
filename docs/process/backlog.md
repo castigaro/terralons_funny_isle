@@ -9,13 +9,13 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 | 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | done in 1.1.0 |
 | 1 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | planned for 1.2.0 |
 | 2 | BI-26 | Export smoke check catches missing sprites and resources in the built exe | small | clear | no | no | planned for 1.2.0 |
-| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | planned for 1.2.0 |
+| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | delivered (feature/BI-18) |
 | 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | planned for 1.2.0 |
 | 5 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | planned for 1.2.0 |
 | 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | planned for 1.2.0 |
 | 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | planned for 1.2.0 |
 | 8 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | planned for 1.2.0 |
-| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | planned for 1.2.0 |
+| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | delivered with BI-18 |
 | 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | planned for 1.2.0 |
 | 11 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
 | 12 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | superseded by BI-27 |
@@ -134,7 +134,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-18 – Live island scene behind title, level select and settings
 
-- Status: planned for 1.2.0
+- Status: delivered (feature/BI-18)
 - Priority: 3
 - Size: large
 - Clarity: clear
@@ -247,7 +247,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### QA-2 – No leftover popup behind the credits panel
 
-- Status: planned for 1.2.0
+- Status: delivered with BI-18 (cause: an announcer line queued by the level, for example the loss taunt, ticked out after the level was freed and showed its caption over the next menu; `_free_level` now calls `Audio.clear_announcer()`; level popups leave with the level and stay hidden behind the result screen)
 - Priority: 9
 - Size: small
 - Clarity: clear

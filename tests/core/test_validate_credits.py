@@ -93,6 +93,18 @@ class CreditsTest(unittest.TestCase):
         errors = validate_credits.check_flow_balance(self.root)
         self.assertTrue(any("result_star_interval_s must be a number" in e for e in errors), errors)
 
+    def test_backdrop_limits(self):
+        self.assertEqual(validate_credits.check_flow_balance(self.root), [])
+        self.write_flow(backdrop_layer=-10, intro_guard_s=-1)
+        errors = validate_credits.check_flow_balance(self.root)
+        self.assertFalse(any("backdrop_layer" in e for e in errors), errors)
+        self.assertTrue(any("intro_guard_s must not be negative" in e for e in errors), errors)
+        self.write_flow(intro_guard_s=0.3, backdrop_layer=0, backdrop_scale=0, backdrop_hop_px=-1)
+        errors = validate_credits.check_flow_balance(self.root)
+        self.assertTrue(any("backdrop_layer must be negative" in e for e in errors), errors)
+        self.assertTrue(any("backdrop_scale must be above 0" in e for e in errors), errors)
+        self.assertTrue(any("backdrop_hop_px must not be negative" in e for e in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()
