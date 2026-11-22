@@ -36,6 +36,8 @@ func _build() -> void:
 			names.append(String(pack.get("pack", "")))
 			licences[String(pack.get("licence", ""))] = true
 		var packs := make_wrapping_label("")
+		# Pack lists use the smallest menu font, so every SOURCES.md row still fits on a 1280x720 screen.
+		packs.add_theme_font_size_override("font_size", int(cfg.get("font_size_min", 0)))
 		packs.text = ", ".join(names)
 		box.add_child(packs)
 		pack_labels.append(packs)
