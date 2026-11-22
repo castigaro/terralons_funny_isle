@@ -21,6 +21,25 @@ static func check_layout(t: TestCase, hud: Hud, view: Vector2, tag: String) -> v
 			var a: Rect2 = rects[names[i]]
 			var b: Rect2 = rects[names[j]]
 			t.check(not a.grow(-0.5).intersects(b.grow(-0.5)), "%s %s overlaps %s" % [tag, names[i], names[j]])
+	_check_star_goal(t, hud, tag)
+
+
+## The 3-star goal line is one unclipped line inside the timer panel, right of the timer and clear of the cue slot.
+static func _check_star_goal(t: TestCase, hud: Hud, tag: String) -> void:
+	var label := hud.panel("StarGoalLabel") as Label
+	if label == null or not label.is_visible_in_tree():
+		return
+	t.check_eq(label.get_line_count(), 1, "%s star goal one line" % tag)
+	var font := label.get_theme_font("font")
+	var w := font.get_string_size(label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, label.get_theme_font_size("font_size")).x
+	t.check(w <= label.size.x + 1.0, "%s star goal fits: %.1f > %.1f" % [tag, w, label.size.x])
+	var star_rect := label.get_global_rect()
+	t.check(hud.panel("TimerPanel").get_global_rect().grow(0.5).encloses(star_rect), "%s star goal inside the timer panel" % tag)
+	t.check(star_rect.position.x >= hud.timer_label().get_global_rect().end.x - 0.5, "%s star goal right of the timer" % tag)
+	var cue := hud.panel("CueSlot")
+	if cue != null and cue.is_visible_in_tree():
+		t.check(not hud.panel("TimerPanel").get_global_rect().grow(-0.5).intersects(cue.get_global_rect().grow(-0.5)),
+				"%s timer panel clear of the cue slot" % tag)
 
 
 ## Every task title is one line whose text fits the label (no ellipsis) and the task panel ends left of the timer.

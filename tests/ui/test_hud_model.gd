@@ -51,6 +51,36 @@ func test_warning_and_star_goal() -> void:
 	check_false(HudModel.star_goal_reachable(44.9, 45.0), "unreachable below")
 
 
+func test_star_goal_state() -> void:
+	var G := HudModel.StarGoal
+	var none := _progress()
+	var cases := [
+		[46.0, S.RUNNING, G.REACHABLE, "above"],
+		[45.0, S.RUNNING, G.REACHABLE, "at the threshold"],
+		[44.99, S.RUNNING, G.MISSED, "below"],
+		[46.0, S.REQUIRED_DONE, G.REACHABLE, "required done is never secured"],
+		[46.0, S.PAUSED, G.REACHABLE, "paused"],
+		[46.0, S.READY, G.REACHABLE, "ready"],
+		[44.0, S.REQUIRED_DONE, G.MISSED, "required done below"],
+	]
+	for c in cases:
+		check_eq(HudModel.star_goal_state(c[0], 45.0, none, c[1], 0), c[2], String(c[3]))
+	var all_done := _progress(["t_req_a", "t_req_b", "t_opt_c", "t_opt_d"])
+	check_eq(HudModel.star_goal_state(100.0, 45.0, all_done, S.REQUIRED_DONE, 3), G.REACHABLE, "no tick before win")
+
+
+func test_star_goal_state_missed_task_and_end() -> void:
+	var G := HudModel.StarGoal
+	check_eq(HudModel.star_goal_state(100.0, 45.0, _progress([], ["t_opt_c"]), S.RUNNING, 0), G.MISSED,
+			"missed optional task")
+	check_eq(HudModel.star_goal_state(100.0, 45.0, _progress([], ["t_req_b"]), S.RUNNING, 0), G.MISSED,
+			"missed required task")
+	check_eq(HudModel.star_goal_state(100.0, 45.0, _progress(), S.LOST, 0), G.MISSED, "lost")
+	check_eq(HudModel.star_goal_state(100.0, 45.0, _progress(), S.WON, 3), G.SECURED, "won with 3 stars")
+	check_eq(HudModel.star_goal_state(100.0, 45.0, _progress(), S.WON, 2), G.MISSED, "won with 2 stars")
+	check_eq(HudModel.star_goal_state(10.0, 45.0, _progress(), S.WON, 3), G.SECURED, "result stars decide")
+
+
 func test_select_hint() -> void:
 	check_eq(HudModel.select_hint(_tasks, _progress()), "h.req_a", "nothing done")
 	check_eq(HudModel.select_hint(_tasks, _progress(["t_req_a"])), "h.req_b", "first required done")

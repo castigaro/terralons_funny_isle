@@ -10,6 +10,9 @@ const KIND_CLASSES := ["animal", "item"]
 const TRIGGER_FIELDS := ["signal", "kind_class", "reasons", "effects"]
 const SECONDS_PER_MINUTE := 60
 const EPSILON := 0.000001
+
+## State of the HUD 3-star goal line.
+enum StarGoal { REACHABLE, MISSED, SECURED }
 ## Signal that ends a dismissible prompt -> the prompt action it stands for.
 const DISMISS_ACTIONS := {
 	"castaway_step": "move",
@@ -57,8 +60,22 @@ static func is_warning(time_left: float, warn_seconds: float, state: int) -> boo
 	return time_left <= warn_seconds + EPSILON
 
 
+## True while time_left is at or above the 3-star threshold (inclusive, same EPSILON as the countdown).
 static func star_goal_reachable(time_left: float, three_star_time: float) -> bool:
 	return time_left + EPSILON >= three_star_time
+
+
+## Star-goal state: the won result decides, a loss or any missed task misses it, else the time threshold does.
+static func star_goal_state(time_left: float, three_star_time: float, progress: Array, state: int,
+		stars: int) -> int:
+	if state == LevelSession.State.WON:
+		return StarGoal.SECURED if stars >= Stars.MAX_STARS else StarGoal.MISSED
+	if state == LevelSession.State.LOST:
+		return StarGoal.MISSED
+	for entry in progress:
+		if entry is Dictionary and bool((entry as Dictionary).get("missed", false)):
+			return StarGoal.MISSED
+	return StarGoal.REACHABLE if star_goal_reachable(time_left, three_star_time) else StarGoal.MISSED
 
 
 ## Hint key of the first open required task, else the first open optional task, else hud.hint.none.
