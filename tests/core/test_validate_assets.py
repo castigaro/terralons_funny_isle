@@ -230,6 +230,28 @@ class RepoAssetsTest(unittest.TestCase):
             text = (common.REPO / user).read_text(encoding="utf-8")
             self.assertIn("res://assets/graphics/pirate-pack-derived/" + name, text)
 
+    def test_theme_props_are_listed_imported_used_and_clean(self):
+        sys.path.insert(0, str(TOOLS))
+        import validate_assets  # noqa: E402
+        folder = common.REPO / "assets" / "graphics" / "theme-derived"
+        names = sorted(p.name for p in folder.glob("*.png"))
+        self.assertEqual(len(names), 14, names)
+        sources = (common.REPO / "assets" / "SOURCES.md").read_text(encoding="utf-8")
+        row = [ln for ln in sources.splitlines() if ln.startswith("| `graphics/theme-derived/` |")]
+        self.assertEqual(len(row), 1, "SOURCES.md row")
+        self.assertIn("derive_theme_props.gd", row[0])
+        self.assertTrue(row[0].rstrip().endswith("| %d |" % len(names)), "file count in the row")
+        deny, errors = validate_assets.load_deny(common.REPO)
+        self.assertEqual(errors, [])
+        scenes = "".join((common.REPO / "scenes" / "levels" / f).read_text(encoding="utf-8")
+                         for f in ("l1_beach_camp.tscn", "l2_farm_meadow.tscn"))
+        for name in names:
+            self.assertEqual(validate_assets.deny_hits(name, deny), [], name)
+            self.assertTrue((folder / (name + ".import")).is_file(), "%s imported" % name)
+            self.assertIn("res://assets/graphics/theme-derived/" + name, scenes)
+        for excluded in ("graphics/topdown-characters/Tilesheet", "graphics/pirate-pack/PNG/Retina/Ship parts"):
+            self.assertTrue((common.REPO / "assets" / excluded / ".gdignore").is_file(), excluded)
+
     def test_asset_map_names_every_category(self):
         text = (common.REPO / "docs" / "asset_map.md").read_text(encoding="utf-8").lower()
         for word in ("castaway", "animals", "items", "tiles", "ui", "fonts", "particles", "music", "sfx"):
