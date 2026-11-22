@@ -11,5 +11,10 @@
 	"restart_cue_seconds": 1.0,
 	"palm_crown_px": 200,
 	"palm_crown_lift_px": 80,
-	"palm_footprint_radius": 18
+	"palm_footprint_radius": 18,
+	"canopy_fade_alpha": 0.45,
+	"canopy_fade_seconds": 0.2,
+	"canopy_fade_margin_px": 24,
+	"canopy_fade_hysteresis_px": 16,
+	"canopy_crown_share": 0.75
 }
