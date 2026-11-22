@@ -2,6 +2,12 @@
 
 A hectic, single-player, keyboard-first slapstick action game for Windows (Godot 4.7.2, GDScript, offline, English and German). A castaway runs, dashes, grabs, carries and throws animals and items across five handcrafted tropical island levels against a 3–5 minute timer while funny tasks and slapstick events keep going wrong. Version 2 replaces the turn-based survival game of v1 with real-time action, polished CC0 art and full audio.
 
+## Installation and usage
+
+Windows only, no installer. Either run the exported `build/TerralonsFunnyIsle.exe` (produced by `python tools/export.py`, pack embedded, version 1.0.0, no Godot needed) or start the project from source with `python tools/play.py` (needs Godot 4.7.2 and Python 3).
+
+Controls: WASD or arrow keys move, Shift dashes, Space or E grabs, throws and uses (the context prompt shows which), H shows a hint, F finishes a level once all required tasks are done, R restarts the level, Esc pauses. Menus work with the keyboard (arrows, Enter, Esc). Language (English or German), music and effects volume are set under Settings and, like the stars and best times per level, are saved in the data folder (`user://`, or `--data-dir=<path>`).
+
 ## Start
 
     python tools/play.py              # windowed game

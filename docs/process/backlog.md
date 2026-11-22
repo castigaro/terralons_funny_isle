@@ -2,24 +2,24 @@
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
-| 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | planned for 1.0.0 |
-| 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | planned for 1.0.0 |
-| 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | planned for 1.0.0 |
-| 4 | BI-2 | Castaway real-time controller: move, dash, grab, carry, throw, use, dizzy | large | clear | yes | yes | planned for 1.0.0 |
-| 5 | BI-5 | Level scene framework, camera and polished environment art | large | clear | yes | yes | planned for 1.0.0 |
-| 6 | BI-4 | Animals and items: behaviours, herding, hit reactions and respawn | large | clear | no | yes | planned for 1.0.0 |
-| 7 | BI-8 | Slapstick juice and feedback system | large | clear | yes | yes | planned for 1.0.0 |
-| 8 | BI-9 | Audio: music, sound effects, jingles, announcer and buses | large | clear | no | yes | planned for 1.0.0 |
-| 9 | BI-6 | HUD, contextual prompts, hints and failure cues | large | clear | no | yes | planned for 1.0.0 |
-| 10 | BI-7 | Game flow, menus, progression and saved settings | large | clear | no | yes | planned for 1.0.0 |
-| 11 | BI-10 | Levels 1–2: Beach Camp and Farm Meadow | large | clear | no | yes | planned for 1.0.0 |
-| 12 | BI-11 | Levels 3–5: Jungle, Lagoon and Volcano Cliffs | large | clear | no | yes | planned for 1.0.0 |
-| 13 | BI-12 | Bot playthrough of all levels under worst-case event timing | large | clear | no | no | planned for 1.0.0 |
-| 14 | BI-14 | Windowed smoke run, performance, German clip check, content review and export | large | clear | no | no | planned for 1.0.0 |
+| 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
+| 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
+| 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | done in 1.0.0 |
+| 4 | BI-2 | Castaway real-time controller: move, dash, grab, carry, throw, use, dizzy | large | clear | yes | yes | done in 1.0.0 |
+| 5 | BI-5 | Level scene framework, camera and polished environment art | large | clear | yes | yes | done in 1.0.0 |
+| 6 | BI-4 | Animals and items: behaviours, herding, hit reactions and respawn | large | clear | no | yes | done in 1.0.0 |
+| 7 | BI-8 | Slapstick juice and feedback system | large | clear | yes | yes | done in 1.0.0 |
+| 8 | BI-9 | Audio: music, sound effects, jingles, announcer and buses | large | clear | no | yes | done in 1.0.0 |
+| 9 | BI-6 | HUD, contextual prompts, hints and failure cues | large | clear | no | yes | done in 1.0.0 |
+| 10 | BI-7 | Game flow, menus, progression and saved settings | large | clear | no | yes | done in 1.0.0 |
+| 11 | BI-10 | Levels 1–2: Beach Camp and Farm Meadow | large | clear | no | yes | done in 1.0.0 |
+| 12 | BI-11 | Levels 3–5: Jungle, Lagoon and Volcano Cliffs | large | clear | no | yes | done in 1.0.0 |
+| 13 | BI-12 | Bot playthrough of all levels under worst-case event timing | large | clear | no | no | done in 1.0.0 |
+| 14 | BI-14 | Windowed smoke run, performance, German clip check, content review and export | large | clear | no | no | done in 1.0.0 |
 
 ### BI-1 – Project foundation, reused tooling and core autoloads
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 1
 - Size: large
 - Clarity: clear
@@ -40,7 +40,7 @@
 
 ### BI-13 – Asset import, SOURCES.md and asset validator
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 2
 - Size: small
 - Clarity: clear
@@ -59,7 +59,7 @@
 
 ### BI-3 – Data-driven level, task, event, timer and star rules engine
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 3
 - Size: large
 - Clarity: clear
@@ -81,7 +81,7 @@
 
 ### BI-2 – Castaway real-time controller: move, dash, grab, carry, throw, use, dizzy
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 4
 - Size: large
 - Clarity: clear
@@ -103,7 +103,7 @@
 
 ### BI-5 – Level scene framework, camera and polished environment art
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 5
 - Size: large
 - Clarity: clear
@@ -123,7 +123,7 @@
 
 ### BI-4 – Animals and items: behaviours, herding, hit reactions and respawn
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 6
 - Size: large
 - Clarity: clear
@@ -143,7 +143,7 @@
 
 ### BI-8 – Slapstick juice and feedback system
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 7
 - Size: large
 - Clarity: clear
@@ -162,7 +162,7 @@
 
 ### BI-9 – Audio: music, sound effects, jingles, announcer and buses
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 8
 - Size: large
 - Clarity: clear
@@ -182,7 +182,7 @@
 
 ### BI-6 – HUD, contextual prompts, hints and failure cues
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 9
 - Size: large
 - Clarity: clear
@@ -202,7 +202,7 @@
 
 ### BI-7 – Game flow, menus, progression and saved settings
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 10
 - Size: large
 - Clarity: clear
@@ -224,7 +224,7 @@
 
 ### BI-10 – Levels 1–2: Beach Camp and Farm Meadow
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 11
 - Size: large
 - Clarity: clear
@@ -243,7 +243,7 @@
 
 ### BI-11 – Levels 3–5: Jungle, Lagoon and Volcano Cliffs
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 12
 - Size: large
 - Clarity: clear
@@ -262,7 +262,7 @@
 
 ### BI-12 – Bot playthrough of all levels under worst-case event timing
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 13
 - Size: large
 - Clarity: clear
@@ -280,7 +280,7 @@
 
 ### BI-14 – Windowed smoke run, performance, German clip check, content review and export
 
-- Status: planned for 1.0.0
+- Status: done in 1.0.0
 - Priority: 14
 - Size: large
 - Clarity: clear
