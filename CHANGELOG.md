@@ -8,12 +8,12 @@ Fix round for the findings of the 1.2.0 release QA. Gameplay, tasks, timers, lay
 
 ### Fixed
 
+- Grass patches in Beach Camp, Farm Meadow and Volcano Cliffs have soft, rounded outlines with outer and inner corner edges instead of straight rectangle borders (QA-3).
 - No leftover 'HA HA' emote or popup beside the loss result panel: result mode now clears and blocks emotes as well as popup words (QA-4).
 - Version raised to 1.2.1 in `project.godot` and `export_presets.cfg`.
 
 ### Known limitations
 
-- Hard-edged rectangular grass patches remain in L1, L2 and L5 (QA-3); the fix is not on main yet.
 - Clean exit (BI-24) and the difficulty curve are still open.
 
 ## [1.2.0] – 2026-11-23

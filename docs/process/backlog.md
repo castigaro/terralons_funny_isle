@@ -1,6 +1,6 @@
 # Backlog – Release 1.2.0
 
-Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23; BI-26 (export smoke check), QA-1, QA-2 and BI-27 (release preparation) ride along. Difficulty, timers, tasks, events and layout stay unchanged. BI-24 stays open and out of scope; BI-25 is superseded by BI-27. Delivered in 1.2.0: BI-19, BI-21, BI-26, QA-1 and BI-27; QA-2 partly. BI-18, BI-20, BI-22 and BI-23 are not on main and stay open. QA-3 and QA-4 were found in release QA. Items done in 1.1.0 and 1.0.0 follow with unchanged sections.
+Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23; BI-26 (export smoke check), QA-1, QA-2 and BI-27 (release preparation) ride along. Difficulty, timers, tasks, events and layout stay unchanged. BI-24 stays open and out of scope; BI-25 is superseded by BI-27. Delivered in 1.2.0: BI-19, BI-21, BI-26, QA-1 and BI-27; QA-2 partly. BI-18, BI-20, BI-22, BI-23 and QA-2 followed in 1.2.0 after serial merges. QA-3 and QA-4 were found in release QA and are done in 1.2.1. Items done in 1.1.0 and 1.0.0 follow with unchanged sections.
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
@@ -19,7 +19,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 | 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | done in 1.2.0 (release candidate rc1) |
 | 11 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
 | 12 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | superseded by BI-27 |
-| 13 | QA-3 | Hard-edged rectangular grass patches remain inside play areas of L1, L2 and L5 | small | clear | no | yes | open |
+| 13 | QA-3 | Hard-edged rectangular grass patches remain inside play areas of L1, L2 and L5 | small | clear | no | yes | done in 1.2.1 |
 | 14 | QA-4 | Leftover 'HA HA' popup visible beside the loss result panel | small | clear | no | yes | done in 1.2.1 |
 | 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
 | 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
@@ -286,7 +286,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### QA-3 – Hard-edged rectangular grass patches remain inside play areas of L1, L2 and L5
 
-- Status: open
+- Status: done in 1.2.1
 - Priority: 13
 - Size: small
 - Clarity: clear
@@ -641,7 +641,7 @@ Stage fix, patch version 1.2.1. Gameplay, tasks, timers, layout and difficulty s
 
 | ID | Title | Findings | Status |
 |----|-------|----------|--------|
-| FX-1 | Soft-edged grass patches in L1, L2 and L5 | QA-3 | open (not accepted after 2 rework rounds; branch fix/FX-1 kept, not on main) |
+| FX-1 | Soft-edged grass patches in L1, L2 and L5 | QA-3 | done in 1.2.1 (merged after a completed review outside the run) |
 | FX-2 | No level effect beside the loss result panel | QA-4 | done in 1.2.1 |
 
 - FX-1 locus: `scenes/levels/layouts/l1_beach_camp.layout.txt`, `l2_farm_meadow.layout.txt`, `l5_volcano_cliffs.layout.txt` (grass cells are straight-sided rectangles of "," whose borders get straight edge tiles) rebuilt with `tools/build_level_layout.gd`, if needed `tools/derive_grass_edges.gd`; check with `tools/flat_area_check.py` and playtest shots. Grass has no collision, so reshaping the patches (rounded outlines with outer and inner corner tiles) keeps layout and collision unchanged.
