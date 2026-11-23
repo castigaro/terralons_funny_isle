@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=37 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/levels/level_base.tscn" id="1_base"]
 [ext_resource type="PackedScene" path="res://scenes/castaway/castaway.tscn" id="2_castaway"]
@@ -28,6 +28,10 @@
 [ext_resource type="Texture2D" path="res://assets/graphics/pirate-pack/PNG/Retina/Tiles/tile_76.png" id="t12"]
 [ext_resource type="Texture2D" path="res://assets/graphics/items/PNG/Colored/genericItem_color_128.png" id="t13"]
 [ext_resource type="PackedScene" path="res://scenes/levels/props/zone_marker.tscn" id="zm_marker"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/fence_h@2.png" id="td_fence_h"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/fence_v@2.png" id="td_fence_v"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/field@2.png" id="td_field"]
+[ext_resource type="Texture2D" path="res://assets/graphics/theme-derived/barn@2.png" id="td_barn"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pond"]
 size = Vector2(512, 512)
@@ -221,6 +225,11 @@ position = Vector2(1694, 1252)
 [node name="Boulder17" parent="Actors" instance=ExtResource("7_boulder")]
 position = Vector2(3776, 1600)
 
+[node name="Sprite" parent="Actors/Boulder17" index="1"]
+position = Vector2(0, -96)
+scale = Vector2(1, 1)
+texture = ExtResource("td_barn")
+
 [node name="PondJetty" type="Node2D" parent="Actors"]
 position = Vector2(2048, 1236)
 script = ExtResource("14_pen")
@@ -370,6 +379,45 @@ event_id = "rain_shower"
 
 [node name="EventEffects" type="Node2D" parent="."]
 script = ExtResource("10_effects")
+
+[node name="Field" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+position = Vector2(2784, 896)
+texture = ExtResource("td_field")
+
+[node name="FenceN" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+texture_repeat = 2
+position = Vector2(3264, 768)
+texture = ExtResource("td_fence_h")
+region_enabled = true
+region_rect = Rect2(-5, 0, 394, 24)
+
+[node name="FenceS_W" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+texture_repeat = 2
+position = Vector2(3136, 1152)
+texture = ExtResource("td_fence_h")
+region_enabled = true
+region_rect = Rect2(-5, 0, 138, 24)
+
+[node name="FenceS_E" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+texture_repeat = 2
+position = Vector2(3392, 1152)
+texture = ExtResource("td_fence_h")
+region_enabled = true
+region_rect = Rect2(-5, 0, 138, 24)
+
+[node name="FenceW" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+texture_repeat = 2
+position = Vector2(3072, 960)
+texture = ExtResource("td_fence_v")
+region_enabled = true
+region_rect = Rect2(0, -5, 24, 394)
+
+[node name="FenceE" type="Sprite2D" parent="GroundDecor" groups=["decor"]]
+texture_repeat = 2
+position = Vector2(3456, 960)
+texture = ExtResource("td_fence_v")
+region_enabled = true
+region_rect = Rect2(0, -5, 24, 394)
 
 [node name="pond" parent="ZoneMarkers" instance=ExtResource("zm_marker")]
 zone_id = "pond"

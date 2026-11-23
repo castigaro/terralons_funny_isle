@@ -43,6 +43,9 @@ tile_set = ExtResource("4_tiles")
 z_index = -2
 tile_set = ExtResource("4_tiles")
 
+[node name="GroundDecor" type="Node2D" parent="."]
+z_index = -2
+
 [node name="ZoneMarkers" type="Node2D" parent="."]
 z_index = -2
 

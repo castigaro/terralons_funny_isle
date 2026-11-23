@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://scenes/levels/art/volcanic_ground.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/graphics/volcano-derived/volcanic_detail@2.png" id="2_detail"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/rock_low = Color(0.0784, 0.0588, 0.051, 1)
+shader_parameter/rock_high = Color(0.3529, 0.2863, 0.2431, 1)
+shader_parameter/ash_tint = Color(0.4314, 0.4078, 0.3765, 1)
+shader_parameter/stone_tint = Color(0.8235, 0.7216, 0.651, 1)
+shader_parameter/detail_tex = ExtResource("2_detail")
+shader_parameter/detail_world_px = 256.0
+shader_parameter/detail_strength = 0.9
+shader_parameter/luma_gain = 3.0
+shader_parameter/sand_luma_mean = 0.913

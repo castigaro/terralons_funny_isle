@@ -39,6 +39,7 @@ func setup(config: EntityConfig, kind_def: Dictionary, speed_lines: CPUParticles
 		body.texture = load(sprite_path)
 	_body_scale = Vector2.ONE * float(kind_def.get("sprite_scale", 1.0))
 	body.scale = _body_scale
+	ArtPalette.apply_level_halo(body)
 	max_speed = maxf(float(kind_def.get("speed", 1.0)) * float(kind_def.get("flee_speed_factor", 1.0)), 1.0)
 	_speed_lines.amount = maxi(1, int(cfg.speed_line_amount))
 	_stars.setup(cfg)

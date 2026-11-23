@@ -4,13 +4,20 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [1.2.0] – 2026-11-23
 
-Finished-look pass, first part: textured ground, a themed Jungle and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
+Finished-look pass: textured ground, five themed levels and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
 
 ### Added
 
 - Textured ground with edge tiles instead of flat single-colour rectangles in all levels (BI-19).
+- Beach Camp reads as a camp (tent, crates, barrels, campfire, driftwood, dune grass) and Farm Meadow as a farm (fenced pig pen, barn, ploughed field with crops); gameplay positions and collision are unchanged (BI-20).
+- The Lagoon reads as a lagoon village: four thatched stilt huts on the water, plank docks leading to them from the shore, two sailing boats plus a rowing dinghy that bob gently on the water (still with "reduce screen shake and flashes"); huts and boats cast a soft water reflection instead of a ground shadow. Gameplay positions, collision, tasks and events are unchanged (BI-22).
+- Volcano Cliffs reads as a volcano: dark textured basalt ground with scorched ash instead of grass, cliff faces along the coast, glowing lava fissures on the rock clusters and three smoking vents; animals get a light halo and items a light outline there, drop shadows are tinted darker, and lava glow holds still under "reduce screen shake and flashes". Layout, collision, tasks and events are unchanged (BI-23).
 - Themed Jungle (level 3) with dense layered vegetation, a darker jungle ground, a grass tint and semi-transparent canopy foliage that fades near the castaway (BI-21).
 - The smoke run of the exported exe loads every animal and item sprite and every level and fails on any unknown kind or missing resource; `tools/export.py` reports each problem line (BI-26).
+
+### Changed
+
+- The credits list the pack names in the smallest menu font, so the added theme props row still fits at 1280x720.
 
 ### Fixed
 
@@ -20,7 +27,7 @@ Finished-look pass, first part: textured ground, a themed Jungle and a stricter 
 
 ### Known limitations
 
-- Not on main and therefore not in this release: live island backdrop behind the menus (BI-18), themed Beach Camp and Farm Meadow (BI-20), themed Lagoon (BI-22), themed Volcano Cliffs (BI-23). The branches `feature/BI-18`, `feature/BI-20`, `feature/BI-22` and `feature/BI-23` are kept; levels 1, 2, 4 and 5 still look like plain sand and grass, and the menus sit on plain light blue.
+- The live island backdrop behind the menus (BI-18) is not in this release yet; the menus sit on plain light blue.
 - Hard-edged rectangular grass patches remain in L1, L2 and L5 (QA-3); a level popup ('HA HA') stays visible beside the loss panel (QA-4).
 - Clean exit (BI-24) and the difficulty curve are still open.
 

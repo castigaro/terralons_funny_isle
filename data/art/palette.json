@@ -16,7 +16,24 @@
 		"jungle_leaf": "#3f8f4a",
 		"jungle_leaf_deep": "#2b6b3a",
 		"jungle_fern": "#5aa84f",
-		"jungle_canopy": "#8fbf96"
+		"jungle_canopy": "#8fbf96",
+		"volcano_rock_low": "#140f0d",
+		"volcano_rock_high": "#5a493e",
+		"volcano_rim": "#a8876f",
+		"volcano_ash": "#6e6860",
+		"volcano_stone": "#d2b8a6",
+		"volcano_cliff": "#1f1714",
+		"lava_hot": "#ff6a1a",
+		"lava_core": "#ffd23f",
+		"volcano_outline": "#f3e3cc",
+		"volcano_shadow_tint": "#4d4040"
+	},
+	"level_overrides": {
+		"l5_volcano_cliffs": {
+			"outline_color_key": "volcano_outline",
+			"halo_color_key": "volcano_outline",
+			"shadow_tint_key": "volcano_shadow_tint"
+		}
 	},
 	"water_tint": "water",
 	"highlight": "#ffffff",
@@ -43,6 +60,7 @@
 		"assets/graphics/foliage-sprites/",
 		"assets/graphics/pirate-pack/PNG/Retina/Tiles/",
 		"assets/graphics/pirate-pack-derived/",
+		"assets/graphics/theme-derived/",
 		"assets/graphics/topdown-characters/",
 		"assets/graphics/animals/PNG/Round (outline)/"
 	]

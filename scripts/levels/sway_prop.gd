@@ -14,6 +14,8 @@ const ACTOR_GROUP := "actor"
 @export var footprint_radius := 0.0
 ## Width share of the sprite that casts the shadow (trees cast a smaller base shadow than their crown).
 @export var shadow_width_share := 1.0
+## Colour multiplied onto the sprite only (white tufts tinted per level); the shadow keeps its palette alpha.
+@export var tint := Color.WHITE
 ## Fade the sprite while an actor (castaway, animal, item) is behind its crown.
 @export var occlusion_fade := false
 ## False hides the drop shadow (small ground cover); the Shadow node stays.
@@ -37,6 +39,7 @@ func _ready() -> void:
 		sprite.texture = texture
 	sprite.centered = false
 	sprite.scale = Vector2.ONE * sprite_scale
+	sprite.modulate = tint
 	if sprite.texture != null:
 		var size := sprite.texture.get_size()
 		sprite.offset = Vector2(-size.x / 2.0, -size.y)

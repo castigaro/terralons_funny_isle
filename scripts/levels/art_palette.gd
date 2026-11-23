@@ -51,6 +51,18 @@ static func validate(palette: Dictionary) -> Array:
 		for prefix in outlined:
 			if drawn.has(prefix):
 				errors.append("%s: listed as outlined and as drawn_outline" % prefix)
+	var overrides: Variant = palette.get("level_overrides", {})
+	if not overrides is Dictionary:
+		errors.append("level_overrides: must be an object of level ids")
+	else:
+		for level_id in overrides:
+			var block: Variant = overrides[level_id]
+			if not block is Dictionary:
+				errors.append("level_overrides.%s: must be an object" % level_id)
+				continue
+			for key in block:
+				if not colors.has(str(block[key])):
+					errors.append("level_overrides.%s.%s: must name a palette colour" % [level_id, key])
 	return errors
 
 
@@ -126,8 +138,45 @@ static func apply_outline(sprite: Sprite2D) -> void:
 	var mat := current if has_outline else ShaderMaterial.new()
 	mat.shader = OUTLINE_SHADER
 	apply_to(mat)
+	mat.set_shader_parameter("outline_color", level_color(sprite, "outline_color_key", outline_color()))
 	mat.set_shader_parameter("outline_px", outline_px() / maxf(absf(sprite.scale.x), 0.01))  # balance-exempt: divide guard
 	sprite.material = mat
+
+
+## Gives a sprite a light halo (the outline shader in the colour named by the level's halo_color_key override) when
+## the level that owns it asks for one; the only case where a drawn-outline sprite gets the shader, so dark animals
+## stay readable on the dark volcanic ground. Leaves the sprite unchanged in every other level.
+static func apply_level_halo(sprite: Sprite2D) -> void:
+	if sprite == null or sprite.texture == null:
+		return
+	var halo := level_color(sprite, "halo_color_key", Color.TRANSPARENT)
+	if halo.a <= 0.0:
+		return
+	var mat := ShaderMaterial.new()
+	mat.shader = OUTLINE_SHADER
+	mat.set_shader_parameter("outline_color", halo)
+	mat.set_shader_parameter("outline_px", outline_px() / maxf(absf(sprite.scale.x), 0.01))  # balance-exempt: divide guard
+	sprite.material = mat
+
+
+## Colour of a per-level override (palette "level_overrides" -> level id -> key naming a palette colour) for the
+## level that owns node; fallback when the node is in no level or the level has no such override.
+static func level_color(node: Node, key: String, fallback: Color) -> Color:
+	var block: Variant = data().get("level_overrides", {}).get(level_id_of(node), {})
+	if not block is Dictionary or not (block as Dictionary).has(key):
+		return fallback
+	return color(str(block[key]))
+
+
+## Level id (file name of its level JSON) of the level scene that contains node, or "".
+static func level_id_of(node: Node) -> String:
+	var n := node
+	while n != null:
+		var path: Variant = n.get("level_json_path")
+		if path is String and path != "":
+			return String(path).get_file().get_basename()
+		n = n.get_parent()
+	return ""
 
 
 static func _matches(texture_path: String, prefixes: Array) -> bool:
