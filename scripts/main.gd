@@ -157,7 +157,7 @@ func _set_playing() -> void:
 
 
 ## Quiets everything that could show a second headline behind the result screen: the HUD, cue and prompts of the
-## level, its popup words and the announcer caption (the voice line still plays).
+## level, its popup words and emotes and the announcer caption (the voice line still plays).
 func _set_result_quiet(on: bool) -> void:
 	if _level != null and is_instance_valid(_level):
 		_level.set_result_mode(on)
