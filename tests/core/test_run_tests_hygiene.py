@@ -51,6 +51,23 @@ class SnapshotDiffTest(unittest.TestCase):
         self.assertEqual(run_tests.snapshot_diff(before, after), ([], [], ["progress.json"]))
 
 
+class UserdataSnapshotTest(unittest.TestCase):
+    setUp = SnapshotDiffTest.setUp
+    write = SnapshotDiffTest.write
+
+    def test_engine_logs_and_caches_are_ignored(self):
+        self.write("progress.json", "{}")
+        before = run_tests.userdata_snapshot(self.root)
+        self.write("logs/godot2026-01-01T00.00.00.log", "x")
+        self.write("shader_cache/CanvasShaderGLES3/a.cache", "x")
+        self.assertEqual(run_tests.snapshot_diff(before, run_tests.userdata_snapshot(self.root)), ([], [], []))
+
+    def test_save_data_still_counts(self):
+        before = run_tests.userdata_snapshot(self.root)
+        self.write("progress.json", "{}")
+        self.assertEqual(run_tests.snapshot_diff(before, run_tests.userdata_snapshot(self.root))[0], ["progress.json"])
+
+
 class FormatUserdataDiffTest(unittest.TestCase):
     def test_header_lines_and_truncation(self):
         added = ["file_%02d.cfg" % i for i in range(25)]
@@ -69,7 +86,7 @@ class FormatUserdataDiffTest(unittest.TestCase):
         self.assertNotIn("Users", text)
 
     def test_parallel_play_hint_for_logs_and_progress(self):
-        _t, detail = run_tests.format_userdata_diff([], [], ["logs/godot.log"])
+        _t, detail = run_tests.format_userdata_diff([], [], ["settings.json"])
         self.assertIn("likely parallel play, rerun without playing", detail)
         _t, detail = run_tests.format_userdata_diff(["progress.json"], [], [])
         self.assertIn("likely parallel play", detail)
@@ -97,12 +114,11 @@ class StageHygieneTest(unittest.TestCase):
 
     def test_changed_folder_fails_with_relative_paths(self):
         before = run_tests.folder_snapshot(self.root)
-        (self.root / "logs").mkdir()
-        (self.root / "logs" / "godot.log").write_text("x", encoding="utf-8")
+        (self.root / "progress.json").write_text("{}", encoding="utf-8")
         stage, out = self.run_stage(before)
         self.assertEqual(stage.failed, 1)
         self.assertIn("hygiene: real user folder changed (1 files)", out)
-        self.assertIn("  + logs/godot.log", out)
+        self.assertIn("  + progress.json", out)
         self.assertIn("likely parallel play", out)
         self.assertNotIn(str(self.root), out)
 
