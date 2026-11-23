@@ -18,6 +18,7 @@ const SCREEN_SCENES := {
 const MUSIC_MENU := "title"
 const MUSIC_ENDING := "ending"
 const CLI_LEVEL := "level"
+const ANNOUNCER_GO := "go"
 
 ## Replaces the real quit (tests); empty means Audio.quit_game().
 var quit_handler := Callable()
@@ -41,6 +42,7 @@ func _ready() -> void:
 	_ui_layer.layer = Balance.get_int("flow", "ui_layer")
 	EventBus.level_won.connect(_on_level_won)
 	EventBus.level_lost.connect(_on_level_lost)
+	EventBus.announcer_line.connect(_on_announcer_line)
 	var cli_level: Variant = CliArgs.current().get(CLI_LEVEL, "")
 	if cli_level is String and cli_level != "" and start_level_flow(cli_level):
 		return
@@ -88,6 +90,8 @@ func last_result() -> Dictionary:
 func show_screen(screen: int, came_from: int = FlowRules.Screen.NONE) -> MenuScreen:
 	_clear_screen()
 	_set_result_quiet(screen == FlowRules.Screen.RESULT)
+	if _is_bare_menu(screen):
+		_hide_caption()
 	_screen = screen
 	if came_from != FlowRules.Screen.NONE:
 		_came_from[screen] = came_from
@@ -101,6 +105,12 @@ func show_screen(screen: int, came_from: int = FlowRules.Screen.NONE) -> MenuScr
 	_update_music()
 	screen_changed.emit(screen)
 	return _screen_node
+
+
+## True for a menu screen shown without a level behind it; no announcer caption may show there.
+func _is_bare_menu(screen: int) -> bool:
+	return _level == null and screen in [FlowRules.Screen.TITLE, FlowRules.Screen.LEVEL_SELECT,
+			FlowRules.Screen.SETTINGS, FlowRules.Screen.CREDITS]
 
 
 func _clear_screen() -> void:
@@ -220,6 +230,18 @@ func start_level_flow(level_id: String, with_intro: bool = true) -> bool:
 		_level.start_level()
 		_set_playing()
 	return true
+
+
+## The big GO popup is the start cue, so the caption chip of the 'go' voice line is hidden again.
+func _on_announcer_line(line_id: String, _caption_key: String, _seconds: float) -> void:
+	if line_id == ANNOUNCER_GO:
+		_hide_caption()
+
+
+func _hide_caption() -> void:
+	var caption := Audio.caption()
+	if caption != null and caption.has_method("hide_now"):
+		caption.call("hide_now")
 
 
 func _on_intro_dismissed() -> void:
@@ -352,6 +374,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _run_smoke() -> void:
 	var reason := _smoke_problem()
+	if reason == "":
+		reason = await SmokeContent.problem(self)
 	if reason == "":
 		print("SMOKE OK")
 		Audio.quit_game(0)

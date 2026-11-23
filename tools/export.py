@@ -1,5 +1,6 @@
 """Build the Windows release exe: python tools/export.py [--out <path>].
 
+The smoke run loads every animal and item sprite and every level, and fails on any unknown kind or missing resource.
 Exports the preset "Windows Desktop" of export_presets.cfg (pack embedded, one file) to build/TerralonsFunnyIsle.exe
 and runs the headless smoke test on the built exe with its user and data folders below <testdata>/export.
 Needs the Godot 4.7.2 export templates in %APPDATA%/Godot/export_templates/4.7.2.stable; the export reads them from the
@@ -8,6 +9,7 @@ Exit codes: 0 built and smoke OK, 1 export or smoke failed, 2 Godot missing, 3 e
 """
 import argparse
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -34,6 +36,14 @@ def check_templates(environ=os.environ) -> str:
     return "" if path.is_file() else "export templates for 4.7.2 missing at %s" % path
 
 
+_CONTENT_RE = re.compile(r"unknown kind|sprite missing|scene missing|Failed loading resource|Resource file not found", re.I)
+
+
+def content_problems(output: str) -> list:
+    """Lines of the exe output that report a missing sprite, scene or resource or an unknown kind."""
+    return [ln.strip() for ln in output.splitlines() if _CONTENT_RE.search(ln) or ln.startswith("SMOKE FAIL")]
+
+
 def smoke(exe: Path) -> bool:
     """Run the smoke mode of the built exe in a sandbox and report whether it printed SMOKE OK."""
     try:
@@ -46,6 +56,10 @@ def smoke(exe: Path) -> bool:
         return False
     output = proc.stdout + proc.stderr
     ok = proc.returncode == 0 and "SMOKE OK" in output and not scan_output(output, load_allowlist())
+    ok = ok and not content_problems(output)
+    if not ok:
+        for line in content_problems(output):
+            print("smoke content problem: " + line, file=sys.stderr)
     print(output.strip().splitlines()[-1] if output.strip() else "(no output)", file=sys.stdout if ok else sys.stderr)
     return ok
 

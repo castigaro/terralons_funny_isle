@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] – 2026-11-23
+
+Finished-look pass, first part: textured ground, a themed Jungle and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
+
+### Added
+
+- Textured ground with edge tiles instead of flat single-colour rectangles in all levels (BI-19).
+- Themed Jungle (level 3) with dense layered vegetation, a darker jungle ground, a grass tint and semi-transparent canopy foliage that fades near the castaway (BI-21).
+- The smoke run of the exported exe loads every animal and item sprite and every level and fails on any unknown kind or missing resource; `tools/export.py` reports each problem line (BI-26).
+
+### Fixed
+
+- Level start shows a single 'GO!' cue: the big popup stays, the caption chip of the 'go' voice line is hidden (QA-1).
+- Menu screens opened without a level behind them hide a leftover announcer caption, so the credits show only their panel (QA-2, partly).
+- Version raised to 1.2.0 in `project.godot` and `export_presets.cfg`.
+
+### Known limitations
+
+- Not on main and therefore not in this release: live island backdrop behind the menus (BI-18), themed Beach Camp and Farm Meadow (BI-20), themed Lagoon (BI-22), themed Volcano Cliffs (BI-23). The branches `feature/BI-18`, `feature/BI-20`, `feature/BI-22` and `feature/BI-23` are kept; levels 1, 2, 4 and 5 still look like plain sand and grass, and the menus sit on plain light blue.
+- Hard-edged rectangular grass patches remain in L1, L2 and L5 (QA-3); a level popup ('HA HA') stays visible beside the loss panel (QA-4).
+- Clean exit (BI-24) and the difficulty curve are still open.
+
 ## [1.1.0] – 2026-11-22
 
 Readability pass: font, result screen and HUD 3-star target. Gameplay, tasks, timers and difficulty are unchanged.

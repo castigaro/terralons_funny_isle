@@ -1,24 +1,26 @@
 # Backlog – Release 1.2.0
 
-Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23; BI-26 (export smoke check), QA-1, QA-2 and BI-27 (release preparation) ride along. Difficulty, timers, tasks, events and layout stay unchanged. BI-24 stays open and out of scope; BI-25 is superseded by BI-27. Items done in 1.1.0 and 1.0.0 follow with unchanged sections.
+Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23; BI-26 (export smoke check), QA-1, QA-2 and BI-27 (release preparation) ride along. Difficulty, timers, tasks, events and layout stay unchanged. BI-24 stays open and out of scope; BI-25 is superseded by BI-27. Delivered in 1.2.0: BI-19, BI-21, BI-26, QA-1 and BI-27; QA-2 partly. BI-18, BI-20, BI-22 and BI-23 are not on main and stay open. QA-3 and QA-4 were found in release QA. Items done in 1.1.0 and 1.0.0 follow with unchanged sections.
 
 | Prio | ID | Title | Size | Clarity | Novel | UX | Status |
 |---|---|---|---|---|---|---|---|
 | 1 | BI-15 | Readable display font with full EN/DE glyphs and one-line HUD task names | small | clear | no | yes | done in 1.1.0 |
 | 2 | BI-16 | Result screen with one headline and one star animation | small | clear | no | yes | done in 1.1.0 |
 | 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | done in 1.1.0 |
-| 1 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | planned for 1.2.0 |
-| 2 | BI-26 | Export smoke check catches missing sprites and resources in the built exe | small | clear | no | no | planned for 1.2.0 |
-| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | planned for 1.2.0 |
-| 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | planned for 1.2.0 |
-| 5 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | planned for 1.2.0 |
-| 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | planned for 1.2.0 |
-| 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | planned for 1.2.0 |
-| 8 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | planned for 1.2.0 |
-| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | planned for 1.2.0 |
-| 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | planned for 1.2.0 |
+| 1 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | done in 1.2.0 |
+| 2 | BI-26 | Export smoke check catches missing sprites and resources in the built exe | small | clear | no | no | done in 1.2.0 (criterion 3: the output filter is unit-tested, no test build with a forced missing sprite) |
+| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | open (branch feature/BI-18, merge not completed) |
+| 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | open (branch feature/BI-20, merge not completed) |
+| 5 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | done in 1.2.0 |
+| 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | open (branch feature/BI-22, merge reverted on the hygiene check) |
+| 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | open (branch feature/BI-23, reviewed with a blocker, merge not completed) |
+| 8 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | done in 1.2.0 |
+| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | partly done in 1.2.0 (credits clean; open: loss-result popup, BI-18 backdrop) |
+| 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | done in 1.2.0 (release candidate rc1) |
 | 11 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
 | 12 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | superseded by BI-27 |
+| 13 | QA-3 | Hard-edged rectangular grass patches remain inside play areas of L1, L2 and L5 | small | clear | no | yes | open |
+| 14 | QA-4 | Leftover 'HA HA' popup visible beside the loss result panel | small | clear | no | yes | open |
 | 1 | BI-1 | Project foundation, reused tooling and core autoloads | large | clear | no | no | done in 1.0.0 |
 | 2 | BI-13 | Asset import, SOURCES.md and asset validator | small | clear | no | no | done in 1.0.0 |
 | 3 | BI-3 | Data-driven level, task, event, timer and star rules engine | large | clear | no | no | done in 1.0.0 |
@@ -93,7 +95,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-19 – Textured ground with edge tiles and no flat placeholder shapes in any level
 
-- Status: planned for 1.2.0
+- Status: done in 1.2.0
 - Priority: 1
 - Size: large
 - Clarity: clear
@@ -115,7 +117,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-26 – Export smoke check catches missing sprites and resources in the built exe
 
-- Status: planned for 1.2.0
+- Status: done in 1.2.0 (criterion 3: the output filter is unit-tested, no test build with a forced missing sprite)
 - Priority: 2
 - Size: small
 - Clarity: clear
@@ -134,7 +136,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-18 – Live island scene behind title, level select and settings
 
-- Status: planned for 1.2.0
+- Status: open (branch feature/BI-18, merge not completed)
 - Priority: 3
 - Size: large
 - Clarity: clear
@@ -153,7 +155,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-20 – Themed Beach Camp and Farm Meadow
 
-- Status: planned for 1.2.0
+- Status: open (branch feature/BI-20, merge not completed)
 - Priority: 4
 - Size: large
 - Clarity: clear
@@ -172,7 +174,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-21 – Themed Jungle with dense vegetation
 
-- Status: planned for 1.2.0
+- Status: done in 1.2.0
 - Priority: 5
 - Size: large
 - Clarity: clear
@@ -191,7 +193,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-22 – Themed Lagoon with huts, boats and docks
 
-- Status: planned for 1.2.0
+- Status: open (branch feature/BI-22, merge reverted on the hygiene check)
 - Priority: 6
 - Size: large
 - Clarity: clear
@@ -210,7 +212,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-23 – Themed Volcano Cliffs with dark rock, cliff edges and lava glow
 
-- Status: planned for 1.2.0
+- Status: open (branch feature/BI-23, reviewed with a blocker, merge not completed)
 - Priority: 7
 - Size: large
 - Clarity: clear
@@ -229,7 +231,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### QA-1 – One 'GO!' cue at level start instead of chip plus giant text
 
-- Status: planned for 1.2.0
+- Status: done in 1.2.0
 - Priority: 8
 - Size: small
 - Clarity: clear
@@ -247,7 +249,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### QA-2 – No leftover popup behind the credits panel
 
-- Status: planned for 1.2.0
+- Status: partly done in 1.2.0 (credits clean; open: loss-result popup, BI-18 backdrop)
 - Priority: 9
 - Size: small
 - Clarity: clear
@@ -265,7 +267,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-27 – Release 1.2.0: full visual pass, tag and fresh verified export
 
-- Status: planned for 1.2.0
+- Status: done in 1.2.0 (release candidate rc1)
 - Priority: 10
 - Size: small
 - Clarity: clear
@@ -281,6 +283,40 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 3. A fresh build/TerralonsFunnyIsle.exe is exported via tools/export.py and passes the extended BI-26 smoke check (all levels load, all animals and items present); the run report names its absolute path and build time.
 4. docs/process/backlog.md shows each item's status; the superseded BI-25 is closed formally; the release commit gets a local tag v1.2.0 (no push).
 5. The run report lists remaining open points (human playtest, listening pass, unsigned exe, BI-24, difficulty curve, EventActor conversion warning, BONUS tag spacing) as still open.
+
+### QA-3 – Hard-edged rectangular grass patches remain inside play areas of L1, L2 and L5
+
+- Status: open
+- Priority: 13
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want grass areas to blend into the sand with edge tiles, so that no rectangular cut-out looks like a placeholder.
+
+**Acceptance criteria:**
+
+1. In the release playtest the textured grass patches at the top left and bottom right of L1 (shot 05), the centre patch of L5 (shot 38) and the band in L2 have soft or tiled edges, not straight cut-out rectangle borders.
+2. Layout, collision, tasks and events stay unchanged.
+3. tools/playtest.py shots of L1, L2 and L5 show no rectangular patch outline; run_tests.py stays green.
+
+### QA-4 – Leftover 'HA HA' popup visible beside the loss result panel
+
+- Status: open
+- Priority: 14
+- Size: small
+- Clarity: clear
+- Novel: no
+- UX-relevant: yes
+
+**User story:** As a player I want the loss screen to show only its panel, so that no level popup lingers next to it.
+
+**Acceptance criteria:**
+
+1. On the loss result screen of any level, EN and DE, no level popup (for example 'HA HA') is visible; popups are cleared or hidden when the panel opens.
+2. The win result screen and the pause menu stay unchanged.
+3. tools/playtest.py loss shot (48_*_result_loss) shows only the panel over the level; run_tests.py stays green.
 
 ### BI-24 – Clean exit without leaked-instance warnings
 

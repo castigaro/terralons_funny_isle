@@ -61,8 +61,8 @@ class PresetTest(unittest.TestCase):
         match = re.search(r'^exclude_filter="([^"]*)"', text, re.M)
         self.assertIsNotNone(match)
         self.assertIn("tests/*", match.group(1))
-        self.assertIn('application/file_version="1.1.0.0"', text)
-        self.assertIn('application/product_version="1.1.0.0"', text)
+        self.assertIn('application/file_version="1.2.0.0"', text)
+        self.assertIn('application/product_version="1.2.0.0"', text)
 
     def test_gitignore(self):
         lines = [ln.strip() for ln in (REPO / ".gitignore").read_text(encoding="utf-8").splitlines()]
@@ -79,7 +79,17 @@ class PresetTest(unittest.TestCase):
 
     def test_release_version(self):
         text = (REPO / "project.godot").read_text(encoding="utf-8")
-        self.assertIn('config/version="1.1.0"', text)
+        self.assertIn('config/version="1.2.0"', text)
+
+
+
+class ContentProblemsTest(unittest.TestCase):
+    def test_unknown_kind_and_missing_sprite_are_caught(self):
+        lines = ["WARNING: Animal: unknown kind hen", "SMOKE FAIL item hat sprite missing: res://x.png", "SMOKE OK"]
+        self.assertEqual(len(export.content_problems(chr(10).join(lines))), 2)
+
+    def test_clean_output_has_no_problems(self):
+        self.assertEqual(export.content_problems(chr(10).join(["Godot Engine v4.7.2", "SMOKE OK"])), [])
 
 
 if __name__ == "__main__":
