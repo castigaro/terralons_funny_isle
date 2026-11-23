@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.1] – 2026-11-23
+
+Fix round for the findings of the 1.2.0 release QA. Gameplay, tasks, timers, layout and difficulty are unchanged.
+
+### Fixed
+
+- No leftover 'HA HA' emote or popup beside the loss result panel: result mode now clears and blocks emotes as well as popup words (QA-4).
+- Version raised to 1.2.1 in `project.godot` and `export_presets.cfg`.
+
+### Known limitations
+
+- Hard-edged rectangular grass patches remain in L1, L2 and L5 (QA-3); the fix is not on main yet.
+- Clean exit (BI-24) and the difficulty curve are still open.
+
 ## [1.2.0] – 2026-11-23
 
 Finished-look pass: textured ground, five themed levels, a live island behind the menus and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
