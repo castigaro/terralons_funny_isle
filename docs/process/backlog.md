@@ -634,3 +634,16 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 4. docs/content_review.md holds a checklist (no violence, weapons, scary images or sounds, no animal harm, slapstick only) with each item checked against assets, texts and screenshots.
 5. export_presets.cfg contains a Windows preset; tools/export.py produces build/TerralonsFunnyIsle.exe and runs a headless smoke start of the exe, or reports clearly that export templates are missing; build/ is git-ignored.
 6. run_tests.py can run the windowed stages via an opt-in flag so the default headless run stays window-free.
+
+## Fix round 1.2.1
+
+Stage fix, patch version 1.2.1. Gameplay, tasks, timers, layout and difficulty stay unchanged. The release preparation exports a fresh `build/TerralonsFunnyIsle.exe`, runs `tools/export.py` (smoke) and `tools/playtest.py` over all five levels.
+
+| ID | Title | Findings | Status |
+|----|-------|----------|--------|
+| FX-1 | Soft-edged grass patches in L1, L2 and L5 | QA-3 | planned |
+| FX-2 | No level effect beside the loss result panel | QA-4 | planned |
+
+- FX-1 locus: `scenes/levels/layouts/l1_beach_camp.layout.txt`, `l2_farm_meadow.layout.txt`, `l5_volcano_cliffs.layout.txt` (grass cells are straight-sided rectangles of "," whose borders get straight edge tiles) rebuilt with `tools/build_level_layout.gd`, if needed `tools/derive_grass_edges.gd`; check with `tools/flat_area_check.py` and playtest shots. Grass has no collision, so reshaping the patches (rounded outlines with outer and inner corner tiles) keeps layout and collision unchanged.
+- FX-2 locus: `scripts/feedback/feedback_director.gd` and `scripts/levels/level_base.gd` (`set_result_mode`). Result mode only suppresses popup words; emotes and other pooled effects (and effects started in the same frame as `level_lost`) stay on the effect layers while the tree is paused. Release or hide them when the result panel opens; win screen and pause menu unchanged.
+- Assumption: the 'HA HA' text is not a translation key in the code base (no match in `i18n/` or `data/`); it is assumed to come from a pooled feedback effect left on screen, to be confirmed by the fixer with `tools/playtest.py` loss shots (EN and DE).
