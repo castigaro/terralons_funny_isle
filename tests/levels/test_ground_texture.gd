@@ -28,6 +28,12 @@ const IRREGULAR_GRASS_LEVELS := ["l1_beach_camp", "l2_farm_meadow", "l5_volcano_
 ## Grass of an outer corner tile starts at least this far along the diagonal from the sand corner (a rectangle corner
 ## with the 40 px sand strip starts at about 40 px).
 const OUTER_DIAGONAL_MIN := 60
+## Grass of an inner corner tile starts at most this far beyond the 40 px quarter circle along the diagonal (about
+## 28 px; the old soft-max corner started at about 34 px).
+const INNER_DIAGONAL_SLACK := 2
+## Longest run of neighbouring grass edge tiles with sand on the same side, in cells (a longer run reads as a straight
+## rectangle side; the old Farm Meadow patch had runs of 9 to 15 cells).
+const MAX_STRAIGHT_EDGE := 5
 
 var _tile_cache := {}
 
@@ -324,7 +330,8 @@ func _diagonal_grass_start(atlas: Image, col: int, row: int) -> int:
 	return TILE
 
 
-## QA-3: outer corners are round arcs, so a patch reads as a blob and not as a rectangle with clipped corners.
+## QA-3: outer corners are round arcs, so a patch reads as a blob and not as a rectangle with clipped corners; inner
+## corners are a quarter circle of sand.
 func test_grass_outer_corners_are_round() -> void:
 	var atlas := _atlas()
 	for col in 4:
@@ -332,8 +339,10 @@ func test_grass_outer_corners_are_round() -> void:
 		check(start >= OUTER_DIAGONAL_MIN, "outer corner %s: grass starts %d px along the diagonal (>= %d)"
 				% [CORNERS[col], start, OUTER_DIAGONAL_MIN])
 		var inner := _diagonal_grass_start(atlas, col, 2)
-		check(inner >= int(GrassTool.GRASS_DEPTH / sqrt(2.0)) - 1 and inner <= int(GrassTool.GRASS_DEPTH),
-				"inner corner %s: sand quarter circle, grass starts %d px along the diagonal" % [CORNERS[col], inner])
+		var arc := int(GrassTool.GRASS_DEPTH / sqrt(2.0))
+		check(inner >= arc - 1 and inner <= arc + INNER_DIAGONAL_SLACK,
+				"inner corner %s: sand quarter circle, grass starts %d px along the diagonal (%d..%d)"
+				% [CORNERS[col], inner, arc - 1, arc + INNER_DIAGONAL_SLACK])
 
 
 ## Grass cells of a TileMapLayer grouped into 4-connected patches.
@@ -376,4 +385,28 @@ func test_grass_patches_are_not_rectangles() -> void:
 			check(patch.size() < box.get_area(), "%s grass patch at %s fills its %s bounding box" % [level_id, box.position,
 					box.size])
 			check(inner >= 1, "%s grass patch at %s has no inner corner tile" % [level_id, box.position])
+		lvl.free()
+
+
+## QA-3: no grass border of Beach Camp, Farm Meadow or Volcano Cliffs runs straight for more than MAX_STRAIGHT_EDGE
+## cells (edge tiles with sand on the same side in a row along that side).
+func test_grass_borders_have_no_long_straight_runs() -> void:
+	for level_id in IRREGULAR_GRASS_LEVELS:
+		var lvl := _scene(level_id)
+		var grass := lvl.get_node("Grass") as TileMapLayer
+		var side_of := {}
+		for cell in grass.get_used_cells():
+			var coords := grass.get_cell_atlas_coords(cell)
+			if grass.get_cell_source_id(cell) == DERIVED and coords.y == 0:
+				side_of[cell] = coords.x
+		for cell: Vector2i in side_of:
+			var side: int = side_of[cell]
+			var step := Vector2i.RIGHT if side < 2 else Vector2i.DOWN
+			if side_of.get(cell - step, -1) == side:
+				continue
+			var run := 0
+			while side_of.get(cell + step * run, -1) == side:
+				run += 1
+			check(run <= MAX_STRAIGHT_EDGE, "%s straight %s grass border of %d cells from %s (max %d)"
+					% [level_id, EDGE_SIDES[side], run, cell, MAX_STRAIGHT_EDGE])
 		lvl.free()
