@@ -95,3 +95,7 @@ Vision, backlog, requirements, market and personas are in `docs/process/`.
 `docs/feedback.md` describes the slapstick feedback director (effects, data schema, anchors, caps, hit-stop and the reduce toggle).
 
 `docs/rules.md` describes the data-driven rules engine in `scripts/rules/`: level schema, conditions, events, snapshot contract, tick order, signals and stars.
+
+## License
+
+The code is licensed under the GNU Affero General Public License v3.0 or later (`AGPL-3.0-or-later`), see `LICENSE`. The assets in `assets/` are CC0 1.0; authors and sources are listed in `assets/SOURCES.md`.
