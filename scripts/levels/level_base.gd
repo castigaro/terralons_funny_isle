@@ -314,9 +314,10 @@ func feedback_director() -> FeedbackDirector:
 	return get_node_or_null("FeedbackDirector") as FeedbackDirector
 
 
-## Result mode hides the HUD, the level cue and the world prompts and suppresses popup words, so the result screen
-## shows the only headline. Off restores the remembered HUD and prompt visibility; the cue manages its own visibility
-## and comes back with its next show_key (for example "Restarted!"). Calling on twice keeps the first memory.
+## Result mode hides the HUD, the level cue and the world prompts and suppresses popup words and emotes, so the
+## result screen shows the only headline. Off restores the remembered HUD and prompt visibility; the cue manages its
+## own visibility and comes back with its next show_key (for example "Restarted!"). Calling on twice keeps the first
+## memory.
 func set_result_mode(on: bool) -> void:
 	if on:
 		if _result_hidden.is_empty():

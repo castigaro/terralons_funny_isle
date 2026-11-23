@@ -124,6 +124,36 @@ func test_real_level_popups_are_skipped() -> void:
 	check_false(director.text_suppressed(), "director unsuppressed after retry")
 
 
+## QA-4: an emote playing at the moment of the loss (the laugh art reads "HA HA") is gone from the loss screen, and
+## the paused tree does not keep any popup or emote node visible beside the panel.
+func test_real_level_loss_hides_emotes() -> void:
+	await open_flow("headline_real_emote", REAL_CAMPAIGN)
+	Audio.levels_dir = REAL_LEVELS
+	await _start(L1)
+	await frames(5)
+	var director := level().feedback_director()
+	check_ne(director, null, "real level has a director")
+	EventBus.castaway_dizzy_started.emit("bonk")
+	check(director.active_count("emote") > 0, "emote plays before the loss")
+	var nodes := director.active_nodes("emote")
+	await lose_level()
+	await frames(30)
+	check_eq(screen(), FlowRules.Screen.RESULT, "loss result shown")
+	check_eq(director.active_count("emote"), 0, "no emote behind the loss result")
+	check_eq(director.active_count("popup"), 0, "no popup behind the loss result")
+	for node: CanvasItem in nodes:
+		check_false(node.is_visible_in_tree(), "emote node hidden")
+	EventBus.castaway_dizzy_started.emit("bonk")
+	await frames(2)
+	check_eq(director.active_count("emote"), 0, "a late emote stays away")
+	_check_clean(false, "en")
+	await wait_guard()
+	await key(KEY_R)
+	check_eq(screen(), FlowRules.Screen.PLAYING, "retry")
+	EventBus.castaway_dizzy_started.emit("bonk")
+	check(director.active_count("emote") > 0, "emotes play again after retry")
+
+
 func _host_result(size: Vector2) -> MenuScreen:
 	var host := Control.new()
 	host.size = size

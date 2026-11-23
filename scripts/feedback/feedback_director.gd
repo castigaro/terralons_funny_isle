@@ -17,6 +17,8 @@ const EVENT_ANCHOR_GROUP := "event_anchor"
 const ANCHOR_SIGNALS := ["fx_anchor", "fx_anchor_node"]
 const VISUAL_TYPES := ["popup", "splat", "puff", "particles", "emote", "flash"]
 const COUNT_TYPES := ["squash", "recoil"]
+## Effects that read as a sign beside the result panel: popup words and emotes (whose art carries text like HA HA).
+const SUPPRESSED_TYPES := ["popup", "emote"]
 const MS_PER_SECOND := 1000.0  # balance-exempt: unit conversion
 const MAX_SIGNAL_ARGS := 4  # balance-exempt: number of generic adapters
 const LAST_EFFECTS_SIZE := 64  # balance-exempt: length of the test ring buffer
@@ -375,7 +377,7 @@ func _recoil_dir(target: Node2D) -> Vector2:
 
 
 func _play_visual(effect: String, entry: Dictionary, key: String, at: Dictionary, sig_name: String) -> void:
-	if effect == "popup" and _text_suppressed:
+	if _text_suppressed and SUPPRESSED_TYPES.has(effect):
 		return
 	if effect == "flash":
 		var now := float(clock.call())
@@ -687,12 +689,16 @@ func reset_all() -> void:
 	_text_suppressed = false
 
 
-## Suppresses popup words (the result screen is open): releases the active popups and skips new ones, while
-## particles, puffs, splats and flashes keep playing.
+## Suppresses popup words and emotes (the result screen is open): releases the active ones and skips new ones,
+## while particles, puffs, splats and flashes keep playing. Released nodes hide at once, because the paused tree
+## would otherwise freeze them in place beside the panel.
 func set_text_suppressed(on: bool) -> void:
 	_text_suppressed = on
-	if on and _pools.has("popup"):
-		(_pools["popup"] as FxPool).release_all()
+	if not on:
+		return
+	for type in SUPPRESSED_TYPES:
+		if _pools.has(type):
+			(_pools[type] as FxPool).release_all()
 
 
 func text_suppressed() -> bool:
