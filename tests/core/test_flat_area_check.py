@@ -1,4 +1,5 @@
 """Tests for tools/flat_area_check.py: PNG round trip, flat and textured windows, masks."""
+import argparse
 import random
 import sys
 import tempfile
@@ -72,6 +73,41 @@ class FlatAreaCheckTest(unittest.TestCase):
         fac.write_png(folder / "07_l1_x_t004.png", SIZE, SIZE * 3, 3, image(lambda x, y: GRASS, height=SIZE * 3))
         self.assertEqual(fac.main([str(folder)]), 1)
         self.assertEqual(fac.main([str(folder), "--glob", "none_*.png"]), 2)
+
+    def test_mask_x_parsing(self):
+        self.assertEqual(fac.parse_mask_x("0.21,0.79"), (0.21, 0.79))
+        for bad in ("0.8,0.2", "x,0.5", "0.5", "-0.1,0.5", "0.2,1.5"):
+            with self.assertRaises(argparse.ArgumentTypeError):
+                fac.parse_mask_x(bad)
+
+    def test_mask_x_skips_the_menu_band_only(self):
+        # A flat dark panel in the middle and flat grass at the left edge of a menu-like shot.
+        width, height = 800, 200
+
+        def colour(x, _y):
+            return (29, 39, 51) if 168 <= x < 632 else GRASS
+
+        pixels = image(colour, width=width, height=height)
+        all_hits = fac.flat_windows(width, height, 3, pixels, hud=False)
+        masked = fac.flat_windows(width, height, 3, pixels, mask_x=(0.21, 0.79), hud=False)
+        self.assertTrue(any(168 <= x < 632 for x, _y, _sd in all_hits), "panel hits without the mask")
+        self.assertFalse(any(x + fac.WINDOW > 168 and x < 632 for x, _y, _sd in masked), "band skipped")
+        self.assertTrue(any(x + fac.WINDOW <= 168 for x, _y, _sd in masked), "flat grass beside the band still hits")
+
+    def test_no_hud_measures_the_full_height(self):
+        pixels = image(lambda x, y: GRASS, height=120)
+        self.assertTrue(fac.flat_windows(SIZE, 120, 3, pixels, hud=False))
+
+    def test_main_with_menu_options(self):
+        folder = tmp_dir()
+        width = 800
+
+        def colour(x, _y):
+            return (29, 39, 51) if 168 <= x < 632 else fac.SAND[0]
+
+        fac.write_png(folder / "01_title_en.png", width, SIZE, 3, image(colour, width=width))
+        self.assertEqual(fac.main([str(folder), "--glob", "*_title_*.png", "--no-hud"]), 1)
+        self.assertEqual(fac.main([str(folder), "--glob", "*_title_*.png", "--no-hud", "--mask-x", "0.21,0.79"]), 0)
 
 
 if __name__ == "__main__":

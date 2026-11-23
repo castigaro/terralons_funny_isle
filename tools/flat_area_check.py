@@ -1,11 +1,14 @@
 """Opt-in screenshot check (not part of run_tests.py): finds flat single-colour areas in level screenshots.
 
-Usage: python tools/flat_area_check.py <dir> [--glob "*_l?_*_t*.png"]
+Usage: python tools/flat_area_check.py <dir> [--glob "*_l?_*_t*.png"] [--mask-x <from>,<to>] [--no-hud]
 
 Slides WINDOW x WINDOW windows with STRIDE over every matching PNG (8-bit RGB or RGBA, not interlaced). The HUD bands
 at the top and bottom, water-coloured pixels (palette water and water_deep) and sand-coloured pixels (the measured
 sand tile means) are masked. A window with at least MIN_UNMASKED unmasked pixels whose luma standard deviation is
 below FLAT_SD is a hit: "FLAT <file> x,y sd". Exit codes: 0 no hits, 1 hits, 2 no matching file.
+Menu screenshots: --mask-x 0.21,0.79 also masks a vertical screen-fraction band (the centred menu panel is a flat
+dark colour by design) and --no-hud measures the full height (menus have no HUD bands). Windows that reach into the
+band are skipped.
 """
 import argparse
 import struct
@@ -115,13 +118,27 @@ def masked(r: int, g: int, b: int) -> bool:
     return False
 
 
-def flat_windows(width: int, height: int, channels: int, pixels: bytes) -> list:
-    """Return [(x, y, sd)] of the flat windows of an image."""
-    top = int(height * HUD_TOP)
-    bottom = height - int(height * HUD_BOTTOM)
+def parse_mask_x(text: str):
+    """argparse type of --mask-x: "<from>,<to>" screen fractions with 0 <= from < to <= 1."""
+    try:
+        lo, hi = (float(part) for part in text.split(","))
+    except ValueError:
+        raise argparse.ArgumentTypeError("mask-x must look like 0.21,0.79, got %r" % text)
+    if not 0.0 <= lo < hi <= 1.0:
+        raise argparse.ArgumentTypeError("mask-x needs 0 <= from < to <= 1, got %r" % text)
+    return lo, hi
+
+
+def flat_windows(width: int, height: int, channels: int, pixels: bytes, mask_x=None, hud: bool = True) -> list:
+    """Return [(x, y, sd)] of the flat windows of an image; mask_x (from, to) skips windows touching that band."""
+    top = int(height * HUD_TOP) if hud else 0
+    bottom = height - int(height * HUD_BOTTOM) if hud else height
+    band = (int(width * mask_x[0]), int(width * mask_x[1])) if mask_x else None
     hits = []
     for wy in range(top, bottom - WINDOW + 1, STRIDE):
         for wx in range(0, width - WINDOW + 1, STRIDE):
+            if band and wx < band[1] and wx + WINDOW > band[0]:
+                continue
             total = 0
             values = []
             for y in range(wy, wy + WINDOW, SAMPLE):
@@ -145,6 +162,9 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("dir", type=Path)
     parser.add_argument("--glob", default="*_l?_*_t*.png")
+    parser.add_argument("--mask-x", type=parse_mask_x, default=None,
+                        help="screen-fraction band <from>,<to> left out (menu panel), e.g. 0.21,0.79")
+    parser.add_argument("--no-hud", action="store_true", help="measure the full height (menu screenshots)")
     args = parser.parse_args(argv)
     files = sorted(args.dir.glob(args.glob))
     if not files:
@@ -152,7 +172,7 @@ def main(argv=None) -> int:
         return 2
     count = 0
     for path in files:
-        for x, y, sd in flat_windows(*read_png(path)):
+        for x, y, sd in flat_windows(*read_png(path), mask_x=args.mask_x, hud=not args.no_hud):
             print("FLAT %s %d,%d %.4f" % (path.name, x, y, sd))
             count += 1
     print("flat_area_check: %d file(s), %d flat window(s)" % (len(files), count))

@@ -22,3 +22,17 @@ func test_menu_layer_is_on_top() -> void:
 	check(menus > hud, "menus above the HUD")
 	check(menus > caption, "menus above the caption")
 	check(menus > error_layer, "menus above the level error panel")
+
+
+func test_backdrop_is_below_everything() -> void:
+	await open_flow("layers_backdrop")
+	var backdrop := flow.call("backdrop") as CanvasLayer
+	check(backdrop != null, "backdrop on the title")
+	if backdrop == null:
+		return
+	var layer := Balance.get_int("flow", "backdrop_layer")
+	check_eq(backdrop.layer, layer, "backdrop uses Balance flow backdrop_layer")
+	check(layer < 0, "backdrop below the level canvas (layer 0)")
+	for other in [Balance.get_int("hud", "layer"), Balance.get_int("audio", "caption_layer"),
+			Balance.get_int("flow", "ui_layer")]:
+		check(layer < other, "backdrop below layer %d" % other)

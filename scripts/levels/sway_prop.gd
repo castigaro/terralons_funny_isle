@@ -24,6 +24,8 @@ const ACTOR_GROUP := "actor"
 @export var tint_key := ""
 ## Mirrors the sprite horizontally (variety without new textures).
 @export var flip_h := false
+## Pure decoration (menu backdrop): joins no prop group and builds no solid footprint.
+@export var decorative := false
 
 var _occluded := false
 ## Canopy fade settings from the level balance, read once in _ready.
@@ -34,7 +36,7 @@ var _fade := {}
 
 
 func _ready() -> void:
-	add_to_group(GROUP)
+	_join_group()
 	if texture != null:
 		sprite.texture = texture
 	sprite.centered = false
@@ -67,7 +69,18 @@ func _read_fade_settings() -> void:
 			"seconds": float(cfg.get("canopy_fade_seconds", 1.0)), "crown_share": float(cfg.get("canopy_crown_share", 1.0))}
 
 
+## Joins the prop group, or leaves it when decorative (scenes such as palm.tscn declare the group statically).
+func _join_group() -> void:
+	if decorative:
+		if is_in_group(GROUP):
+			remove_from_group(GROUP)
+	else:
+		add_to_group(GROUP)
+
+
 func _build_footprint() -> void:
+	if decorative:
+		return
 	var body := StaticBody2D.new()
 	body.name = "Footprint"
 	body.collision_layer = PhysicsLayers.WORLD_SOLID

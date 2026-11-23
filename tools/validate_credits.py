@@ -7,7 +7,9 @@ Usage: python tools/validate_credits.py [--root <dir>]   (exit code 1 on any err
 (b) data/balance/flow.json: result_input_delay_s in (0, 2] and not above result_input_delay_max_s (<= 2), guards
     and the debounce non-negative, every font size at least font_size_min; result_star_interval_s and
     result_star_pop_s above 0, result_star_pop_scale at least 1 and the whole star animation
-    (MAX_STARS * interval + pop) within result_input_delay_max_s.
+    (MAX_STARS * interval + pop) within result_input_delay_max_s; the menu backdrop (BI-18): backdrop_layer
+    negative (below the level canvas and every overlay), backdrop_scale, backdrop_critter_scale and backdrop_hop_hz
+    above 0, backdrop_hop_px and backdrop_walk_min_speed non-negative.
 """
 import argparse
 import json
@@ -23,6 +25,8 @@ FONT_KEYS = ("font_size_title", "font_size_heading", "font_size_button", "font_s
 # Stars.MAX_STARS in scripts/rules/stars.gd.
 MAX_STARS = 3
 GUARD_KEYS = ("intro_guard_s", "credits_guard_s", "settings_save_debounce_s", "locked_label_s")
+BACKDROP_POSITIVE = ("backdrop_scale", "backdrop_critter_scale", "backdrop_hop_hz")
+BACKDROP_NON_NEGATIVE = ("backdrop_hop_px", "backdrop_walk_min_speed")
 
 
 def check_credits(root: Path) -> list:
@@ -88,6 +92,17 @@ def check_flow_balance(root: Path) -> list:
     if None not in (interval, pop, delay_max) and MAX_STARS * interval + pop > delay_max:
         errors.append("flow.json: the star animation (%d * result_star_interval_s + result_star_pop_s) exceeds "
                       "result_input_delay_max_s" % MAX_STARS)
+    layer = num("backdrop_layer")
+    if layer is not None and layer >= 0:
+        errors.append("flow.json: backdrop_layer must be negative (below the level canvas)")
+    for key in BACKDROP_POSITIVE:
+        value = num(key)
+        if value is not None and value <= 0:
+            errors.append("flow.json: %s must be above 0" % key)
+    for key in BACKDROP_NON_NEGATIVE:
+        value = num(key)
+        if value is not None and value < 0:
+            errors.append("flow.json: %s must not be negative" % key)
     minimum = num("font_size_min")
     for key in FONT_KEYS:
         value = num(key)

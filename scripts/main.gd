@@ -19,9 +19,12 @@ const MUSIC_MENU := "title"
 const MUSIC_ENDING := "ending"
 const CLI_LEVEL := "level"
 const ANNOUNCER_GO := "go"
+const BACKDROP_SCENE := "res://scenes/ui/backdrop/menu_island.tscn"
 
 ## Replaces the real quit (tests); empty means Audio.quit_game().
 var quit_handler := Callable()
+## Replaces the command-line arguments read in _ready (tests); empty means CliArgs.current().
+var cli_override := {}
 
 var _screen: int = FlowRules.Screen.NONE
 var _screen_node: MenuScreen = null
@@ -30,6 +33,7 @@ var _level: LevelBase = null
 var _level_id := ""
 var _next := {}
 var _last_result := {}
+var _backdrop: CanvasLayer = null
 
 @onready var _level_host: Node = $LevelHost
 @onready var _ui_layer: CanvasLayer = $UiLayer
@@ -43,7 +47,8 @@ func _ready() -> void:
 	EventBus.level_won.connect(_on_level_won)
 	EventBus.level_lost.connect(_on_level_lost)
 	EventBus.announcer_line.connect(_on_announcer_line)
-	var cli_level: Variant = CliArgs.current().get(CLI_LEVEL, "")
+	var args := cli_override if not cli_override.is_empty() else CliArgs.current()
+	var cli_level: Variant = args.get(CLI_LEVEL, "")
 	if cli_level is String and cli_level != "" and start_level_flow(cli_level):
 		return
 	show_screen(FlowRules.Screen.TITLE)
@@ -71,6 +76,11 @@ func level() -> LevelBase:
 	return _level
 
 
+## The live island behind the menus (null until the first menu screen without a level).
+func backdrop() -> CanvasLayer:
+	return _backdrop
+
+
 func level_id() -> String:
 	return _level_id
 
@@ -89,6 +99,9 @@ func last_result() -> Dictionary:
 ## Shows a menu screen; came_from decides where Back leads (FlowRules.back_target).
 func show_screen(screen: int, came_from: int = FlowRules.Screen.NONE) -> MenuScreen:
 	_clear_screen()
+	if _level == null:
+		_ensure_backdrop()
+	_update_backdrop()
 	_set_result_quiet(screen == FlowRules.Screen.RESULT)
 	if _is_bare_menu(screen):
 		_hide_caption()
@@ -118,6 +131,22 @@ func _clear_screen() -> void:
 		_ui_layer.remove_child(_screen_node)
 		_screen_node.queue_free()
 	_screen_node = null
+
+
+## Creates the menu backdrop once; it lives as long as the GameFlow root and is only hidden while a level exists.
+func _ensure_backdrop() -> void:
+	if _backdrop == null:
+		_backdrop = (load(BACKDROP_SCENE) as PackedScene).instantiate() as CanvasLayer
+		add_child(_backdrop)
+
+
+## Shows and runs the backdrop without a level; hides and freezes it while a level exists (never freed).
+func _update_backdrop() -> void:
+	if _backdrop == null:
+		return
+	var on := _level == null
+	_backdrop.visible = on
+	_backdrop.process_mode = Node.PROCESS_MODE_INHERIT if on else Node.PROCESS_MODE_DISABLED
 
 
 func _set_playing() -> void:
@@ -219,6 +248,7 @@ func start_level_flow(level_id: String, with_intro: bool = true) -> bool:
 	_level.exit_requested.connect(abandon_to_level_select, CONNECT_DEFERRED)
 	_screen = FlowRules.Screen.NONE
 	_level_host.add_child(_level)
+	_update_backdrop()
 	if _level.is_failed() or _level.level_session() == null:
 		screen_changed.emit(_screen)
 		return true
@@ -289,6 +319,8 @@ func _free_level() -> void:
 	if _level != null and is_instance_valid(_level):
 		_level_host.remove_child(_level)
 		_level.queue_free()
+		# A line queued by the level (for example the loss taunt) must not show its caption over the next menu.
+		Audio.clear_announcer()
 		var caption := Audio.caption()
 		if caption != null and caption.has_method("hide_now"):
 			caption.call("hide_now")
@@ -296,6 +328,7 @@ func _free_level() -> void:
 			caption.call("set_suppressed", false)
 	_level = null
 	_level_id = ""
+	_update_backdrop()
 
 
 func _owns(event_level_id: String) -> bool:

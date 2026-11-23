@@ -9,13 +9,13 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 | 3 | BI-17 | Clear HUD 3-star target with live reachability | small | clear | no | yes | done in 1.1.0 |
 | 1 | BI-19 | Textured ground with edge tiles and no flat placeholder shapes in any level | large | clear | no | yes | done in 1.2.0 |
 | 2 | BI-26 | Export smoke check catches missing sprites and resources in the built exe | small | clear | no | no | done in 1.2.0 (criterion 3: the output filter is unit-tested, no test build with a forced missing sprite) |
-| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | open (branch feature/BI-18, merge not completed) |
-| 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | open (branch feature/BI-20, merge not completed) |
+| 3 | BI-18 | Live island scene behind title, level select and settings | large | clear | yes | yes | done in 1.2.0 |
+| 4 | BI-20 | Themed Beach Camp and Farm Meadow | large | clear | no | yes | done in 1.2.0 |
 | 5 | BI-21 | Themed Jungle with dense vegetation | large | clear | no | yes | done in 1.2.0 |
-| 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | open (branch feature/BI-22, merge reverted on the hygiene check) |
-| 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | open (branch feature/BI-23, reviewed with a blocker, merge not completed) |
+| 6 | BI-22 | Themed Lagoon with huts, boats and docks | large | clear | no | yes | done in 1.2.0 |
+| 7 | BI-23 | Themed Volcano Cliffs with dark rock, cliff edges and lava glow | large | clear | no | yes | done in 1.2.0 |
 | 8 | QA-1 | One 'GO!' cue at level start instead of chip plus giant text | small | clear | no | yes | done in 1.2.0 |
-| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | partly done in 1.2.0 (credits clean; open: loss-result popup, BI-18 backdrop) |
+| 9 | QA-2 | No leftover popup behind the credits panel | small | clear | no | yes | done in 1.2.0 |
 | 10 | BI-27 | Release 1.2.0: full visual pass, tag and fresh verified export | small | clear | no | no | done in 1.2.0 (release candidate rc1) |
 | 11 | BI-24 | Clean exit without leaked-instance warnings | small | unclear | no | no | open |
 | 12 | BI-25 | Release 1.1.0: full visual pass, tag and fresh export | small | clear | no | no | superseded by BI-27 |
@@ -136,7 +136,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-18 – Live island scene behind title, level select and settings
 
-- Status: open (branch feature/BI-18, merge not completed)
+- Status: done in 1.2.0
 - Priority: 3
 - Size: large
 - Clarity: clear
@@ -155,7 +155,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-20 – Themed Beach Camp and Farm Meadow
 
-- Status: open (branch feature/BI-20, merge not completed)
+- Status: done in 1.2.0
 - Priority: 4
 - Size: large
 - Clarity: clear
@@ -193,7 +193,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-22 – Themed Lagoon with huts, boats and docks
 
-- Status: open (branch feature/BI-22, merge reverted on the hygiene check)
+- Status: done in 1.2.0
 - Priority: 6
 - Size: large
 - Clarity: clear
@@ -212,7 +212,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### BI-23 – Themed Volcano Cliffs with dark rock, cliff edges and lava glow
 
-- Status: open (branch feature/BI-23, reviewed with a blocker, merge not completed)
+- Status: done in 1.2.0
 - Priority: 7
 - Size: large
 - Clarity: clear
@@ -249,7 +249,7 @@ Release 1.2.0 "Finished Look" plans BI-19, BI-18, BI-20, BI-21, BI-22 and BI-23;
 
 ### QA-2 – No leftover popup behind the credits panel
 
-- Status: partly done in 1.2.0 (credits clean; open: loss-result popup, BI-18 backdrop)
+- Status: done in 1.2.0 with BI-18 (cause: an announcer line queued by the level, for example the loss taunt, ticked out after the level was freed and showed its caption over the next menu; `_free_level` now calls `Audio.clear_announcer()`; level popups leave with the level and stay hidden behind the result screen)
 - Priority: 9
 - Size: small
 - Clarity: clear

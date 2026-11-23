@@ -175,8 +175,7 @@ func handle_signal(signal_name: String, args: Array) -> void:
 
 func _on_level_started(level_id: String) -> void:
 	_sfx_requests.clear()
-	_queue.clear()
-	_announcer_player.stop()
+	clear_announcer()
 	var info := AudioMap.level_info(level_id, levels_dir)
 	if info.is_empty():
 		_warn_once("level:" + level_id, "no level file for %s, music unchanged" % level_id)
@@ -365,6 +364,12 @@ func play_jingle(jingle_id: String) -> void:
 	_jingle_id = jingle_id
 	_duck.jingle_started(JINGLE_TOKEN, _now, stream.get_length())
 	_apply_music_volumes()
+
+
+## Drops every queued announcer line and stops the one playing (level start and leaving a level).
+func clear_announcer() -> void:
+	_queue.clear()
+	_announcer_player.stop()
 
 
 ## Queues an announcer line; lines never overlap.

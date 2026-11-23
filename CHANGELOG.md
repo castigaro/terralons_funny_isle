@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [1.2.0] – 2026-11-23
 
-Finished-look pass: textured ground, five themed levels and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
+Finished-look pass: textured ground, five themed levels, a live island behind the menus and a stricter export check. Gameplay, tasks, timers, events, layout and difficulty are unchanged.
 
 ### Added
 
@@ -13,6 +13,7 @@ Finished-look pass: textured ground, five themed levels and a stricter export ch
 - The Lagoon reads as a lagoon village: four thatched stilt huts on the water, plank docks leading to them from the shore, two sailing boats plus a rowing dinghy that bob gently on the water (still with "reduce screen shake and flashes"); huts and boats cast a soft water reflection instead of a ground shadow. Gameplay positions, collision, tasks and events are unchanged (BI-22).
 - Volcano Cliffs reads as a volcano: dark textured basalt ground with scorched ash instead of grass, cliff faces along the coast, glowing lava fissures on the rock clusters and three smoking vents; animals get a light halo and items a light outline there, drop shadows are tinted darker, and lava glow holds still under "reduce screen shake and flashes". Layout, collision, tasks and events are unchanged (BI-23).
 - Themed Jungle (level 3) with dense layered vegetation, a darker jungle ground, a grass tint and semi-transparent canopy foliage that fades near the castaway (BI-21).
+- Live island behind the title, level select, settings and credits: animated water, a textured beach with grass patches, palms and a chicken, pig, goat and parrot that wander and idle; the menus stay on their dark panels, the island is hidden and frozen while a level runs, and the critter hop stops with "Reduce screen shake and flashes" (BI-18).
 - The smoke run of the exported exe loads every animal and item sprite and every level and fails on any unknown kind or missing resource; `tools/export.py` reports each problem line (BI-26).
 
 ### Changed
@@ -22,12 +23,11 @@ Finished-look pass: textured ground, five themed levels and a stricter export ch
 ### Fixed
 
 - Level start shows a single 'GO!' cue: the big popup stays, the caption chip of the 'go' voice line is hidden (QA-1).
-- Menu screens opened without a level behind them hide a leftover announcer caption, so the credits show only their panel (QA-2, partly).
+- No leftover announcer caption over the level select or the credits after leaving a level: leaving a level now clears the queued announcer lines (QA-2).
 - Version raised to 1.2.0 in `project.godot` and `export_presets.cfg`.
 
 ### Known limitations
 
-- The live island backdrop behind the menus (BI-18) is not in this release yet; the menus sit on plain light blue.
 - Hard-edged rectangular grass patches remain in L1, L2 and L5 (QA-3); a level popup ('HA HA') stays visible beside the loss panel (QA-4).
 - Clean exit (BI-24) and the difficulty curve are still open.
 

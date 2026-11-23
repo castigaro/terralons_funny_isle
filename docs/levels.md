@@ -162,7 +162,7 @@ Tile data cannot be edited by hand, so layouts are ASCII files painted offline:
 godot --headless --path . --script res://tools/build_level_layout.gd -- --layout=<txt> --scene=<tscn>
 ```
 
-Legend: `~` water, `.` sand, `,` grass on sand, `#` rock on sand (solid). Cells outside the text are water, so give the island a water border. The builder writes the `tile_map_data` of the `Sand`, `Grass`, `Shore` and `Details` override sections of the scene (they must exist, for example `[node name="Sand" parent="."]`); the committed `.tscn` is the result and nothing is generated at runtime.
+Legend: `~` water, `.` sand, `,` grass on sand, `#` rock on sand (solid). Cells outside the text are water, so give the island a water border. The builder writes the `tile_map_data` of the `Sand`, `Grass`, `Shore` and `Details` override sections of the scene (they must exist, for example `[node name="Sand" parent="."]`) or of typed `TileMapLayer` nodes directly below the root of a non-inherited scene (`[node name="Sand" type="TileMapLayer" parent="."]`, used by the menu backdrop `scenes/ui/backdrop/menu_island.tscn`); the committed `.tscn` is the result and nothing is generated at runtime.
 
 Shore rules (keep the water collision closed):
 
@@ -196,6 +196,7 @@ Set dressing per level (BI-20; gameplay positions, collision and layouts unchang
 - Lagoon (BI-22, guarded by `tests/levels/test_l4_lagoon_theme.gd` and the baseline `play_baseline_l4_lagoon.json`): stilt huts `HutWest` (1240, 1344), `HutEast` (3112, 1344, the mirrored hut) and `HutNorth` (1664, 1100) and `HutSouth` (1360, 1880, mirrored, seen from the spawn) on the lagoon water; docks under `GroundDecor` from the shore to each hut – `DockB1`/`DockB2` (y 1290, x 896–1152), `DockC1`/`DockC2` (y 1290, x 3200–3456), `DockD1`/`DockD2` (x 1664, y 640–896) – and `DockA1`/`DockA2` (x 1480, y 1856–2112) from the south shore to `HutSouth`, near the spawn and the `LagoonJetty`; boats in group `boat`: the dinghy `Boat1` (1120, 2010), `Boat2` (large, 2950, 1850) and `Boat3` (small, 280, 2650) in the south-west sea notch. All decor stays outside the zones and at least 192 px from home points, slots, event anchors and the spawn; the `LagoonJetty` and `BeachFlag` art is unchanged.
 - Volcano Cliffs (BI-23, guarded by `tests/levels/test_l5_volcano_theme.gd`): volcanic ground shader on the tile layers, cliff faces on all 102 coast cells with the lip on the collision edge, ground patches on the 8 outer-corner cells whose rounded shore art leaves a pocket, quarter-ring rims in the inner corners, 27 lava fissures and three vents (cells 5,7; 25,3; 29,17) under `GroundDecor/VolcanoDecor`, ash-tinted foliage and warm grey boulders. Regenerate the decor with `python tools/place_volcano_decor.py` (`--check` in the tests), the art with `tools/derive_volcano_art.gd`.
 - Farm Meadow: a fence around the pig pen with a 118 px gap above the pen gate (the corner hedges `Prop6`–`Prop9` stay), a ploughed field with crop rows on the grass west of the pen (2624–2944 × 704–1088, clear of zones, lanes and home points) and a barn as the sprite of `Boulder17`.
+- `SwayProp.decorative` (default false): a decorative prop joins no `prop` group and builds no footprint (menu backdrop palms, BI-18); level props keep the default.
 
 ## Tests
 
