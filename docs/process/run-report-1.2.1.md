@@ -10,7 +10,7 @@ Reached: QA-3 and QA-4 are fixed and on main, local tag `v1.2.1-rc1`. No push.
 
 The workflow run itself ended without FX-1: after two rework rounds the review of the last state did not finish (tests, counter-check and L5 shots were still outstanding), so the run set no tag and reported the gap. The review was then completed outside the run and FX-1 merged (see Packages).
 
-Build: `D:\projects2\fdp-runs\terralons_funny_isle\build\TerralonsFunnyIsle.exe`, version 1.2.1, 136.5 MB, built 2026-11-23 15:43 local time after the FX-1 merge, started once by `tools/export.py` (`SMOKE OK`, content check over all sprites and levels clean).
+Build: `build\TerralonsFunnyIsle.exe`, version 1.2.1, 136.5 MB, built 2026-11-23 15:43 local time after the FX-1 merge, started once by `tools/export.py` (`SMOKE OK`, content check over all sprites and levels clean).
 
 ## Packages
 

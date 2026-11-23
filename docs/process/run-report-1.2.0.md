@@ -8,7 +8,7 @@ Finish the look that 1.1.0 left open: textured ground without placeholder shapes
 
 "Finished Look" 1.2.0. Achieved in part: BI-19 and BI-21 are on main, together with the ride-alongs QA-1, BI-26 and most of QA-2. BI-18, BI-20, BI-22 and BI-23 are not on main (their merges were not completed), so wishes 2, 3, 5 and 6 are still open and levels 1, 2, 4 and 5 still look like plain sand and grass.
 
-Build: `D:\projects2\fdp-runs\terralons_funny_isle\build\TerralonsFunnyIsle.exe`, version 1.2.0.0, 136.2 MB, built 2026-11-23 04:32 local time, export smoke OK including the new content check (all animal and item sprites, all five levels). Local tag: `v1.2.0-rc1` (no push).
+Build: `build\TerralonsFunnyIsle.exe`, version 1.2.0.0, 136.2 MB, built 2026-11-23 04:32 local time, export smoke OK including the new content check (all animal and item sprites, all five levels). Local tag: `v1.2.0-rc1` (no push).
 
 ## Items
 

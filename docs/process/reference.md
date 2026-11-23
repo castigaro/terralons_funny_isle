@@ -1,6 +1,6 @@
 # Reference product – Terralon's Funny Isle 0.1.0
 
-Path: `D:\projects2\fdp-runs\terralons_funny_isle_old` (read only – never change, build, install or write anything there; carry its behaviour over, do not copy its code verbatim).
+Path: `<reference repo>` (read only – never change, build, install or write anything there; carry its behaviour over, do not copy its code verbatim).
 
 ## Purpose and users
 
