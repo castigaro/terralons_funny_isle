@@ -14,6 +14,9 @@ func _ready() -> void:
 	var s := Balance.get_float("flow", "backdrop_scale")
 	scale = Vector2(s, s)
 	_size_water()
+	# The island stays loaded behind a running level, so its tiles must never collide with the level's bodies.
+	for tiles in tile_layers():
+		tiles.collision_enabled = false
 
 
 ## Covers the whole viewport with the water region (local units, rounded up to whole water tiles).
