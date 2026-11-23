@@ -94,6 +94,15 @@ def folder_snapshot(root: Path):
     return snap
 
 
+## Engine-written folders of the real user folder that any Godot run (tools, editor, the game) touches; not save data.
+USERDATA_IGNORED = ("logs/", "shader_cache/", "vulkan/")
+
+
+def userdata_snapshot(root: Path):
+    """folder_snapshot of the real user folder without the engine-written USERDATA_IGNORED folders."""
+    return {entry for entry in folder_snapshot(root) if not entry[0].startswith(USERDATA_IGNORED)}
+
+
 def snapshot_diff(before: set, after: set):
     """Return sorted (added, removed, changed) relpaths between two folder snapshots."""
     old = {rel: (size, mtime) for rel, size, mtime in before}
@@ -111,7 +120,7 @@ def format_userdata_diff(added, removed, changed, limit=20):
     lines = ["  %s %s" % entry for entry in entries[:limit]]
     if len(entries) > limit:
         lines.append("  (showing %d of %d, truncated)" % (limit, len(entries)))
-    if any(rel.startswith("logs/") or rel == "progress.json" for _sign, rel in entries):
+    if any(rel in ("progress.json", "settings.json") for _sign, rel in entries):
         lines.append("  likely parallel play, rerun without playing")
     return title, "\n".join(lines)
 
@@ -421,7 +430,7 @@ def stage_hygiene(stage, before_git, before_userdata, userdata_dir):
             stage.fail("git status changed by the test run", "\n".join(others))
         else:
             stage.ok()
-    added, removed, changed = snapshot_diff(before_userdata, folder_snapshot(userdata_dir))
+    added, removed, changed = snapshot_diff(before_userdata, userdata_snapshot(userdata_dir))
     if added or removed or changed:
         stage.fail(*format_userdata_diff(added, removed, changed))
     else:
@@ -440,7 +449,7 @@ def main(argv=None) -> int:
     stages = []
     before_git = git_status()
     userdata_dir = real_app_userdata()
-    before_userdata = folder_snapshot(userdata_dir)
+    before_userdata = userdata_snapshot(userdata_dir)
 
     godot = None
     base = TESTDATA / "run_tests"
