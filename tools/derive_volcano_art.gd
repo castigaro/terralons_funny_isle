@@ -1,8 +1,9 @@
 extends SceneTree
 ## Offline art tool for Volcano Cliffs (BI-23): writes the seamless basalt detail texture (stamped from the dirt
-## and smoke shapes of the particle pack) and the cliff face atlas (extruded from the alpha of the pirate pack
-## shore tiles, quarter-rings for the inner corners) to assets/graphics/volcano-derived/. Deterministic: a fixed seed
-## and no clock, so a rerun writes identical bytes.
+## and smoke shapes of the particle pack) and the cliff face atlas to assets/graphics/volcano-derived/. The atlas
+## holds the cliff pieces (opaque on the water collision strip of the pirate pack shore tiles, quarter-rings for the
+## inner corners) and the ground patches (sand centre tile pixels that close the pockets the rounded shore corners
+## leave on walkable ground). Deterministic: a fixed seed and no clock, so a rerun writes identical bytes.
 ## Usage: godot --headless --path . --script res://tools/derive_volcano_art.gd
 
 const OUT_DIR := "res://assets/graphics/volcano-derived/"
@@ -45,8 +46,17 @@ const SHORE := {"N": Vector2i(1, 0), "S": Vector2i(1, 2), "W": Vector2i(0, 1), "
 const SHORE_INNER := {"INW": Vector2i(0, 3), "INE": Vector2i(1, 3), "ISW": Vector2i(2, 3), "ISE": Vector2i(3, 3)}
 ## Width of the water collision strip of the shore tiles (scenes/levels/island_tileset.tres, 64 - 42 px).
 const STRIP_PX := 22
-## Radius of the lighter quarter-ring lip drawn into the water collision square of an inner corner tile.
-const INNER_RADIUS := 22.0
+## Ground patch kinds in atlas order, in the rows below the cliff pieces; kinds without a pocket stay empty.
+const GROUND_KINDS := ["N", "E", "S", "W", "NE", "SE", "SW", "NW"]
+## Sand centre tile of the sheet whose pixels fill the ground patches.
+const SAND_CENTRE := Vector2i(1, 1)
+## Width over which the wrap face of the south outer corners fades out at the piece edge.
+const WRAP_FADE_PX := 16
+## Columns (rows) a straight piece repeats past both tile ends along the coast.
+const BLEED_PX := 2
+## Width of the dark antialiased shore rim beside a pocket that the ground patch also covers, and its feather.
+const RIM_COVER_PX := 6
+const PATCH_FEATHER_PX := 2
 
 
 func _initialize() -> void:
@@ -152,24 +162,65 @@ static func region(kind: String) -> Rect2i:
 	return Rect2i((i % ATLAS_COLUMNS) * PIECE, (i / ATLAS_COLUMNS) * PIECE, PIECE, PIECE)
 
 
+## Atlas region (pixels) of a ground patch kind: the rows below the cliff pieces, same piece size and margin.
+static func ground_region(kind: String) -> Rect2i:
+	var i := GROUND_KINDS.find(kind)
+	var row0 := ceili(float(KINDS.size()) / ATLAS_COLUMNS)
+	return Rect2i((i % ATLAS_COLUMNS) * PIECE, (row0 + i / ATLAS_COLUMNS) * PIECE, PIECE, PIECE)
+
+
+static func atlas_rows() -> int:
+	return ceili(float(KINDS.size()) / ATLAS_COLUMNS) + ceili(float(GROUND_KINDS.size()) / ATLAS_COLUMNS)
+
+
 ## Water sides of a piece kind (inner corners have none: their water lies on a diagonal inside the tile).
 static func water_sides(kind: String) -> String:
 	return "" if kind.begins_with("I") else kind
 
 
-static func cliff_atlas(sources: Dictionary) -> Image:
-	var rows := ceili(float(KINDS.size()) / ATLAS_COLUMNS)
-	var atlas := Image.create(ATLAS_COLUMNS * PIECE, rows * PIECE, false, Image.FORMAT_RGBA8)
-	for kind: String in KINDS:
-		var piece := cliff_piece(sources, kind)
-		atlas.blit_rect(piece, Rect2i(0, 0, PIECE, PIECE), region(kind).position)
-	return atlas
+static func in_tile(tx: int, ty: int) -> bool:
+	return tx >= 0 and ty >= 0 and tx < TILE and ty < TILE
+
+
+## Distance of a tile pixel centre to the water corner of an inner corner kind.
+static func corner_distance(kind: String, tx: int, ty: int) -> float:
+	var corner := Vector2(TILE if kind.contains("E") else 0, 0 if kind.contains("N") else TILE)
+	return (Vector2(tx, ty) + Vector2.ONE * 0.5).distance_to(corner)
+
+
+## Whether a tile pixel lies on the water collision of its shore tile: the strip of every water side, or the
+## quarter disc of radius STRIP_PX at the water corner of an inner kind.
+static func in_strip(kind: String, tx: int, ty: int) -> bool:
+	if not in_tile(tx, ty):
+		return false
+	if kind.begins_with("I"):
+		return corner_distance(kind, tx, ty) < STRIP_PX
+	return (kind.contains("N") and ty < STRIP_PX) or (kind.contains("S") and ty >= TILE - STRIP_PX) \
+			or (kind.contains("W") and tx < STRIP_PX) or (kind.contains("E") and tx >= TILE - STRIP_PX)
+
+
+## Whether a tile pixel is walkable ground that must look like ground: inside the tile and off the water collision.
+static func effective_land(kind: String, tx: int, ty: int) -> bool:
+	return in_tile(tx, ty) and not in_strip(kind, tx, ty)
+
+
+## Whether a shore tile pixel would show the water: transparent or blue-dominant.
+static func is_water_px(c: Color) -> bool:
+	return c.a <= 0.5 or (c.b > c.r + 0.1 and c.b > c.g)
+
+
+## Shore tile image and its tile coords for a kind (sheet for sides and outer corners, derived for inner corners).
+static func shore_tile(sources: Dictionary, kind: String) -> Array:
+	if kind.begins_with("I"):
+		return [sources["derived"], SHORE_INNER[kind]]
+	return [sources["sheet"], SHORE[kind]]
 
 
 ## Land mask of a kind's shore tile: 1 where the tile is opaque.
 static func tile_mask(sources: Dictionary, kind: String) -> PackedByteArray:
-	var img: Image = sources["derived"] if kind.begins_with("I") else sources["sheet"]
-	var coords: Vector2i = SHORE_INNER[kind] if kind.begins_with("I") else SHORE[kind]
+	var tile := shore_tile(sources, kind)
+	var img: Image = tile[0]
+	var coords: Vector2i = tile[1]
 	var mask := PackedByteArray()
 	mask.resize(TILE * TILE)
 	for y in TILE:
@@ -178,8 +229,24 @@ static func tile_mask(sources: Dictionary, kind: String) -> PackedByteArray:
 	return mask
 
 
+## Effective land of a side or outer kind as a rectangle in tile coordinates (the tile minus its strips).
+static func land_rect(kind: String) -> Rect2i:
+	var x0 := STRIP_PX if kind.contains("W") else 0
+	var x1 := TILE - STRIP_PX if kind.contains("E") else TILE
+	var y0 := STRIP_PX if kind.contains("N") else 0
+	var y1 := TILE - STRIP_PX if kind.contains("S") else TILE
+	return Rect2i(x0, y0, x1 - x0, y1 - y0)
+
+
+## Chebyshev distance of a pixel to a rectangle (0 inside).
+static func rect_distance(r: Rect2i, tx: int, ty: int) -> int:
+	var dx := maxi(0, maxi(r.position.x - tx, tx - (r.end.x - 1)))
+	var dy := maxi(0, maxi(r.position.y - ty, ty - (r.end.y - 1)))
+	return maxi(dx, dy)
+
+
 ## Whether a piece pixel (tile coordinates) may carry face: outside the tile only towards a water side, inside the
-## tile only on the water collision strip of a water side (the rounded corners of the shore art are walkable there).
+## tile only on the water collision strip.
 static func allowed(kind: String, tx: int, ty: int) -> bool:
 	var sides := water_sides(kind)
 	if tx < 0 and not sides.contains("W"):
@@ -190,9 +257,9 @@ static func allowed(kind: String, tx: int, ty: int) -> bool:
 		return false
 	if ty >= TILE and not sides.contains("S"):
 		return false
-	if tx < 0 or ty < 0 or tx >= TILE or ty >= TILE:
+	if not in_tile(tx, ty):
 		return true
-	return (sides.contains("N") and ty < STRIP_PX) or (sides.contains("S") and ty >= TILE - STRIP_PX) 			or (sides.contains("W") and tx < STRIP_PX) or (sides.contains("E") and tx >= TILE - STRIP_PX)
+	return in_strip(kind, tx, ty)
 
 
 ## Strata shading factor: periodic in the tile coordinate (integer cycles per tile), so neighbouring pieces join
@@ -201,102 +268,153 @@ static func strata(tx: int, depth: int) -> float:
 	return 0.88 + 0.12 * sin(TAU * tx * 7.0 / TILE + depth * 0.35) * sin(TAU * tx * 2.0 / TILE)
 
 
-## Whether a piece pixel (tile coordinates) is a non-land pixel inside the tile on the water collision strip of a
-## water side, including the whole strip intersection square of an outer corner: it gets an opaque cliff base.
-static func fill_strip(kind: String, tx: int, ty: int) -> bool:
-	if tx < 0 or ty < 0 or tx >= TILE or ty >= TILE:
-		return false
-	return allowed(kind, tx, ty)
+## Alpha factor of the wrap face of the south outer corners beyond the tile: opaque for the first
+## MARGIN - WRAP_FADE_PX columns, then linear down to 0 at the piece edge.
+static func wrap_fade(kind: String, tx: int) -> float:
+	var past := 0
+	if kind == "SE":
+		past = tx - TILE + 1
+	elif kind == "SW":
+		past = -tx
+	if past <= 0:
+		return 1.0
+	return clampf(float(MARGIN - past) / WRAP_FADE_PX, 0.0, 1.0)
 
 
-## One piece: an opaque cliff base on the water collision strip, a south face below the land edge (rim line, dark
-## strata fading into the water) that wraps around the south outer corners, and a thin dark drop band on the other
-## water sides; transparent on land.
+static func cliff_atlas(sources: Dictionary) -> Image:
+	var atlas := Image.create(ATLAS_COLUMNS * PIECE, atlas_rows() * PIECE, false, Image.FORMAT_RGBA8)
+	for kind: String in KINDS:
+		atlas.blit_rect(cliff_piece(sources, kind), Rect2i(0, 0, PIECE, PIECE), region(kind).position)
+	for kind: String in GROUND_KINDS:
+		atlas.blit_rect(ground_patch(sources, kind), Rect2i(0, 0, PIECE, PIECE), ground_region(kind).position)
+	return atlas
+
+
+## One piece: an opaque cliff on the whole water collision strip with a light rim band along the walkable edge, a
+## south face below that edge (dark strata fading into the water) that wraps around the south outer corners and
+## fades out, and a thin dark drop band on the other water sides; transparent on walkable ground.
 static func cliff_piece(sources: Dictionary, kind: String) -> Image:
 	if kind.begins_with("I"):
 		return inner_piece(sources, kind)
-	var mask := tile_mask(sources, kind)
 	var rim: Color = sources["volcano_rim"]
 	var cliff: Color = sources["volcano_cliff"]
 	var top: Color = sources["volcano_rock_low"]
-	var img := Image.create(PIECE, PIECE, false, Image.FORMAT_RGBA8)
-	var land := func(tx: int, ty: int) -> bool:
-		return tx >= 0 and ty >= 0 and tx < TILE and ty < TILE and mask[ty * TILE + tx] == 1
-	# Chebyshev distance to land, capped at BAND_PX + 1, by repeated 8-neighbour growth.
-	var dist := PackedInt32Array()
-	dist.resize(PIECE * PIECE)
-	for py in PIECE:
-		for px in PIECE:
-			dist[py * PIECE + px] = 0 if land.call(px - MARGIN, py - MARGIN) else BAND_PX + 1
-	for step in BAND_PX:
-		var next := dist.duplicate()
-		for py in range(1, PIECE - 1):
-			for px in range(1, PIECE - 1):
-				var i := py * PIECE + px
-				if dist[i] <= step:
-					continue
-				for o in [-PIECE - 1, -PIECE, -PIECE + 1, -1, 1, PIECE - 1, PIECE, PIECE + 1]:
-					if dist[i + o] == step:
-						next[i] = step + 1
-						break
-		dist = next
-	# The south face of an outer corner continues across columns without land at the straight S tile's edge row.
-	# Only pieces with a south water side carry the face; the other sides get the strip fill and the band.
+	var land := land_rect(kind)
+	var tile := Rect2i(0, 0, TILE, TILE)
 	var faces := kind.contains("S")
-	var wraps := kind in ["SE", "SW"]
 	var edge_y := TILE - STRIP_PX - 1
-	for px in PIECE:
-		var tx := px - MARGIN
-		var has_land := false
-		for ty in TILE:
-			if land.call(tx, ty):
-				has_land = true
-				break
-		var last_land := edge_y if wraps and not has_land else -1000
-		for py in PIECE:
-			var ty := py - MARGIN
-			if land.call(tx, ty):
-				last_land = ty
-				continue
+	var img := Image.create(PIECE, PIECE, false, Image.FORMAT_RGBA8)
+	for py in PIECE:
+		var ty := py - MARGIN
+		for px in PIECE:
+			var tx := px - MARGIN
 			if not allowed(kind, tx, ty):
 				continue
 			var best := Color(0, 0, 0, 0)
-			var depth := ty - last_land
-			if faces and last_land >= 0 and depth >= 1 and depth <= FACE_DEPTH:
+			var depth := ty - edge_y
+			if faces and depth >= 1 and depth <= FACE_DEPTH:
 				var shade := cliff.lerp(top, 0.55 * (1.0 - float(depth) / FACE_DEPTH)) * strata(tx, depth)
 				var c := rim if depth <= RIM_PX else shade
 				c.a = clampf(float(FACE_DEPTH - depth + 1) / FADE_PX, 0.0, 1.0)
 				best = c
-			var d := dist[py * PIECE + px]
-			if d <= BAND_PX:
-				var band := cliff * strata(tx, d)
-				band.a = BAND_ALPHA * (1.0 - float(d - 1) / BAND_PX)
-				if band.a > best.a:
-					best = band
-			if fill_strip(kind, tx, ty):
-				var base := cliff * strata(tx, maxi(depth, 0) if last_land >= 0 else 0)
-				best = Color(base.lerp(best, best.a), 1.0)
+			if in_tile(tx, ty):
+				var d := rect_distance(land, tx, ty)
+				var base := cliff * strata(tx, d)
+				if d <= RIM_PX:
+					base = rim
+				elif best.a > 0.0:
+					base = best
+				best = Color(base.r, base.g, base.b, 1.0)
+			else:
+				var d_out := rect_distance(tile, tx, ty)
+				if d_out <= BAND_PX:
+					var band := cliff * strata(tx, d_out)
+					band.a = BAND_ALPHA * (1.0 - float(d_out - 1) / BAND_PX)
+					if band.a > best.a:
+						best = band
+			best.a *= wrap_fade(kind, tx)
 			if best.a > 0.0:
-				img.set_pixel(px, py, Color(best.r, best.g, best.b, best.a))
+				img.set_pixel(px, py, best)
+	if kind in ["N", "S", "E", "W"]:
+		_bleed(img, kind in ["N", "S"])
 	return img
 
 
-## Inner corner piece: the inner corner tiles are opaque sand up to the corner, so the cliff fills the tile's water
-## collision square at the water diagonal with an opaque base and a lighter quarter-ring lip.
+## Copies the opaque texels of a straight piece BLEED_PX past both tile ends along the coast (the piece repeats
+## with the tile), so linear filtering at the cell boundary never blends with a transparent texel.
+static func _bleed(img: Image, along_x: bool) -> void:
+	for k in range(1, BLEED_PX + 1):
+		for cross in PIECE:
+			for pair in [[MARGIN - k, MARGIN + TILE - k], [MARGIN + TILE - 1 + k, MARGIN + k - 1]]:
+				var src := img.get_pixel(pair[1], cross) if along_x else img.get_pixel(cross, pair[1])
+				if src.a < 1.0:
+					continue
+				if along_x:
+					img.set_pixel(pair[0], cross, src)
+				else:
+					img.set_pixel(cross, pair[0], src)
+
+
+## Inner corner piece: the inner corner tiles are opaque sand up to the corner, so the cliff fills the quarter disc
+## of radius STRIP_PX at the water corner with an opaque base and the same RIM_PX rim band as the straight pieces.
 static func inner_piece(sources: Dictionary, kind: String) -> Image:
 	var cliff: Color = sources["volcano_cliff"]
 	var rim: Color = sources["volcano_rim"]
-	var corner := Vector2(TILE if kind.contains("E") else 0, 0 if kind.contains("N") else TILE)
 	var x0 := TILE - STRIP_PX if kind.contains("E") else 0
 	var y0 := 0 if kind.contains("N") else TILE - STRIP_PX
 	var img := Image.create(PIECE, PIECE, false, Image.FORMAT_RGBA8)
 	for ty in range(y0, y0 + STRIP_PX):
 		for tx in range(x0, x0 + STRIP_PX):
-			var d := (Vector2(tx, ty) + Vector2.ONE * 0.5).distance_to(corner)
-			var depth := absi(int(round(INNER_RADIUS - d)))
-			var c := cliff * strata(tx, depth)
-			var ring := absf(d - (INNER_RADIUS - 1.0))
-			if ring < RIM_PX * 0.5:
-				c = c.lerp(rim, 0.6 * (1.0 - ring / (RIM_PX * 0.5)))
-			img.set_pixel(tx + MARGIN, ty + MARGIN, Color(c, 1.0))
+			var d := corner_distance(kind, tx, ty)
+			if d >= STRIP_PX:
+				continue
+			var c := rim if d >= STRIP_PX - RIM_PX else cliff * strata(tx, int(STRIP_PX - d))
+			img.set_pixel(tx + MARGIN, ty + MARGIN, Color(c.r, c.g, c.b, 1.0))
+	return img
+
+
+## Ground patch of a side or outer kind: where the rounded shore art leaves walkable ground transparent (the
+## pocket), the sand centre tile at the same tile pixel, widened by RIM_COVER_PX over the shore rim beside any water
+## pixel of the tile and feathered by PATCH_FEATHER_PX; only on walkable ground, and wholly transparent for kinds
+## without a pocket.
+static func ground_patch(sources: Dictionary, kind: String) -> Image:
+	var img := Image.create(PIECE, PIECE, false, Image.FORMAT_RGBA8)
+	var tile := shore_tile(sources, kind)
+	var shore: Image = tile[0]
+	var coords: Vector2i = tile[1]
+	var sheet: Image = sources["sheet"]
+	var reach := RIM_COVER_PX + PATCH_FEATHER_PX
+	var dist := PackedInt32Array()
+	dist.resize(TILE * TILE)
+	dist.fill(reach + 1)
+	var any := false
+	for ty in TILE:
+		for tx in TILE:
+			if is_water_px(shore.get_pixel(coords.x * TILE + tx, coords.y * TILE + ty)):
+				dist[ty * TILE + tx] = 0
+				any = any or effective_land(kind, tx, ty)
+	if not any:
+		return img
+	for step in reach:
+		var next := dist.duplicate()
+		for ty in TILE:
+			for tx in TILE:
+				if dist[ty * TILE + tx] <= step:
+					continue
+				var hit := false
+				for oy in range(maxi(ty - 1, 0), mini(ty + 2, TILE)):
+					for ox in range(maxi(tx - 1, 0), mini(tx + 2, TILE)):
+						if dist[oy * TILE + ox] == step:
+							hit = true
+				if hit:
+					next[ty * TILE + tx] = step + 1
+		dist = next
+	for ty in TILE:
+		for tx in TILE:
+			var d := dist[ty * TILE + tx]
+			if d > reach or not effective_land(kind, tx, ty):
+				continue
+			var a := 1.0 if d <= RIM_COVER_PX else 1.0 - float(d - RIM_COVER_PX) / (PATCH_FEATHER_PX + 1)
+			var c := sheet.get_pixel(SAND_CENTRE.x * TILE + tx, SAND_CENTRE.y * TILE + ty)
+			img.set_pixel(tx + MARGIN, ty + MARGIN, Color(c.r, c.g, c.b, a))
 	return img

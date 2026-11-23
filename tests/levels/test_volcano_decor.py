@@ -71,6 +71,23 @@ class VolcanoDecorTest(unittest.TestCase):
         cell = (int(x0 // decor.CELL) - 1, int(y0 // decor.CELL))
         self.assertIn(cell, decor.excluded(level, 1))
 
+    def test_corner_ground_patches_come_first_with_the_ground_material(self):
+        text = (common.REPO / decor.OUT).read_text(encoding="utf-8")
+        self.assertIn('[ext_resource type="Material" path="%s" id="5_ground"]' % decor.GROUND_MATERIAL, text)
+        self.assertTrue((common.REPO / decor.GROUND_MATERIAL[len("res://"):]).is_file())
+        nodes = re.findall(r'^\[node name="([^"]+)" type="[^"]+" parent="\."\]', text, re.M)
+        self.assertEqual(nodes[:2], ["CornerGround", "CliffFace"])
+        patches = decor.patch_kinds()
+        self.assertTrue(patches, "the cliff atlas holds ground patches")
+        self.assertTrue(set(patches) <= {"NE", "SE", "SW", "NW"}, patches)
+        sprites = re.findall(r'^\[node name="Ground_(\d+)_(\d+)_([A-Z]+)" type="Sprite2D" parent="CornerGround"\]\n'
+                             r'material = ExtResource\("5_ground"\)\n', text, re.M)
+        rows = decor.read_layout(common.REPO)
+        expected = [(str(x), str(y), kind) for x, y, kind in decor.coast_pieces(rows) if kind in patches]
+        self.assertEqual(sprites, expected)
+        self.assertIn(("13", "20", "SE"), sprites)
+        self.assertIn(("19", "20", "SW"), sprites)
+
     def test_every_coast_cell_gets_one_piece(self):
         rows = decor.read_layout(common.REPO)
         pieces = decor.coast_pieces(rows)

@@ -1,10 +1,11 @@
 extends "res://tests/support/level_case.gd"
 ## Volcano Cliffs set dressing (BI-23): the play fingerprint and the surfaces stay as recorded before the dressing,
 ## lava decor sits only on solid rock away from zones and points and adds no physics, every coast cell has exactly
-## its cliff face piece, which never covers walkable ground, closes the water collision strip (also at the corners)
-## and joins its neighbours without a seam, the L5 foliage tints from the palette, the glow pulses slowly and holds
-## still under "reduce screen shake and flashes", the particle budget stays small and the ground material copies the
-## palette.
+## its cliff face piece, which never covers walkable ground and owns the whole water collision strip; no coast cell
+## shows the water (ground patches close the pockets of the rounded outer shore corners and look like the ground),
+## inner corner lips join the rim of their neighbours, the wrap face fades out and straight pieces join without a
+## seam; the L5 foliage tints from the palette, the glow pulses slowly and holds still under "reduce screen shake and
+## flashes", the particle budget stays small and the shared ground material copies the palette.
 
 const Fingerprint := preload("res://tests/support/play_fingerprint.gd")
 const VolcanoArt := preload("res://tools/derive_volcano_art.gd")
@@ -16,6 +17,11 @@ const SURFACES := "res://tests/fixtures/levels/l5_surfaces.json"
 const DECOR_SCENE := "res://scenes/levels/decor/l5_volcano_decor.tscn"
 const SHADER := "res://scenes/levels/art/volcanic_ground.gdshader"
 const DETAIL := "res://assets/graphics/volcano-derived/volcanic_detail@2.png"
+const MATERIAL := "res://scenes/levels/art/volcanic_ground_material.tres"
+## Size of the detail texture, which the material maps 1:1 to world pixels (detail_world_px).
+const DETAIL_PX := 256
+## Light water colour of the backdrop (tools/flat_area_check.py WATER), the worst case under a transparent pixel.
+const WATER := Color(0.6706, 0.8902, 0.9608)
 const TILE_LAYERS := ["Sand", "Grass", "Shore", "Details"]
 const OTHER_LEVELS := ["l1_beach_camp", "l2_farm_meadow", "l3_jungle", "l4_lagoon"]
 const CELL := 128
@@ -264,37 +270,26 @@ func _pieces_by_cell(decor: Node) -> Dictionary:
 	return out
 
 
-## Combined alpha of every cliff piece over a world pixel (alpha compositing of the overlapping pieces).
-func _cover(atlas: Image, by_cell: Dictionary, world: Vector2i) -> float:
-	var clear := 1.0
+## Cliff colour over a world pixel: the overlapping pieces composited in draw order; rgb unpremultiplied, a the
+## combined alpha.
+func _cliff_color(atlas: Image, by_cell: Dictionary, world: Vector2i) -> Color:
+	var acc := Color(0, 0, 0, 0)
 	for piece: Sprite2D in by_cell.get(_cell_of(Vector2(world)), []):
 		var local := world - Vector2i(piece.position)
 		if local.x < 0 or local.y < 0 or local.x >= VolcanoArt.PIECE or local.y >= VolcanoArt.PIECE:
 			continue
 		var region := Rect2i((piece.texture as AtlasTexture).region)
-		clear *= 1.0 - atlas.get_pixel(region.position.x + local.x, region.position.y + local.y).a
-	return 1.0 - clear
+		var c := atlas.get_pixel(region.position.x + local.x, region.position.y + local.y)
+		acc = Color(c.r * c.a + acc.r * (1.0 - c.a), c.g * c.a + acc.g * (1.0 - c.a), c.b * c.a + acc.b * (1.0 - c.a),
+				c.a + acc.a * (1.0 - c.a))
+	if acc.a <= 0.0:
+		return acc
+	return Color(acc.r / acc.a, acc.g / acc.a, acc.b / acc.a, acc.a)
 
 
-## Pixels of a coast cell that show the water below the shore tile and must be closed by the cliff: the transparent
-## pixels of the shore tile on its water collision strip (outer and side kinds), or the whole water collision square
-## at the water diagonal (inner kinds, whose tiles are opaque up to the corner).
-func _strip_pixels(sources: Dictionary, kind: String) -> Array:
-	var out := []
-	var strip := VolcanoArt.STRIP_PX
-	if kind.begins_with("I"):
-		var x0 := CELL - strip if kind.contains("E") else 0
-		var y0 := 0 if kind.contains("N") else CELL - strip
-		for ty in range(y0, y0 + strip):
-			for tx in range(x0, x0 + strip):
-				out.append(Vector2i(tx, ty))
-		return out
-	var mask := VolcanoArt.tile_mask(sources, kind)
-	for ty in CELL:
-		for tx in CELL:
-			if mask[ty * CELL + tx] == 0 and VolcanoArt.fill_strip(kind, tx, ty):
-				out.append(Vector2i(tx, ty))
-	return out
+## Combined alpha of every cliff piece over a world pixel (alpha compositing of the overlapping pieces).
+func _cover(atlas: Image, by_cell: Dictionary, world: Vector2i) -> float:
+	return _cliff_color(atlas, by_cell, world).a
 
 
 func _piece_kinds(decor: Node) -> Dictionary:
@@ -305,59 +300,247 @@ func _piece_kinds(decor: Node) -> Dictionary:
 	return out
 
 
-func test_cliff_corners_cover_shore_water() -> void:
-	var decor := (load(DECOR_SCENE) as PackedScene).instantiate()
-	add_node(decor)
-	var atlas := _atlas()
-	var sources := VolcanoArt.load_sources()
-	var by_cell := _pieces_by_cell(decor)
-	var kinds := _piece_kinds(decor)
+## CornerGround sprites by their own cell.
+func _grounds_by_cell(decor: Node) -> Dictionary:
+	var out := {}
+	for sprite: Sprite2D in decor.get_node("CornerGround").get_children():
+		out[_cell_of(sprite.position + Vector2(VolcanoArt.MARGIN, VolcanoArt.MARGIN))] = sprite
+	return out
+
+
+## Ground patch texel over a tile pixel of a cell (transparent when the cell has no patch).
+func _ground_texel(atlas: Image, grounds: Dictionary, cell: Vector2i, p: Vector2i) -> Color:
+	if not grounds.has(cell):
+		return Color(0, 0, 0, 0)
+	var region := Rect2i(((grounds[cell] as Sprite2D).texture as AtlasTexture).region)
+	return atlas.get_pixel(region.position.x + VolcanoArt.MARGIN + p.x, region.position.y + VolcanoArt.MARGIN + p.y)
+
+
+var _images := {}
+
+
+## The real Shore tile of a level cell: [image, pixel offset of the tile in it] from the level tileset.
+func _shore_tile(lvl: Node, cell: Vector2i) -> Array:
+	var layer := lvl.get_node("Shore") as TileMapLayer
+	var source := layer.tile_set.get_source(layer.get_cell_source_id(cell)) as TileSetAtlasSource
+	var path := source.texture.resource_path
+	if not _images.has(path):
+		var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+		img.convert(Image.FORMAT_RGBA8)
+		_images[path] = img
+	return [_images[path], source.get_tile_texture_region(layer.get_cell_atlas_coords(cell)).position]
+
+
+func _detail() -> Image:
+	var img := Image.load_from_file(ProjectSettings.globalize_path(DETAIL))
+	img.convert(Image.FORMAT_RGBA8)
+	return img
+
+
+static func _over(src: Color, dst: Color) -> Color:
+	return Color(src.r * src.a + dst.r * (1.0 - src.a), src.g * src.a + dst.g * (1.0 - src.a),
+			src.b * src.a + dst.b * (1.0 - src.a), 1.0)
+
+
+## Final colour of a coast cell pixel: the shaded shore pixel over the water, the shaded ground patch over it and the
+## cliff pieces on top.
+func _compose(ctx: Dictionary, cell: Vector2i, p: Vector2i) -> Color:
+	var world := cell * CELL + p
+	var d: float = (ctx["detail"] as Image).get_pixel(posmod(world.x, DETAIL_PX), posmod(world.y, DETAIL_PX)).r
+	var tile: Array = _shore_tile(ctx["level"], cell)
+	var shore := (tile[0] as Image).get_pixel(tile[1].x + p.x, tile[1].y + p.y)
+	var out := _over(VolcanicGround.apply(shore, d, ctx["params"]), WATER)
+	var ground := _ground_texel(ctx["atlas"], ctx["grounds"], cell, p)
+	if ground.a > 0.0:
+		out = _over(VolcanicGround.apply(ground, d, ctx["params"]), out)
+	return _over(_cliff_color(ctx["atlas"], ctx["by_cell"], world), out)
+
+
+func _context(lvl: Node) -> Dictionary:
+	var decor := _decor(lvl)
+	return {"level": lvl, "atlas": _atlas(), "by_cell": _pieces_by_cell(decor), "grounds": _grounds_by_cell(decor),
+			"kinds": _piece_kinds(decor), "detail": _detail(),
+			"params": VolcanicGround.params_from_material((lvl.get_node("Sand") as CanvasItem).material as ShaderMaterial)}
+
+
+static func _blue(c: Color) -> bool:
+	return c.b > c.r + 0.1 and c.b > c.g
+
+
+func test_coast_cells_show_no_water() -> void:
+	var lvl := (load(LEVEL) as PackedScene).instantiate()
+	add_node(lvl)
+	var ctx := _context(lvl)
+	var kinds: Dictionary = ctx["kinds"]
 	var open := 0
 	var checked := 0
+	var per_cell := {}
 	for cell: Vector2i in kinds:
-		for p: Vector2i in _strip_pixels(sources, kinds[cell]):
-			checked += 1
-			var a := _cover(atlas, by_cell, cell * CELL + p)
-			if a < 0.9:
-				open += 1
-				if open <= 5:
-					fail("water shows through the %s cliff of cell %s at tile pixel %s (cover %.2f) – rerun tools/derive_volcano_art.gd"
-							% [kinds[cell], cell, p, a])
-	check(checked > 10000, "strip pixels checked (%d)" % checked)
-	check_eq(open, 0, "every water collision strip pixel of a coast cell is closed by the cliff")
+		var tile: Array = _shore_tile(lvl, cell)
+		var img: Image = tile[0]
+		for ty in CELL:
+			for tx in CELL:
+				if not VolcanoArt.is_water_px(img.get_pixel(tile[1].x + tx, tile[1].y + ty)):
+					continue
+				checked += 1
+				per_cell[cell] = int(per_cell.get(cell, 0)) + 1
+				var p := Vector2i(tx, ty)
+				var ground := _ground_texel(ctx["atlas"], ctx["grounds"], cell, p).a
+				var cliff := _cover(ctx["atlas"], ctx["by_cell"], cell * CELL + p)
+				var shut := 1.0 - (1.0 - ground) * (1.0 - cliff)
+				if shut < 0.9:
+					open += 1
+					if open <= 5:
+						fail("water shows through the %s coast cell %s at tile pixel %s (ground %.2f, cliff %.2f) – rerun tools/derive_volcano_art.gd and tools/place_volcano_decor.py"
+								% [kinds[cell], cell, p, ground, cliff])
+	check(checked > 10000, "water pixels of the shore tiles checked (%d)" % checked)
+	for cell in [Vector2i(13, 20), Vector2i(19, 20)]:
+		check(int(per_cell.get(cell, 0)) >= 250, "inlet corner %s contributes water pixels (%d)" % [cell, per_cell.get(cell, 0)])
+	check_eq(open, 0, "no water shows through a shore tile of a coast cell")
 
 
 func test_south_inlet_corners_closed() -> void:
+	var lvl := (load(LEVEL) as PackedScene).instantiate()
+	add_node(lvl)
+	var ctx := _context(lvl)
+	var expected := {Vector2i(13, 20): "SE", Vector2i(19, 20): "SW", Vector2i(13, 19): "ISE", Vector2i(19, 19): "ISW"}
+	for cell: Vector2i in expected:
+		check_eq((ctx["kinds"] as Dictionary).get(cell, ""), expected[cell], "inlet cell %s is %s" % [cell, expected[cell]])
+		var blue := 0
+		for ty in CELL:
+			for tx in CELL:
+				var c := _compose(ctx, cell, Vector2i(tx, ty))
+				if _blue(c):
+					blue += 1
+					if blue <= 3:
+						fail("inlet cell %s shows water at tile pixel %s (%s)" % [cell, Vector2i(tx, ty), c])
+		check_eq(blue, 0, "inlet cell %s shows no water inside the land cell" % cell)
+
+
+func test_corner_ground_matches_ground() -> void:
+	var lvl := (load(LEVEL) as PackedScene).instantiate()
+	add_node(lvl)
+	var ctx := _context(lvl)
+	var decor := _decor(lvl)
+	var rows := _layout()
+	var atlas: Image = ctx["atlas"]
+	var sand := (lvl.get_node("Sand") as CanvasItem).material
+	check(decor.get_child(0).name == "CornerGround", "CornerGround is the first decor child (below the cliff)")
+	var grounds: Array = decor.corner_grounds()
+	check(grounds.size() >= 4, "corner ground sprites (%d)" % grounds.size())
+	# A cell gets a patch exactly when its kind has a non-empty ground region in the atlas.
+	var with_patch := {}
+	for kind: String in VolcanoArt.GROUND_KINDS:
+		var r := VolcanoArt.ground_region(kind)
+		with_patch[kind] = not atlas.get_region(r).is_invisible()
+	var by_cell: Dictionary = ctx["grounds"]
+	for cell: Vector2i in ctx["kinds"]:
+		var kind: String = ctx["kinds"][cell]
+		check_eq(by_cell.has(cell), bool(with_patch.get(kind, false)), "coast cell %s (%s) has a ground patch exactly when its kind has one" % [cell, kind])
+	var rim_lum := VolcanicGround.luma(ArtPalette.color("volcano_rock_high")) + 0.05
+	for sprite: Sprite2D in grounds:
+		var parts := String(sprite.name).split("_")
+		var kind := parts[3]
+		var cell := Vector2i(int(parts[1]), int(parts[2]))
+		check(sprite.material == sand and sprite.material.resource_path == MATERIAL,
+				"%s uses the shared volcanic ground material" % sprite.name)
+		check_eq(Rect2i((sprite.texture as AtlasTexture).region), VolcanoArt.ground_region(kind), "%s shows the %s patch" % [sprite.name, kind])
+		check_eq(sprite.position, Vector2(cell * CELL) - Vector2(VolcanoArt.MARGIN, VolcanoArt.MARGIN), "%s sits on its cell" % sprite.name)
+		var region := Rect2i((sprite.texture as AtlasTexture).region)
+		var stray := 0
+		for y in VolcanoArt.PIECE:
+			for x in VolcanoArt.PIECE:
+				if atlas.get_pixel(region.position.x + x, region.position.y + y).a <= 0.1:
+					continue
+				var p := Vector2i(x - VolcanoArt.MARGIN, y - VolcanoArt.MARGIN)
+				if not VolcanoArt.effective_land(kind, p.x, p.y) or not _land(rows, cell):
+					stray += 1
+		check_eq(stray, 0, "%s paints only walkable ground of its own land cell" % sprite.name)
+		var light := 0
+		for ty in CELL:
+			for tx in CELL:
+				var p := Vector2i(tx, ty)
+				if not VolcanoArt.effective_land(kind, tx, ty):
+					continue
+				if _ground_texel(atlas, by_cell, cell, p).a >= 0.9:
+					continue
+				var c := _compose(ctx, cell, p)
+				if VolcanicGround.luma(c) > rim_lum or _blue(c):
+					light += 1
+					if light <= 3:
+						fail("%s leaves a light shore rim at tile pixel %s (%s)" % [sprite.name, p, c])
+		check_eq(light, 0, "%s leaves no light shore rim on walkable ground" % sprite.name)
+
+
+## Rim texels on both sides of the cell edges where the quarter-ring of an inner corner ends: [[cell, tile pixel]].
+func _lip_pairs(cell: Vector2i, kind: String) -> Array:
+	var strip := VolcanoArt.STRIP_PX
+	var rim := VolcanoArt.RIM_PX
+	var east := kind.contains("E")
+	var north := kind.contains("N")
+	var band := []
+	for k in rim:
+		band.append(CELL - strip + k if east else strip - rim + k)
+	var rows_band := []
+	for k in rim:
+		rows_band.append(strip - rim + k if north else CELL - strip + k)
+	var out := []
+	var vy := 0 if north else CELL - 1
+	var ny := CELL - 1 if north else 0
+	var vcell := cell + Vector2i(0, -1 if north else 1)
+	for x: int in band:
+		out.append([[cell, Vector2i(x, vy)], [vcell, Vector2i(x, ny)]])
+	var hx := CELL - 1 if east else 0
+	var nx := 0 if east else CELL - 1
+	var hcell := cell + Vector2i(1 if east else -1, 0)
+	for y: int in rows_band:
+		out.append([[cell, Vector2i(hx, y)], [hcell, Vector2i(nx, y)]])
+	return out
+
+
+func test_inner_corner_lip_joins_neighbours() -> void:
 	var decor := (load(DECOR_SCENE) as PackedScene).instantiate()
 	add_node(decor)
 	var atlas := _atlas()
-	var sources := VolcanoArt.load_sources()
 	var by_cell := _pieces_by_cell(decor)
 	var kinds := _piece_kinds(decor)
-	var strip := VolcanoArt.STRIP_PX
-	var expected := {Vector2i(13, 20): "SE", Vector2i(19, 20): "SW", Vector2i(13, 19): "ISE", Vector2i(19, 19): "ISW"}
-	for cell: Vector2i in expected:
-		check_eq(kinds.get(cell, ""), expected[cell], "inlet cell %s is %s" % [cell, expected[cell]])
-		var open := 0
-		for p: Vector2i in _strip_pixels(sources, expected[cell]):
-			if _cover(atlas, by_cell, cell * CELL + p) < 0.9:
-				open += 1
-		check_eq(open, 0, "inlet cell %s shows no water inside the land cell" % cell)
-	# The strip intersection square of the two outer corners is closed completely.
-	for cell: Vector2i in [Vector2i(13, 20), Vector2i(19, 20)]:
-		var x0 := CELL - strip if expected[cell] == "SE" else 0
-		var low := 1.0
-		for ty in range(CELL - strip, CELL):
-			for tx in range(x0, x0 + strip):
-				low = minf(low, _cover(atlas, by_cell, cell * CELL + Vector2i(tx, ty)))
-		check(low >= 0.999, "corner square of %s fully covered (min %.3f)" % [cell, low])
-	# The face wraps into the water cells beside the corners: their corner next to the land is closed.
-	for pair in [[Vector2i(14, 20), 0], [Vector2i(18, 20), CELL - VolcanoArt.MARGIN / 2]]:
-		var low := 1.0
-		for ty in range(0, VolcanoArt.FACE_DEPTH / 2):
-			for tx in range(pair[1], pair[1] + VolcanoArt.MARGIN / 2):
-				low = minf(low, _cover(atlas, by_cell, pair[0] * CELL + Vector2i(tx, ty)))
-		check(low >= 0.9, "water cell %s is closed next to the inlet corner (min %.3f)" % [pair[0], low])
+	var want := VolcanicGround.luma(ArtPalette.color("volcano_rim"))
+	var inner := 0
+	var bad := 0
+	for cell: Vector2i in kinds:
+		if not String(kinds[cell]).begins_with("I"):
+			continue
+		inner += 1
+		for pair: Array in _lip_pairs(cell, kinds[cell]):
+			for side: Array in pair:
+				var c := _cliff_color(atlas, by_cell, side[0] * CELL + side[1])
+				if c.a < 0.9 or absf(VolcanicGround.luma(c) - want) > 0.03:
+					bad += 1
+					if bad <= 5:
+						fail("the %s lip of cell %s does not join the rim at cell %s pixel %s (alpha %.2f, luma %.3f, rim %.3f)"
+								% [kinds[cell], cell, side[0], side[1], c.a, VolcanicGround.luma(c), want])
+	check(inner >= 2, "inner corners found (%d)" % inner)
+	check_eq(bad, 0, "every inner corner lip joins the rim band of its neighbours")
+
+
+func test_wrap_face_fades_out() -> void:
+	var atlas := _atlas()
+	var m := VolcanoArt.MARGIN
+	for kind in ["SE", "SW"]:
+		var r := VolcanoArt.region(kind)
+		var alphas := []
+		# Columns beyond the tile, ordered from the tile edge outwards.
+		for past in range(1, m + 1):
+			var px := m + CELL - 1 + past if kind == "SE" else m - past
+			var top := 0.0
+			for py in range(m + CELL - VolcanoArt.STRIP_PX, VolcanoArt.PIECE):
+				top = maxf(top, atlas.get_pixel(r.position.x + px, r.position.y + py).a)
+			alphas.append(top)
+		check(alphas[0] >= 0.99, "%s wrap face starts opaque at the tile edge (%.2f)" % [kind, alphas[0]])
+		check(alphas[m - 1] <= 0.05, "%s wrap face fades out at the piece edge (%.2f)" % [kind, alphas[m - 1]])
+		for i in range(m - VolcanoArt.WRAP_FADE_PX, m):
+			check(alphas[i] <= alphas[i - 1] + 0.001, "%s wrap alpha does not rise %d px past the tile" % [kind, i + 1])
+			check(alphas[i - 1] - alphas[i] <= 0.25, "%s wrap alpha has no hard step %d px past the tile" % [kind, i + 1])
 
 
 ## Premultiplied luminance of an atlas texel (the face over black).
@@ -395,6 +578,24 @@ func test_cliff_face_has_no_seams() -> void:
 		for tx in range(-VolcanoArt.MARGIN, VolcanoArt.MARGIN):
 			worst = maxf(worst, absf(VolcanoArt.strata(tx, depth) - VolcanoArt.strata(tx + CELL, depth)))
 	check(worst <= 0.0001, "strata shading repeats every tile (max step %.4f)" % worst)
+	# Straight pieces repeat their opaque texels past both tile ends, equal to the continuing neighbour.
+	for spec in [["S", true], ["N", true], ["E", false], ["W", false]]:
+		var r := VolcanoArt.region(spec[0])
+		var bled := 0
+		var off := 0
+		for cross in VolcanoArt.PIECE:
+			for pair in [[m - 1, m + CELL - 1], [m + CELL, m]]:
+				var at: Vector2i = Vector2i(pair[0], cross) if spec[1] else Vector2i(cross, pair[0])
+				var twin: Vector2i = Vector2i(pair[1], cross) if spec[1] else Vector2i(cross, pair[1])
+				var c := atlas.get_pixel(r.position.x + at.x, r.position.y + at.y)
+				if c.a < 1.0:
+					continue
+				bled += 1
+				var t := atlas.get_pixel(r.position.x + twin.x, r.position.y + twin.y)
+				if absf(c.r - t.r) > 2.0 / 255.0 or absf(c.g - t.g) > 2.0 / 255.0 or absf(c.b - t.b) > 2.0 / 255.0:
+					off += 1
+		check(bled >= 2 * VolcanoArt.STRIP_PX, "%s piece bleeds past both tile ends (%d texels)" % [spec[0], bled])
+		check_eq(off, 0, "%s bleed texels equal the continuing neighbour" % spec[0])
 
 
 func test_l5_props_use_palette_tint_key() -> void:
@@ -515,6 +716,9 @@ func test_ground_material_copies_the_palette() -> void:
 		if first == null:
 			first = mat
 		check(mat == first, "L5 %s shares the one ground material" % layer_name)
+		check(mat != null and mat.resource_path == MATERIAL, "L5 %s uses %s" % [layer_name, MATERIAL])
+	for sprite: Sprite2D in _decor(lvl).corner_grounds():
+		check(sprite.material == first, "corner ground %s shares the ground material" % sprite.name)
 	if first == null:
 		return
 	for param in PALETTE_PARAMS:

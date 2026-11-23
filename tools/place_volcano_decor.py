@@ -6,6 +6,9 @@ Reads scenes/levels/layouts/l5_volcano_cliffs.layout.txt and the zones, home poi
 scenes/levels/l5_volcano_cliffs.tscn and writes scenes/levels/decor/l5_volcano_decor.tscn (root VolcanoDecor,
 instanced once under GroundDecor of the level):
 
+- CornerGround: one Sprite2D Ground_<x>_<y>_<kind> per coast cell whose shore kind has a non-empty ground patch in
+  the cliff atlas (the pockets the rounded outer shore corners leave on walkable ground), with the volcanic ground
+  material the tile layers share, so it looks like the ground around it; drawn above Shore and below the cliff.
 - CliffFace: one Sprite2D Face_<x>_<y>_<kind> per coast cell, an AtlasTexture region of
   assets/graphics/volcano-derived/cliff_face@2.png (tools/derive_volcano_art.gd) for the cell's shore kind (N, E, S,
   W, outer corners NE/SE/SW/NW, inner corners INE/ISE/ISW/INW). The piece is opaque only on the water side.
@@ -34,8 +37,9 @@ PALETTE = "data/art/palette.json"
 CELL = 128
 LAND = ".,#"
 ROCK = "#"
-# Must match tools/derive_volcano_art.gd (KINDS, ATLAS_COLUMNS, MARGIN, PIECE).
+# Must match tools/derive_volcano_art.gd (KINDS, GROUND_KINDS, ATLAS_COLUMNS, MARGIN, PIECE).
 KINDS = ["N", "E", "S", "W", "NE", "SE", "SW", "NW", "INE", "ISE", "ISW", "INW"]
+GROUND_KINDS = ["N", "E", "S", "W", "NE", "SE", "SW", "NW"]
 ATLAS_COLUMNS = 4
 MARGIN = 40
 PIECE = CELL + 2 * MARGIN
@@ -55,6 +59,7 @@ DIAGONALS = (("NW", -1, -1), ("NE", 1, -1), ("SW", -1, 1), ("SE", 1, 1))
 SIDE_KIND = {"N": "N", "S": "S", "W": "W", "E": "E", "NW": "NW", "NE": "NE", "SW": "SW", "SE": "SE"}
 
 TEX_CLIFF = "res://assets/graphics/volcano-derived/cliff_face@2.png"
+GROUND_MATERIAL = "res://scenes/levels/art/volcanic_ground_material.tres"
 TEX_PARTICLES = "res://assets/graphics/particles/PNG/%s.png"
 # The particle pack PNGs are white shapes on black, so every lava sprite blends additively.
 CRACK_TEXTURES = ("trace_04", "spark_01")
@@ -208,6 +213,31 @@ def region(kind: str):
     return ((i % ATLAS_COLUMNS) * PIECE, (i // ATLAS_COLUMNS) * PIECE, PIECE, PIECE)
 
 
+def ground_region(kind: str):
+    i = GROUND_KINDS.index(kind)
+    row0 = -(-len(KINDS) // ATLAS_COLUMNS)
+    return ((i % ATLAS_COLUMNS) * PIECE, (row0 + i // ATLAS_COLUMNS) * PIECE, PIECE, PIECE)
+
+
+_PATCH_CACHE = {}
+
+
+def patch_kinds(root: Path = REPO) -> list:
+    """Ground kinds whose atlas region holds at least one visible texel, in GROUND_KINDS order."""
+    path = Path(root) / TEX_CLIFF[len("res://"):]
+    key = (str(path), path.stat().st_mtime_ns)
+    if key not in _PATCH_CACHE:
+        from flat_area_check import read_png
+        width, _height, channels, pixels = read_png(path)
+        found = []
+        for kind in GROUND_KINDS:
+            x0, y0, w, h = ground_region(kind)
+            if any(pixels[(y * width + x) * channels + 3] for y in range(y0, y0 + h) for x in range(x0, x0 + w)):
+                found.append(kind)
+        _PATCH_CACHE[key] = found
+    return list(_PATCH_CACHE[key])
+
+
 def generate(root: Path = REPO) -> str:
     rows = read_layout(root)
     level = read_level(root)
@@ -221,11 +251,18 @@ def generate(root: Path = REPO) -> str:
         ('Script', SCRIPTS["glow"], "2_glow"),
         ('Script', SCRIPTS["vent"], "3_vent"),
         ('Texture2D', TEX_CLIFF, "4_cliff"),
+        ('Material', GROUND_MATERIAL, "5_ground"),
     ]
     for name in CRACK_TEXTURES + (HALO_TEXTURE, "light_01", SPARK_TEXTURE):
         ext.append(('Texture2D', TEX_PARTICLES % name, "t_" + name))
     ext.append(('Texture2D', SMOKE_TEXTURE, "t_smoke"))
+    patches = patch_kinds(root)
+    grounds = [(x, y, kind) for x, y, kind in layout["pieces"] if kind in patches]
     subs = []
+    for kind in sorted({kind for _x, _y, kind in grounds}, key=GROUND_KINDS.index):
+        x, y, w, h = ground_region(kind)
+        subs.append('[sub_resource type="AtlasTexture" id="Ground_%s"]\natlas = ExtResource("4_cliff")\n'
+                    'region = Rect2(%d, %d, %d, %d)\n' % (kind, x, y, w, h))
     for kind in kinds:
         x, y, w, h = region(kind)
         subs.append('[sub_resource type="AtlasTexture" id="Face_%s"]\natlas = ExtResource("4_cliff")\n'
@@ -239,7 +276,13 @@ def generate(root: Path = REPO) -> str:
     subs.append('[sub_resource type="Gradient" id="SparkRamp"]\noffsets = PackedFloat32Array(0, 0.5, 1)\n'
                 'colors = PackedColorArray(%s, %s, %s)\n' % (core, hot, hot_clear))
     nodes = ['[node name="VolcanoDecor" type="Node2D"]\nscript = ExtResource("1_root")\n',
-             '[node name="CliffFace" type="Node2D" parent="."]\n']
+             '[node name="CornerGround" type="Node2D" parent="."]\n']
+    for x, y, kind in grounds:
+        nodes.append('[node name="Ground_%d_%d_%s" type="Sprite2D" parent="CornerGround"]\n'
+                     'material = ExtResource("5_ground")\nposition = Vector2(%d, %d)\n'
+                     'texture = SubResource("Ground_%s")\ncentered = false\n'
+                     % (x, y, kind, x * CELL - MARGIN, y * CELL - MARGIN, kind))
+    nodes.append('[node name="CliffFace" type="Node2D" parent="."]\n')
     for x, y, kind in layout["pieces"]:
         nodes.append('[node name="Face_%d_%d_%s" type="Sprite2D" parent="CliffFace"]\nposition = Vector2(%d, %d)\n'
                      'texture = SubResource("Face_%s")\ncentered = false\n'
@@ -299,8 +342,10 @@ def main(argv=None) -> int:
     out = Path(args.out) if args.out else REPO / OUT
     if args.report:
         layout = place(read_layout(REPO), read_level(REPO))
-        print("pieces=%d cracks=%d vents=%d %s" % (len(layout["pieces"]), len(layout["cracks"]), len(layout["vents"]),
-                                                   layout["vents"]))
+        patches = patch_kinds(REPO)
+        grounds = sum(1 for _x, _y, kind in layout["pieces"] if kind in patches)
+        print("pieces=%d grounds=%d cracks=%d vents=%d %s" % (len(layout["pieces"]), grounds, len(layout["cracks"]),
+                                                              len(layout["vents"]), layout["vents"]))
     if args.check:
         current = out.read_text(encoding="utf-8") if out.is_file() else ""
         if current != text:

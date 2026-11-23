@@ -273,24 +273,31 @@ func test_detail_texture_is_seamless() -> void:
 
 
 func test_cliff_pieces_are_clear_on_land() -> void:
-	var sources := VolcanoArt.load_sources()
 	var atlas := Art.load_png(VolcanoArt.OUT_DIR + "cliff_face@2.png")
 	var opaque_total := 0
 	for kind: String in VolcanoArt.KINDS:
 		var region := VolcanoArt.region(kind)
-		var mask := VolcanoArt.tile_mask(sources, kind)
 		var opaque := 0
+		var on_land := 0
+		var open_strip := 0
 		for ty in range(0, TILE, 2):
 			for tx in range(0, TILE, 2):
 				var a := atlas.get_pixel(region.position.x + VolcanoArt.MARGIN + tx, region.position.y + VolcanoArt.MARGIN + ty).a
 				if a > 0.1:
 					opaque += 1
-				if mask[ty * TILE + tx] == 1 and a > 0.1 and not kind.begins_with("I"):
-					fail("cliff piece %s is opaque on land at %d,%d" % [kind, tx, ty])
-					return
+				if VolcanoArt.effective_land(kind, tx, ty) and a > 0.1:
+					on_land += 1
+					if on_land <= 3:
+						fail("cliff piece %s is opaque on walkable ground at %d,%d" % [kind, tx, ty])
+				if VolcanoArt.in_strip(kind, tx, ty) and a < 1.0:
+					open_strip += 1
+					if open_strip <= 3:
+						fail("cliff piece %s leaves the water collision open at %d,%d" % [kind, tx, ty])
+		check_eq(on_land, 0, "piece %s is clear on walkable ground" % kind)
+		check_eq(open_strip, 0, "piece %s is opaque on the whole water collision" % kind)
 		for y in region.size.y:
 			for x in region.size.x:
 				if atlas.get_pixel(region.position.x + x, region.position.y + y).a > 0.1:
 					opaque_total += 1
-		check(opaque > 0 or kind in ["N", "E", "W", "NE", "NW"], "piece %s draws inside its tile" % kind)
+		check(opaque > 0, "piece %s draws inside its tile" % kind)
 	check(opaque_total > 10000, "cliff atlas carries a visible face (%d texels)" % opaque_total)

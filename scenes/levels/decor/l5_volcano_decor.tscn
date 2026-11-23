@@ -1,15 +1,32 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/levels/volcano_decor.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/levels/lava_glow.gd" id="2_glow"]
 [ext_resource type="Script" path="res://scripts/levels/lava_vent.gd" id="3_vent"]
 [ext_resource type="Texture2D" path="res://assets/graphics/volcano-derived/cliff_face@2.png" id="4_cliff"]
+[ext_resource type="Material" path="res://scenes/levels/art/volcanic_ground_material.tres" id="5_ground"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/trace_04.png" id="t_trace_04"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/spark_01.png" id="t_spark_01"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/light_02.png" id="t_light_02"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/light_01.png" id="t_light_01"]
 [ext_resource type="Texture2D" path="res://assets/graphics/particles/PNG/flare_01.png" id="t_flare_01"]
 [ext_resource type="Texture2D" path="res://assets/graphics/smoke/PNG/White puff/whitePuff05.png" id="t_smoke"]
+
+[sub_resource type="AtlasTexture" id="Ground_NE"]
+atlas = ExtResource("4_cliff")
+region = Rect2(0, 832, 208, 208)
+
+[sub_resource type="AtlasTexture" id="Ground_SE"]
+atlas = ExtResource("4_cliff")
+region = Rect2(208, 832, 208, 208)
+
+[sub_resource type="AtlasTexture" id="Ground_SW"]
+atlas = ExtResource("4_cliff")
+region = Rect2(416, 832, 208, 208)
+
+[sub_resource type="AtlasTexture" id="Ground_NW"]
+atlas = ExtResource("4_cliff")
+region = Rect2(624, 832, 208, 208)
 
 [sub_resource type="AtlasTexture" id="Face_N"]
 atlas = ExtResource("4_cliff")
@@ -68,6 +85,56 @@ colors = PackedColorArray(1, 0.8235, 0.2471, 1, 1, 0.4157, 0.102, 1, 1, 0.4157, 
 
 [node name="VolcanoDecor" type="Node2D"]
 script = ExtResource("1_root")
+
+[node name="CornerGround" type="Node2D" parent="."]
+
+[node name="Ground_5_1_NW" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(600, 88)
+texture = SubResource("Ground_NW")
+centered = false
+
+[node name="Ground_32_1_NE" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(4056, 88)
+texture = SubResource("Ground_NE")
+centered = false
+
+[node name="Ground_1_2_NW" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(88, 216)
+texture = SubResource("Ground_NW")
+centered = false
+
+[node name="Ground_32_18_SE" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(4056, 2264)
+texture = SubResource("Ground_SE")
+centered = false
+
+[node name="Ground_1_20_SW" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(88, 2520)
+texture = SubResource("Ground_SW")
+centered = false
+
+[node name="Ground_13_20_SE" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(1624, 2520)
+texture = SubResource("Ground_SE")
+centered = false
+
+[node name="Ground_19_20_SW" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(2392, 2520)
+texture = SubResource("Ground_SW")
+centered = false
+
+[node name="Ground_30_20_SE" type="Sprite2D" parent="CornerGround"]
+material = ExtResource("5_ground")
+position = Vector2(3800, 2520)
+texture = SubResource("Ground_SE")
+centered = false
 
 [node name="CliffFace" type="Node2D" parent="."]
 
