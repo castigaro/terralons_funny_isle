@@ -94,3 +94,9 @@ func test_no_flat_placeholder_nodes() -> void:
 	var island := _island()
 	for type in ["ColorRect", "Polygon2D", "Line2D", "Control"]:
 		check_eq(island.find_children("*", type, true, false).size(), 0, "no %s in the backdrop" % type)
+
+
+func test_tiles_never_collide() -> void:
+	var island := _island()
+	for tiles in island.tile_layers():
+		check(not (tiles as TileMapLayer).collision_enabled, "%s has no collision behind a running level" % tiles.name)
