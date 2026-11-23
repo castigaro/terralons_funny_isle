@@ -32,7 +32,7 @@
 		"monkey_1": "1856.00,1344.00"
 	},
 	"json_sha": "ec974b1252f33a2f35c777547caa7c8aafe616550ecd295c57b9cc0c866b32c5",
-	"layout_sha": "e5a58c1b2550aa6069dc11b89310023b5d8f5438f368b40f26da55c27b2b88c5",
+	"layout_sha": "e2d1ece812bba6bc935585a3c26f41d8c1b6ba8eea5157d8de50ec861768a91f",
 	"level_id": "l1_beach_camp",
 	"markers": {
 		"EventAnchors/coconut_volley": "1856.00,1088.00",
@@ -77,7 +77,7 @@
 	},
 	"tiles": {
 		"Details": "48e3cf69b2a1ebe7c92d7c063a94a4b12216560701c892e534ffdc3d46077665",
-		"Grass": "a2b456bfddf61da2fe31930bc4e9a88edac288d48d9f0b93090122fcde194cc5",
+		"Grass": "819e9f39e77a22dac7304973ae415021b1359118adcca956546308880f1aa86e",
 		"Sand": "a219ff3d08247d3dace4dee3ce3aa04f5e81d51729eeed02f836f722006f9fa5",
 		"Shore": "9988d946a07c0363b469450cf4fb1af2c405996a40b72a0ddf37729fd62eb1a0"
 	}

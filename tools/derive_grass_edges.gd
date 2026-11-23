@@ -24,7 +24,10 @@ const RING := {"N": Vector2i(6, 0), "S": Vector2i(6, 3), "W": Vector2i(5, 1), "E
 const GRASS_DEPTH := 40.0
 ## Distance from the water side at which the shore rim has turned into plain sand.
 const RIM_END := 56.0
-## Exponent of the soft min/max that rounds the corners.
+## Radius of the arc that rounds a grass outer corner; the arc meets the straight borders of the neighbour edge tiles
+## at the tile sides, so the corner reads as a round blob instead of a rectangle corner.
+const OUTER_RADIUS := TILE - GRASS_DEPTH
+## Exponent of the soft max that rounds the shore inner corners.
 const ROUND_K := 4.0
 const EDGES := ["N", "S", "W", "E"]
 const CORNERS := ["NW", "NE", "SW", "SE"]
@@ -76,11 +79,9 @@ static func derive(sheet: Image) -> Image:
 			return _grass_over(sand, grass, x, y, dt.x - (GRASS_DEPTH + wobble[int(dt.y)])))
 	for i in CORNERS.size():
 		_paint(out, Vector2i(i, 1), func(x: int, y: int) -> Color:
-			var d := _corner_coords(CORNERS[i], x, y)
-			return _grass_over(sand, grass, x, y, _soft_min(d.x, d.y) - GRASS_DEPTH))
+			return _grass_over(sand, grass, x, y, outer_inside(_corner_coords(CORNERS[i], x, y))))
 		_paint(out, Vector2i(i, 2), func(x: int, y: int) -> Color:
-			var d := _corner_coords(CORNERS[i], x, y)
-			return _grass_over(sand, grass, x, y, _soft_max(d.x, d.y) - GRASS_DEPTH))
+			return _grass_over(sand, grass, x, y, inner_inside(_corner_coords(CORNERS[i], x, y))))
 		_paint(out, Vector2i(i, 3), func(x: int, y: int) -> Color:
 			var d := _corner_coords(CORNERS[i], x, y)
 			var dist := _soft_max(d.x, d.y)
@@ -186,10 +187,19 @@ static func _corner_coords(corner: String, x: int, y: int) -> Vector2:
 	return Vector2(dx, dy)
 
 
-static func _soft_min(a: float, b: float) -> float:
-	if a <= 0.0 or b <= 0.0:
-		return minf(a, b)
-	return pow(pow(a, -ROUND_K) + pow(b, -ROUND_K), -1.0 / ROUND_K)
+## Signed distance into the grass of an outer corner tile (> 0 is grass): the grass borders at GRASS_DEPTH from both
+## sand sides, joined by a circular arc of OUTER_RADIUS.
+static func outer_inside(d: Vector2) -> float:
+	var centre := GRASS_DEPTH + OUTER_RADIUS
+	if d.x >= centre or d.y >= centre:
+		return minf(d.x, d.y) - GRASS_DEPTH
+	return OUTER_RADIUS - Vector2(centre - d.x, centre - d.y).length()
+
+
+## Signed distance into the grass of an inner corner tile (> 0 is grass): the sand of the diagonal is a quarter circle
+## of GRASS_DEPTH, which meets the sand strips of both neighbour edge tiles at the tile sides.
+static func inner_inside(d: Vector2) -> float:
+	return d.length() - GRASS_DEPTH
 
 
 static func _soft_max(a: float, b: float) -> float:

@@ -173,7 +173,7 @@ Shore rules (keep the water collision closed):
 
 Grass rules (soft grass-to-sand transitions from `assets/graphics/pirate-pack-derived/grass_edges@2.png`):
 
-- A grass cell with sand or rock on one side gets an edge tile, on two adjacent sides an outer corner tile, and with sand only on one diagonal an inner corner tile (all atlas source 1 on the `Grass` layer, plain sand below). Inner grass cells get a textured fill variant (atlas source 1, row 4) from `fill_variant(cell)`: cells with an even `x + y` use variants 0 or 1, odd cells 2 or 3, picked by a deterministic cell hash, so no two 4-neighbours and no 2×2 block repeat one tile.
+- A grass cell with sand or rock on one side gets an edge tile, on two adjacent sides an outer corner tile, and with sand only on one diagonal an inner corner tile (all atlas source 1 on the `Grass` layer, plain sand below). Inner grass cells get a textured fill variant (atlas source 1, row 4) from `fill_variant(cell)`: cells with an even `x + y` use variants 0 or 1, odd cells 2 or 3, picked by a deterministic cell hash, so no two 4-neighbours and no 2×2 block repeat one tile. Shape grass patches as irregular blobs (steps with inner corners), not as plain rectangles: the round outer corner tiles then give a soft outline.
 - Grass patches must be at least 2 cells wide in both directions; a one-cell strip is a layout error.
 - Grass must not touch the shore or water (8-neighbours): keep one plain sand cell between grass and any shore tile.
 - Other shapes (for example sand on one side plus a sand diagonal on the far side) are rejected; round the patch off.
