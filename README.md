@@ -1,5 +1,9 @@
 # Terralon's Funny Isle 2
 
+![Terralon's Funny Isle – five island levels full of chickens, pigs, monkeys and penguins](docs/splash.png)
+
+**[Download for Windows (latest release)](https://github.com/castigaro/terralons_funny_isle/releases/latest)** – unpack the ZIP and start `TerralonsFunnyIsle.exe`.
+
 A hectic, single-player, keyboard-first slapstick action game for Windows (Godot 4.7.2, GDScript, offline, English and German). A castaway runs, dashes, grabs, carries and throws animals and items across five handcrafted tropical island levels against a 3–5 minute timer while funny tasks and slapstick events keep going wrong. Version 2 replaces the turn-based survival game of v1 with real-time action, polished CC0 art and full audio.
 
 ## Installation and usage
