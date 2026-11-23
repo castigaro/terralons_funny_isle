@@ -24,6 +24,7 @@ Finished-look pass: textured ground, five themed levels, a live island behind th
 
 - Level start shows a single 'GO!' cue: the big popup stays, the caption chip of the 'go' voice line is hidden (QA-1).
 - No leftover announcer caption over the level select or the credits after leaving a level: leaving a level now clears the queued announcer lines (QA-2).
+- The exported exe shows all animals and items again; since 1.0.0 its sprite check missed the imported textures and dropped every kind.
 - Version raised to 1.2.0 in `project.godot` and `export_presets.cfg`.
 
 ### Known limitations
