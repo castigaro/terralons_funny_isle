@@ -1,4 +1,4 @@
-# Terralon's Funny Isle 2
+# Terralon's Funny Isle
 
 ![Terralon's Funny Isle – five island levels full of chickens, pigs, monkeys and penguins](docs/splash.png)
 
